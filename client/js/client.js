@@ -1,33 +1,42 @@
-var Client = {};
-Client.socket = io('http://localhost:55000');
+class Client {
 
-Client.sendTest = function () {
-    console.log("test sent");
-    Client.socket.emit('test');
-};
+  constructor() {
+    console.log("in client constructor");
+    this.socket = io('http://localhost:55000');
 
-Client.askNewPlayer = function () {
-    Client.socket.emit('newplayer');
-};
+    this.socket.on('newplayer', function(data) {
+      addNewPlayer(data.id, data.x, data.y);
+    });
 
-Client.sendClick = function (x, y) {
-    Client.socket.emit('click', { x: x, y: y });
-};
-
-Client.socket.on('newplayer', function (data) {
-    addNewPlayer(data.id, data.x, data.y);
-});
-
-Client.socket.on('allplayers', function (data) {
-    for (var i = 0; i < data.length; i++) {
+    this.socket.on('allplayers', function(data) {
+      for (var i = 0; i < data.length; i++) {
         addNewPlayer(data[i].id, data[i].x, data[i].y);
-    }
+      }
 
-    Client.socket.on('move', function (data) {
+      this.socket.on('move', function(data) {
         movePlayer(data.id, data.x, data.y);
-    });
+      });
 
-    Client.socket.on('remove', function (id) {
+      this.socket.on('remove', function(id) {
         removePlayer(id);
+      });
     });
-});
+  }
+
+  sendTest() {
+    console.log("Test Sent");
+    this.socket.emit('test');
+  }
+
+  askNewPlayer() {
+    this.socket.emit('newplayer');
+  }
+
+  sendClick(x, y) {
+    this.socket.emit('click', {
+      x: x,
+      y: y
+    });
+  }
+
+}
