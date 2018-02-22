@@ -2,7 +2,7 @@ class Client {
 
   constructor() {
     console.log("in client constructor");
-    this.socket = io('http://localhost:55000');
+    this.socket = io(location.hostname + ':55000');
     this.newPlayer();
     this.allPlayers();
   }
