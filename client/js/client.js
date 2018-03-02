@@ -52,4 +52,10 @@ class Client {
     });
   }
 
+  sendCursor(direction) {
+    this.socket.emit('movement', {
+      direction: direction
+    });
+  }
+
 }

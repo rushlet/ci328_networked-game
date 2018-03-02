@@ -8,7 +8,8 @@ function main() {
   // Initialize the phaser game window, give it a width of GAMEWIDTH and a height of GAMEHEIGHT, set the rendering context to auto and attach the window to a div with the ID "GameWindow"
   game = new Phaser.Game(GAMEWIDTH, GAMEHEIGHT, Phaser.AUTO, 'GameWindow', {
     preload: preload,
-    create: create
+    create: create,
+    update: update
   });
 }
 
@@ -28,8 +29,20 @@ function create() {
   console.log("Testing Server Connection");
   client.sendTest();
 
-  game.input.onTap.add(getCoordinates, this);
+  game.cursors = game.input.keyboard.createCursorKeys();
+
   client.askNewPlayer();
+}
+
+function update() {
+  var currentKey;
+  var directions = ["up", "down", "left", "right"];
+  directions.forEach((direction) => {
+    if (game.cursors[direction].isDown && currentKey != direction) {
+      client.sendCursor(direction);
+      currentKey = direction;
+    }
+  });
 }
 
 function getCoordinates(pointer) {

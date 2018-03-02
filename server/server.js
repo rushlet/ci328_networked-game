@@ -25,6 +25,26 @@ io.on('connection', function(client) {
       io.emit('move', client.player);
     });
 
+    client.on('movement', function(data) {
+      console.log('moving ' + data.direction);
+      switch (data.direction) {
+        case "left":
+          client.player.x -= 3;
+          break;
+        case "right":
+          client.player.x += 3;
+          break;
+        case "up":
+          client.player.y -= 3;
+          break;
+        case "down":
+          client.player.y += 3;
+          break;
+        default:
+      }
+      io.emit('move', client.player);
+    });
+
     client.on('disconnect', function() {
       io.emit('remove', client.player.id);
       console.log('disconnecting: ' + client.player.id);
