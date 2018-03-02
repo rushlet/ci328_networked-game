@@ -21,7 +21,7 @@
         {
          "columns":8,
          "firstgid":1,
-         "image":"..\/..\/..\/Downloads\/template.png",
+         "image":"./maze-template.png",
          "imageheight":256,
          "imagewidth":256,
          "margin":0,
@@ -30,7 +30,7 @@
          "tilecount":64,
          "tileheight":32,
          "tilewidth":32
-        }, 
+        },
         {
          "firstgid":65,
          "source":"jungle tileset.tsx"
