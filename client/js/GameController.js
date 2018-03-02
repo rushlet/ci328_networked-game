@@ -14,34 +14,25 @@ function main() {
 }
 
 function preload() {
-  console.log("preload()");
   game.load.image('sprite', 'assets/coin.png');
   game.load.tilemap('map1', 'assets/maps/map-template.json', null, Phaser.Tilemap.TILED_JSON);
   game.load.image('maze-template', 'assets/maps/maze-template.png');
 }
 
 function create() {
-  console.log("create()");
-
   game.stage.disableVisibilityChange = true;
   game.playerMap = {};
 
-  console.log("Creating Client Object");
   client = new Client();
-  console.log("Testing Server Connection");
   client.sendTest();
 
   game.cursors = game.input.keyboard.createCursorKeys();
 
+  game.physics.startSystem(Phaser.Physics.ARCADE);
+
   client.askNewPlayer();
 
-  // gameWorld = new GameWorld;
-  // gameWorld.createMap("map1");
-  var map = game.add.tilemap('map1');
-  map.addTilesetImage('maze-template');
-  // map.setCollisionBetween(1, 12);
-  var layer = map.createLayer('Tile Layer 1');
-  layer.resizeWorld();
+  gameWorld = new GameWorld;
 }
 
 function update() {
@@ -53,6 +44,7 @@ function update() {
       currentKey = direction;
     }
   });
+  handleCollisions();
 }
 
 function getCoordinates(pointer) {
@@ -60,7 +52,12 @@ function getCoordinates(pointer) {
 }
 
 function addNewPlayer(id, x, y) {
+  console.log('add player');
   game.playerMap[id] = game.add.sprite(x, y, 'sprite');
+  game.physics.arcade.enable(game.playerMap[id]);
+  game.playerMap[id].enableBody = true;
+  game.playerMap[id].physicsBodyType = Phaser.Physics.ARCADE;
+  game.playerMap[id].body.collideWorldBounds = true;
 }
 
 function movePlayer(id, x, y) {
@@ -78,4 +75,11 @@ function movePlayer(id, x, y) {
 function removePlayer(id) {
   game.playerMap[id].destroy();
   delete game.playerMap[id];
+}
+
+function handleCollisions() {
+  let playerIds = Object.keys(game.playerMap);
+  playerIds.forEach((id) => {
+    game.physics.arcade.collide(game.playerMap[id], gameWorld.layer);
+  });
 }
