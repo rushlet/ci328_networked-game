@@ -29,7 +29,6 @@ function create() {
   console.log("Testing Server Connection");
   client.sendTest();
 
-  // game.input.onTap.add(getCoordinates, this);
   game.cursors = game.input.keyboard.createCursorKeys();
 
   client.askNewPlayer();
@@ -41,15 +40,15 @@ function update() {
           client.sendCursor("left");
           currentKey = "left";
      }
-     else if (game.cursors.right.isDown) {
+     else if (game.cursors.right.isDown && currentKey !== "right") {
          client.sendCursor("right");
          currentKey = "right";
      }
-     else if (game.cursors.up.isDown) {
+     else if (game.cursors.up.isDown && currentKey !== "up") {
          client.sendCursor("up");
          currentKey = "up";
      }
-     else if (game.cursors.down.isDown) {
+     else if (game.cursors.down.isDown && currentKey !== "down") {
          client.sendCursor("down");
          currentKey = "down";
      }
