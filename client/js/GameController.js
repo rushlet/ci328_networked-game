@@ -36,22 +36,13 @@ function create() {
 
 function update() {
   var currentKey;
-  if (game.cursors.left.isDown && currentKey !== "left") {
-          client.sendCursor("left");
-          currentKey = "left";
-     }
-     else if (game.cursors.right.isDown && currentKey !== "right") {
-         client.sendCursor("right");
-         currentKey = "right";
-     }
-     else if (game.cursors.up.isDown && currentKey !== "up") {
-         client.sendCursor("up");
-         currentKey = "up";
-     }
-     else if (game.cursors.down.isDown && currentKey !== "down") {
-         client.sendCursor("down");
-         currentKey = "down";
-     }
+  var directions = ["up", "down", "left", "right"];
+  directions.forEach((direction) => {
+    if (game.cursors[direction].isDown && currentKey != direction) {
+      client.sendCursor(direction);
+      currentKey = direction;
+    }
+  });
 }
 
 function getCoordinates(pointer) {
