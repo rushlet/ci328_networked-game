@@ -36,17 +36,22 @@ function create() {
 }
 
 function update() {
-  if (game.cursors.left.isDown) {
+  var currentKey;
+  if (game.cursors.left.isDown && currentKey !== "left") {
           client.sendCursor("left");
+          currentKey = "left";
      }
      else if (game.cursors.right.isDown) {
          client.sendCursor("right");
+         currentKey = "right";
      }
      else if (game.cursors.up.isDown) {
          client.sendCursor("up");
+         currentKey = "up";
      }
      else if (game.cursors.down.isDown) {
          client.sendCursor("down");
+         currentKey = "down";
      }
 }
 
