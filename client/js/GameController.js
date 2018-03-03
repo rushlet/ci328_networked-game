@@ -88,16 +88,16 @@ function movePlayer(id, x, y, direction) {
   if (player.x !== x || player.y !== y) {
     switch (direction) {
       case "left":
-        game.playerMap[id].body.velocity.x = -3;
+        game.playerMap[id].body.velocity.x = -50;
         break;
       case "right":
-        game.playerMap[id].body.velocity.x += 3;
+        game.playerMap[id].body.velocity.x = 50;
         break;
       case "up":
-        game.playerMap[id].body.velocity.y = -3;
+        game.playerMap[id].body.velocity.y = -50;
         break;
       case "down":
-        game.playerMap[id].body.velocity.y += 3;
+        game.playerMap[id].body.velocity.y = 50;
         break;
       default:
         break;
@@ -120,5 +120,9 @@ function handleCollisions() {
 
 function log() {
   console.log("hit!");
-  // send mesage to server to update position
+  let playerIds = Object.keys(game.playerMap);
+  playerIds.forEach((id) => {
+    game.playerMap[id].body.velocity.x = 0;
+    game.playerMap[id].body.velocity.y = 0;
+  });
 }
