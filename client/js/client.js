@@ -25,8 +25,9 @@ class Client {
   }
 
   move() {
-    this.socket.on('move', function(data) {
-      movePlayer(data.id, data.x, data.y);
+    this.socket.on('move', function(data, direction) {
+      console.log('move ', direction);
+      movePlayer(data.id, data.x, data.y, direction);
     });
   }
 
