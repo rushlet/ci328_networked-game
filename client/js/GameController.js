@@ -32,22 +32,20 @@ function create() {
 
   client.askNewPlayer();
 
-  game.map = game.add.tilemap('map1');
-  game.layer = game.map.createLayer('map');
-  game.map.addTilesetImage('maze-template');
-  game.map.setCollisionByExclusion([10]);
-  game.layer.resizeWorld();
-  console.log(game.layer);
+  game.gameWorld = new GameWorld();
+  console.log(game.gameWorld);
+   //debugging tile map
   game.input.onDown.add(getTileProperties, this);
   // game.physics.arcade.gravity.y = 100;
   // game.map.setTileIndexCallback(45, log, this);
+
 }
 
 function getTileProperties() {
 
-  var x = game.layer.getTileX(game.input.activePointer.worldX);
-  var y = game.layer.getTileY(game.input.activePointer.worldY);
-  console.log(game.map.getTile(x, y, game.layer));
+  var x = game.gameWorld.layer.getTileX(game.input.activePointer.worldX);
+  var y = game.gameWorld.layer.getTileY(game.input.activePointer.worldY);
+  console.log(game.gameWorld.map.getTile(x, y, game.gameWorld.layer));
 }
 
 function update() {
@@ -89,15 +87,19 @@ function movePlayer(id, x, y, direction) {
     switch (direction) {
       case "left":
         game.playerMap[id].body.velocity.x = -50;
+        game.playerMap[id].body.velocity.y = 0;
         break;
       case "right":
         game.playerMap[id].body.velocity.x = 50;
+        game.playerMap[id].body.velocity.y = 0;
         break;
       case "up":
         game.playerMap[id].body.velocity.y = -50;
+        game.playerMap[id].body.velocity.x = 0;
         break;
       case "down":
         game.playerMap[id].body.velocity.y = 50;
+        game.playerMap[id].body.velocity.x = 0;
         break;
       default:
         break;
@@ -113,7 +115,7 @@ function removePlayer(id) {
 function handleCollisions() {
   let playerIds = Object.keys(game.playerMap);
   playerIds.forEach((id) => {
-    game.physics.arcade.collide(game.playerMap[id], game.layer, log, null, this);
+    game.physics.arcade.collide(game.playerMap[id], game.gameWorld.layer, log, null, this);
     game.debug.body(game.playerMap[id], 'blue', false);
   });
 }
