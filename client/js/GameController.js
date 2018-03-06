@@ -25,38 +25,25 @@ function create() {
 
   client = new Client();
   client.sendTest();
+  client.askNewPlayer();
+  game.gameWorld = new GameWorld();
 
   game.cursors = game.input.keyboard.createCursorKeys();
-
   game.physics.startSystem(Phaser.Physics.ARCADE);
 
-  client.askNewPlayer();
 
-  game.gameWorld = new GameWorld();
-  console.log(game.gameWorld);
-   //debugging tile map
+  //enable tile debugging
   game.input.onDown.add(getTileProperties, this);
-  // game.physics.arcade.gravity.y = 100;
-  // game.map.setTileIndexCallback(45, log, this);
-
 }
 
 function getTileProperties() {
-
   var x = game.gameWorld.layer.getTileX(game.input.activePointer.worldX);
   var y = game.gameWorld.layer.getTileY(game.input.activePointer.worldY);
   console.log(game.gameWorld.map.getTile(x, y, game.gameWorld.layer));
 }
 
 function update() {
-  var currentKey;
-  var directions = ["up", "down", "left", "right"];
-  directions.forEach((direction) => {
-    if (game.cursors[direction].isDown && currentKey != direction) {
-      client.sendCursor(direction);
-      currentKey = direction;
-    }
-  });
+  handleMovement();
   handleCollisions();
 }
 
@@ -76,30 +63,24 @@ function addNewPlayer(id, x, y) {
 function movePlayer(id, x, y, direction) {
   var player = game.playerMap[id];
   var distance = Phaser.Math.distance(player.x, player.y, x, y);
-  // var tween = game.add.tween(player);
-  // var duration = distance * 10;
-  // tween.to({
-  //   x: x,
-  //   y: y
-  // }, duration);
-  // tween.start();
+
   if (player.x !== x || player.y !== y) {
     switch (direction) {
       case "left":
-        game.playerMap[id].body.velocity.x = -50;
-        game.playerMap[id].body.velocity.y = 0;
+        player.body.velocity.x = -50;
+        player.body.velocity.y = 0;
         break;
       case "right":
-        game.playerMap[id].body.velocity.x = 50;
-        game.playerMap[id].body.velocity.y = 0;
+        player.body.velocity.x = 50;
+        player.body.velocity.y = 0;
         break;
       case "up":
-        game.playerMap[id].body.velocity.y = -50;
-        game.playerMap[id].body.velocity.x = 0;
+        player.body.velocity.y = -50;
+        player.body.velocity.x = 0;
         break;
       case "down":
-        game.playerMap[id].body.velocity.y = 50;
-        game.playerMap[id].body.velocity.x = 0;
+        player.body.velocity.y = 50;
+        player.body.velocity.x = 0;
         break;
       default:
         break;
@@ -112,19 +93,29 @@ function removePlayer(id) {
   delete game.playerMap[id];
 }
 
+function handleMovement() {
+  var currentKey;
+  var directions = ["up", "down", "left", "right"];
+  directions.forEach((direction) => {
+    if (game.cursors[direction].isDown && currentKey != direction) {
+      client.sendCursor(direction);
+      currentKey = direction;
+    }
+  });
+}
+
 function handleCollisions() {
   let playerIds = Object.keys(game.playerMap);
   playerIds.forEach((id) => {
-    game.physics.arcade.collide(game.playerMap[id], game.gameWorld.layer, log, null, this);
+    game.physics.arcade.collide(game.playerMap[id], game.gameWorld.layer, () => {
+      playerWallCollision(game.playerMap[id])
+    }, null, this);
     game.debug.body(game.playerMap[id], 'blue', false);
   });
 }
 
-function log() {
+function playerWallCollision(player) {
   console.log("hit!");
-  let playerIds = Object.keys(game.playerMap);
-  playerIds.forEach((id) => {
-    game.playerMap[id].body.velocity.x = 0;
-    game.playerMap[id].body.velocity.y = 0;
-  });
+  player.body.velocity.x = 0;
+  player.body.velocity.y = 0;
 }
