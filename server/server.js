@@ -18,13 +18,6 @@ io.on('connection', function(client) {
     client.emit('allplayers', getAllPlayers());
     client.broadcast.emit('newplayer', client.player);
 
-    client.on('click', function(data) {
-      console.log('click to ' + data.x + ', ' + data.y);
-      client.player.x = data.x;
-      client.player.y = data.y;
-      io.emit('move', client.player);
-    });
-
     client.on('movement', function(data) {
       console.log('moving ' + data.direction);
       switch (data.direction) {
@@ -42,7 +35,8 @@ io.on('connection', function(client) {
           break;
         default:
       }
-      io.emit('move', client.player);
+      console.log(data.direction);
+      io.emit('move', client.player, data.direction);
     });
 
     client.on('disconnect', function() {
