@@ -13,17 +13,19 @@ io.on('connection', function(client) {
     client.player = {
       id: server.lastPlayerID++,
       x: randomInt(100, 400),
-      y: randomInt(100, 400)
+      y: randomInt(100, 400),
+      direction: ""
     };
     client.emit('allplayers', getAllPlayers());
     client.broadcast.emit('newplayer', client.player);
 
     client.on('movement', function(data) {
-      console.log('moving ' + data.direction);
       client.player.x = data.x;
       client.player.y = data.y;
-      console.log(data.direction);
-      io.emit('move', client.player, data.direction);
+      if (client.player.direction !== data.direction) {
+        client.player.direction = data.direction;
+        io.emit('move', client.player, data.direction);
+      }
     });
 
     client.on('disconnect', function() {
