@@ -2,6 +2,10 @@ class Client {
 
   constructor() {
     console.log("in client constructor");
+    this.ID;
+    this.x;
+    this.y;
+    this.currentKey;
     this.socket = io(location.hostname + ':55000');
     this.newPlayer();
     this.allPlayers();
@@ -18,6 +22,9 @@ class Client {
     this.socket.on('allplayers', function(data) {
       for (var i = 0; i < data.length; i++) {
         addNewPlayer(data[i].id, data[i].x, data[i].y);
+        client.ID = data[i].id;
+        client.x = data[i].x;
+        client.y = data[i].y;
       }
       client.move();
       client.remove();
@@ -26,8 +33,10 @@ class Client {
 
   move() {
     this.socket.on('move', function(data, direction) {
-      console.log('move ', direction);
-      movePlayer(data.id, data.x, data.y, direction);
+      if (client.ID != data.id) {
+              console.log('move ', direction);
+        movePlayer(data.id, direction, data.x, data.y);
+      }
     });
   }
 
@@ -53,9 +62,11 @@ class Client {
     });
   }
 
-  sendCursor(direction) {
+  updatePlayerInput(direction, x, y) {
     this.socket.emit('movement', {
-      direction: direction
+      direction: direction,
+      x: x,
+      y: y
     });
   }
 

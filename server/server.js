@@ -20,21 +20,8 @@ io.on('connection', function(client) {
 
     client.on('movement', function(data) {
       console.log('moving ' + data.direction);
-      switch (data.direction) {
-        case "left":
-          client.player.x -= 3;
-          break;
-        case "right":
-          client.player.x += 3;
-          break;
-        case "up":
-          client.player.y -= 3;
-          break;
-        case "down":
-          client.player.y += 3;
-          break;
-        default:
-      }
+      client.player.x = data.x;
+      client.player.y = data.y;
       console.log(data.direction);
       io.emit('move', client.player, data.direction);
     });

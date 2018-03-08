@@ -43,7 +43,10 @@ function getTileProperties() {
 }
 
 function update() {
-  handleMovement();
+  handleCursorInput();
+  if (game.playerMap[client.ID]) {
+    client.updatePlayerInput(client.currentKey, game.playerMap[client.ID].x, game.playerMap[client.ID].y);
+  }
   handleCollisions();
 }
 
@@ -60,31 +63,37 @@ function addNewPlayer(id, x, y) {
   game.playerMap[id].body.collideWorldBounds = true;
 }
 
-function movePlayer(id, x, y, direction) {
+function movePlayer(id, direction, x, y) {
+  console.log("Moving " + direction);
   var player = game.playerMap[id];
-  var distance = Phaser.Math.distance(player.x, player.y, x, y);
 
-  if (player.x !== x || player.y !== y) {
-    switch (direction) {
-      case "left":
-        player.body.velocity.x = -50;
-        player.body.velocity.y = 0;
-        break;
-      case "right":
-        player.body.velocity.x = 50;
-        player.body.velocity.y = 0;
-        break;
-      case "up":
-        player.body.velocity.y = -50;
-        player.body.velocity.x = 0;
-        break;
-      case "down":
-        player.body.velocity.y = 50;
-        player.body.velocity.x = 0;
-        break;
-      default:
-        break;
-    }
+  if (client.ID == id) {
+    client.x = player.x;
+    client.y = player.y;
+  } else {
+    player.x = x;
+    player.y = y;
+  }
+
+  switch (direction) {
+    case "left":
+      player.body.velocity.x = -50;
+      player.body.velocity.y = 0;
+      break;
+    case "right":
+      player.body.velocity.x = 50;
+      player.body.velocity.y = 0;
+      break;
+    case "up":
+      player.body.velocity.y = -50;
+      player.body.velocity.x = 0;
+      break;
+    case "down":
+      player.body.velocity.y = 50;
+      player.body.velocity.x = 0;
+      break;
+    default:
+      break;
   }
 }
 
@@ -93,13 +102,12 @@ function removePlayer(id) {
   delete game.playerMap[id];
 }
 
-function handleMovement() {
-  var currentKey;
+function handleCursorInput() {
   var directions = ["up", "down", "left", "right"];
   directions.forEach((direction) => {
-    if (game.cursors[direction].isDown && currentKey != direction) {
-      client.sendCursor(direction);
-      currentKey = direction;
+    if (game.cursors[direction].isDown && client.currentKey != direction) {
+      client.currentKey = direction;
+      movePlayer(client.ID, client.currentKey, client.x, client.y);
     }
   });
 }
@@ -118,4 +126,5 @@ function playerWallCollision(player) {
   console.log("hit!");
   player.body.velocity.x = 0;
   player.body.velocity.y = 0;
+  //client.updatePlayerInput( client.direction, game.playerMap[client.ID].body.x, game.playerMap[client.ID].body.y);
 }
