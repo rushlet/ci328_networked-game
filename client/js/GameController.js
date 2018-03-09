@@ -77,19 +77,19 @@ function movePlayer(id, direction, x, y) {
 
   switch (direction) {
     case "left":
-      player.body.velocity.x = -50;
+      player.body.velocity.x = -250;
       player.body.velocity.y = 0;
       break;
     case "right":
-      player.body.velocity.x = 50;
+      player.body.velocity.x = 250;
       player.body.velocity.y = 0;
       break;
     case "up":
-      player.body.velocity.y = -50;
+      player.body.velocity.y = -250;
       player.body.velocity.x = 0;
       break;
     case "down":
-      player.body.velocity.y = 50;
+      player.body.velocity.y = 250;
       player.body.velocity.x = 0;
       break;
     default:

@@ -20,6 +20,7 @@ class Client {
   allPlayers() {
     let client = this;
     this.socket.on('allplayers', function(data) {
+      console.log(data);
       for (var i = 0; i < data.length; i++) {
         addNewPlayer(data[i].id, data[i].x, data[i].y);
         client.ID = data[i].id;
