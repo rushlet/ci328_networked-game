@@ -2,7 +2,10 @@
 const PORT = 55000;
 var server = require('http').createServer();
 var io = require('socket.io')(server);
+var tilemapper = require('./utils/tilemap-array-generator.js');
+
 var entities = {};
+
 
 main();
 
@@ -12,6 +15,9 @@ function main() {
     client.on('test', function() {
       console.log('test received');
     });
+
+    var tilemap = tilemapper.create2dArrayFromTilemap(0); // number refers to which map to use
+    console.log(JSON.stringify(tilemap)); //using stringify to print to console in easy to read format, won't need to do this to use the tilemap.
 
     client.on('newplayer', function() {
       createEntity("players", server.lastPlayerID++, randomInt(100, 400), randomInt(100, 400));
@@ -33,6 +39,7 @@ function main() {
         //console.log('disconnecting: ' + client.player.id);
       });
     });
+
   });
 
   server.listen(PORT, function() {
