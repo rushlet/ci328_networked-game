@@ -26,5 +26,8 @@
   "homepage": "https://github.com/AlmasB/CI328#readme",
   "dependencies": {
     "socket.io": "^2.0.4"
+  },
+  "devDependencies": {
+    "console.table": "^0.10.0"
   }
 }
