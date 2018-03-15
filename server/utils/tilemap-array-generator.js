@@ -11,9 +11,11 @@ module.exports.create2dArrayFromTilemap = function(tilemapIndex) {
     if (x === 39) {
       output.push(row);
       row = [];
-      x = 0;
     }
     x++;
+    if (x == 40) {
+      x = 0;
+    }
   });
 
   return output;
