@@ -80,8 +80,8 @@ function randomInt(low, high) {
 }
 
 function initialPlayerPosition(tilemap) {
-  var y = randomInt(3, 19);
-  var x = randomInt(0, 39);
+  var y = randomInt(3, 18);
+  var x = randomInt(1, 38);
   var randomTile = tilemap[y][x];
   return {
     'worldX': x * 32,
