@@ -33,11 +33,8 @@ class Client {
   }
 
   move() {
-    this.socket.on('move', function(data, direction) {
-      if (client.ID != data.id) {
-              console.log('move ', direction);
-        movePlayer(data.id, direction, data.x, data.y);
-      }
+    this.socket.on('move', function(data) {
+      movePlayer(data.id, data.direction, data.x, data.y, data.expectedPosition.x, data.expectedPosition.y);
     });
   }
 
@@ -63,11 +60,12 @@ class Client {
     });
   }
 
-  updatePlayerInput(direction, x, y) {
+  updatePlayerInput(id, direction, x, y) {
     this.socket.emit('movement', {
       direction: direction,
       x: x,
-      y: y
+      y: y,
+      id: id
     });
   }
 

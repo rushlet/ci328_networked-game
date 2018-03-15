@@ -45,7 +45,7 @@ function getTileProperties() {
 function update() {
   handleCursorInput();
   if (game.playerMap[client.ID]) {
-    client.updatePlayerInput(client.currentKey, game.playerMap[client.ID].x, game.playerMap[client.ID].y);
+    client.updatePlayerInput(client.ID, client.currentKey, game.playerMap[client.ID].x, game.playerMap[client.ID].y);
   }
   handleCollisions();
 }
@@ -63,38 +63,14 @@ function addNewPlayer(id, x, y) {
   game.playerMap[id].body.collideWorldBounds = true;
 }
 
-function movePlayer(id, direction, x, y) {
+function movePlayer(id, direction, x, y, targetX, targetY) {
   console.log("Moving " + direction);
   var player = game.playerMap[id];
-
-  if (client.ID == id) {
-    client.x = player.x;
-    client.y = player.y;
-  } else {
-    player.x = x;
-    player.y = y;
-  }
-
-  switch (direction) {
-    case "left":
-      player.body.velocity.x = -250;
-      player.body.velocity.y = 0;
-      break;
-    case "right":
-      player.body.velocity.x = 250;
-      player.body.velocity.y = 0;
-      break;
-    case "up":
-      player.body.velocity.y = -250;
-      player.body.velocity.x = 0;
-      break;
-    case "down":
-      player.body.velocity.y = 250;
-      player.body.velocity.x = 0;
-      break;
-    default:
-      break;
-  }
+  var tween = game.add.tween(player);
+  var duration = 320;
+  console.log(id, direction, x, y, targetX, targetY);
+  tween.to({ x: targetX, y: targetY }, duration);
+  tween.start();
 }
 
 function removePlayer(id) {
@@ -107,7 +83,7 @@ function handleCursorInput() {
   directions.forEach((direction) => {
     if (game.cursors[direction].isDown && client.currentKey != direction) {
       client.currentKey = direction;
-      movePlayer(client.ID, client.currentKey, client.x, client.y);
+      // movePlayer(client.ID, client.currentKey, client.x, client.y);
     }
   });
 }

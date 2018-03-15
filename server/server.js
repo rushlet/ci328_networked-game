@@ -30,12 +30,51 @@ function main() {
       client.broadcast.emit('newplayer', entities.players[server.lastPlayerID]);
 
       client.on('movement', function(data) {
-        /*client.player.x = data.x;
-        client.player.y = data.y;
-        if (client.player.direction !== data.direction) {
-          client.player.direction = data.direction;
-          io.emit('move', client.player, data.direction);
-        }*/
+        var player = entities.players[data.id];
+        var currentX = player.x / 32;
+        var currentY = player.y /32;
+        if (data.direction !== player.direction) {
+          player.direction = data.direction;
+          switch (data.direction) {
+            case "left":
+              if (tilemap[currentY][currentX -1] === 10) {
+                player.expectedPosition.x -= 32;
+                io.emit('move', player);
+              } else {
+                // emit not valid
+              }
+              break;
+            case "right":
+              if (tilemap[currentY][currentX +1] === 10) {
+                player.expectedPosition.x += 32;
+                io.emit('move', player);
+                //emit valid
+              } else {
+                // emit not valid
+              }
+              break;
+            case "up":
+              if (tilemap[currentY -1][currentX] === 10) {
+                player.expectedPosition.y -= 32;
+                io.emit('move', player);
+                //emit valid
+              } else {
+                // emit not valid
+              }
+              break;
+            case "down":
+              if (tilemap[currentY +1][currentX] === 10) {
+                player.expectedPosition.y += 32;
+                io.emit('move', player);
+                //emit valid
+              } else {
+                // emit not valid
+              }
+              break;
+            default:
+              break;
+          }
+        }
       });
 
       client.on('disconnect', function() {
@@ -63,6 +102,10 @@ function createEntity(type, id, x, y) {
   }
   if (type === "players") {
     entities[type][id]["direction"] = "";
+    entities[type][id]["expectedPosition"] = {
+      x: x,
+      y: y
+    };
   }
 }
 
