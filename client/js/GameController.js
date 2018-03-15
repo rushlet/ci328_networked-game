@@ -63,14 +63,18 @@ function addNewPlayer(id, x, y) {
   game.playerMap[id].body.collideWorldBounds = true;
 }
 
-function movePlayer(id, direction, x, y, targetX, targetY) {
-  console.log("Moving " + direction);
+function movePlayer(id, targetX, targetY) {
   var player = game.playerMap[id];
   var tween = game.add.tween(player);
   var duration = 320;
-  console.log(id, direction, x, y, targetX, targetY);
-  tween.to({ x: targetX, y: targetY }, duration);
+  tween.to({
+    x: targetX,
+    y: targetY
+  }, duration);
   tween.start();
+  tween.onComplete.add(() => {
+    client.targetReached()
+  });
 }
 
 function removePlayer(id) {
@@ -83,7 +87,7 @@ function handleCursorInput() {
   directions.forEach((direction) => {
     if (game.cursors[direction].isDown && client.currentKey != direction) {
       client.currentKey = direction;
-      // movePlayer(client.ID, client.currentKey, client.x, client.y);
+
     }
   });
 }

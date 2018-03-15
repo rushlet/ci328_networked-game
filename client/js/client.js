@@ -34,7 +34,14 @@ class Client {
 
   move() {
     this.socket.on('move', function(data) {
-      movePlayer(data.id, data.direction, data.x, data.y, data.expectedPosition.x, data.expectedPosition.y);
+      movePlayer(data.id, data.expectedPosition.x, data.expectedPosition.y);
+    });
+  }
+
+  targetReached(){
+    console.log("Target Reached");
+    this.socket.emit('targetReached',{
+      id: client.ID
     });
   }
 

@@ -33,7 +33,7 @@ function main() {
         var player = entities.players[data.id];
         var currentX = player.x / 32;
         var currentY = player.y /32;
-        if (data.direction !== player.direction) {
+        if (player.x === player.expectedPosition.x && player.y === player.expectedPosition.y) {
           player.direction = data.direction;
           switch (data.direction) {
             case "left":
@@ -77,6 +77,13 @@ function main() {
         }
       });
 
+      client.on('targetReached', function(data){
+        console.log("target Reached");
+        var player = entities.players[data.id];
+        player.x = player.expectedPosition.x;
+        player.y = player.expectedPosition.y;
+      });
+
       client.on('disconnect', function() {
         //io.emit('remove', client.player.id);
         //console.log('disconnecting: ' + client.player.id);
@@ -93,7 +100,7 @@ function main() {
 }
 
 function createEntity(type, id, x, y) {
-  console.log("Creating Entity:" + type);
+  console.log("Creating Entity: " + type + " ID: " + id);
   entities[type] = {};
   entities[type][id] = {
     id: id,
