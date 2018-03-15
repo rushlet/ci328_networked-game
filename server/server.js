@@ -1,4 +1,5 @@
 //Global Vaiables
+require('console.table');
 const PORT = 55000;
 var server = require('http').createServer();
 var io = require('socket.io')(server);
@@ -16,11 +17,14 @@ function main() {
       console.log('test received');
     });
 
-    var tilemap = tilemapper.create2dArrayFromTilemap(0); // number refers to which map to use
-    console.log(JSON.stringify(tilemap)); //using stringify to print to console in easy to read format, won't need to do this to use the tilemap.
+    var tilemap = tilemapper.create2dArrayFromTilemap(0); // number refers to which map to use, can be randomly generated when we have multiple maps
 
     client.on('newplayer', function() {
-      createEntity("players", server.lastPlayerID++, randomInt(100, 400), randomInt(100, 400));
+      playerPosition = initialPlayerPosition(tilemap);
+      if (playerPosition.tileId !== 10) { //tried to make it recursive but returned wrong data, so using this check for now
+        playerPosition = initialPlayerPosition(tilemap);
+      }
+      createEntity("players", server.lastPlayerID++, playerPosition.worldX, playerPosition.worldY);
 
       client.emit('allplayers', getAllPlayers());
       client.broadcast.emit('newplayer', entities.players[server.lastPlayerID]);
@@ -73,4 +77,17 @@ function getAllPlayers() {
 
 function randomInt(low, high) {
   return Math.floor(Math.random() * (high - low) + low);
+}
+
+function initialPlayerPosition(tilemap) {
+  var y = randomInt(3, 19);
+  var x = randomInt(0, 39);
+  var randomTile = tilemap[y][x];
+  return {
+    'worldX': x * 32,
+    'worldY': y * 32,
+    'tileId': randomTile,
+    'arrayX': x, // not sure if we need these?
+    'arrayY': y,
+  };
 }
