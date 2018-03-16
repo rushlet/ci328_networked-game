@@ -34,15 +34,14 @@ function main() {
       lastPlayerID++;
 
       client.on('movement', function(data) {
-        console.log("Movement ID" + data.id);
         var player = entities.players[data.id];
         var currentX = player.x / 32;
-        var currentY = player.y /32;
+        var currentY = player.y / 32;
         if (player.x === player.expectedPosition.x && player.y === player.expectedPosition.y) {
           player.direction = data.direction;
           switch (data.direction) {
             case "left":
-              if (tilemap[currentY][currentX -1] === 10) {
+              if (tilemap[currentY][currentX - 1] === 10) {
                 player.expectedPosition.x -= 32;
                 io.emit('move', player);
               } else {
@@ -50,7 +49,7 @@ function main() {
               }
               break;
             case "right":
-              if (tilemap[currentY][currentX +1] === 10) {
+              if (tilemap[currentY][currentX + 1] === 10) {
                 player.expectedPosition.x += 32;
                 io.emit('move', player);
                 //emit valid
@@ -59,7 +58,7 @@ function main() {
               }
               break;
             case "up":
-              if (tilemap[currentY -1][currentX] === 10) {
+              if (tilemap[currentY - 1][currentX] === 10) {
                 player.expectedPosition.y -= 32;
                 io.emit('move', player);
                 //emit valid
@@ -68,7 +67,7 @@ function main() {
               }
               break;
             case "down":
-              if (tilemap[currentY +1][currentX] === 10) {
+              if (tilemap[currentY + 1][currentX] === 10) {
                 player.expectedPosition.y += 32;
                 io.emit('move', player);
                 //emit valid
@@ -82,7 +81,7 @@ function main() {
         }
       });
 
-      client.on('targetReached', function(data){
+      client.on('targetReached', function(data) {
         var player = entities.players[data.id];
         player.x = player.expectedPosition.x;
         player.y = player.expectedPosition.y;

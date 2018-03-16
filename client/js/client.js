@@ -1,19 +1,16 @@
 class Client {
 
   constructor() {
-    console.log("in client constructor");
     this.ID;
-    this.x;
-    this.y;
-    this.currentKey;
+    this.direction;
     this.socket = io(location.hostname + ':55000');
     this.newPlayer();
     this.allPlayers();
   }
 
+  // Client Socket On Functions
   newPlayer() {
     this.socket.on('newplayer', function(data) {
-      console.log(data);
       addNewPlayer(data.id, data.x, data.y);
     });
   }
@@ -21,12 +18,9 @@ class Client {
   allPlayers() {
     let client = this;
     this.socket.on('allplayers', function(data) {
-      console.log(data);
       for (var i = 0; i < data.length; i++) {
         addNewPlayer(data[i].id, data[i].x, data[i].y);
         client.ID = data[i].id;
-        client.x = data[i].x;
-        client.y = data[i].y;
       }
       client.move();
       client.remove();
@@ -39,42 +33,31 @@ class Client {
     });
   }
 
-  targetReached(){
-    console.log("Target Reached");
-    this.socket.emit('targetReached',{
-      id: client.ID
-    });
-  }
-
   remove() {
     this.socket.on('remove', function(id) {
       removePlayer(id);
     });
   }
 
+  // Client Emit Functions
   sendTest() {
-    console.log("Test Sent");
     this.socket.emit('test');
   }
 
-  askNewPlayer() {
+  addClientToServer() {
     this.socket.emit('newplayer');
   }
 
-  sendClick(x, y) {
-    this.socket.emit('click', {
-      x: x,
-      y: y
+  updatePlayerInput(id, direction) {
+    this.socket.emit('movement', {
+      direction: direction,
+      id: id
     });
   }
 
-  updatePlayerInput(id, direction, x, y) {
-    console.log("update ID:" + id);
-    this.socket.emit('movement', {
-      direction: direction,
-      x: x,
-      y: y,
-      id: id
+  targetReached() {
+    this.socket.emit('targetReached', {
+      id: client.ID
     });
   }
 
