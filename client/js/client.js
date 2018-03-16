@@ -13,6 +13,7 @@ class Client {
 
   newPlayer() {
     this.socket.on('newplayer', function(data) {
+      console.log(data);
       addNewPlayer(data.id, data.x, data.y);
     });
   }
@@ -68,6 +69,7 @@ class Client {
   }
 
   updatePlayerInput(id, direction, x, y) {
+    console.log("update ID:" + id);
     this.socket.emit('movement', {
       direction: direction,
       x: x,

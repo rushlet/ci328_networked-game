@@ -4,8 +4,10 @@ const PORT = 55000;
 var server = require('http').createServer();
 var io = require('socket.io')(server);
 var tilemapper = require('./utils/tilemap-array-generator.js');
-
-var entities = {};
+var lastPlayerID = 1;
+var entities = {
+  players: {}
+};
 
 
 main();
@@ -24,12 +26,15 @@ function main() {
       if (playerPosition.tileId !== 10) { //tried to make it recursive but returned wrong data, so using this check for now
         playerPosition = initialPlayerPosition(tilemap);
       }
-      createEntity("players", server.lastPlayerID++, playerPosition.worldX, playerPosition.worldY);
 
+      createEntity("players", lastPlayerID, playerPosition.worldX, playerPosition.worldY);
       client.emit('allplayers', getAllPlayers());
-      client.broadcast.emit('newplayer', entities.players[server.lastPlayerID]);
+      client.broadcast.emit('newplayer', entities.players[lastPlayerID]);
+      client.playerId = lastPlayerID;
+      lastPlayerID++;
 
       client.on('movement', function(data) {
+        console.log("Movement ID" + data.id);
         var player = entities.players[data.id];
         var currentX = player.x / 32;
         var currentY = player.y /32;
@@ -78,14 +83,14 @@ function main() {
       });
 
       client.on('targetReached', function(data){
-        console.log("target Reached");
         var player = entities.players[data.id];
         player.x = player.expectedPosition.x;
         player.y = player.expectedPosition.y;
       });
 
       client.on('disconnect', function() {
-        //io.emit('remove', client.player.id);
+        io.emit('remove', client.playerId);
+        delete entities.players[client.playerId];
         //console.log('disconnecting: ' + client.player.id);
       });
     });
@@ -96,12 +101,10 @@ function main() {
     console.log('Listening on ' + server.address().port);
   });
 
-  server.lastPlayerID = 0;
 }
 
 function createEntity(type, id, x, y) {
   console.log("Creating Entity: " + type + " ID: " + id);
-  entities[type] = {};
   entities[type][id] = {
     id: id,
     x: x,
