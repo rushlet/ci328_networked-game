@@ -44,35 +44,24 @@ function main() {
               if (tilemap[currentY][currentX - 1] === 10) {
                 player.expectedPosition.x -= 32;
                 io.emit('move', player);
-              } else {
-                // emit not valid
               }
               break;
             case "right":
               if (tilemap[currentY][currentX + 1] === 10) {
                 player.expectedPosition.x += 32;
                 io.emit('move', player);
-                //emit valid
-              } else {
-                // emit not valid
               }
               break;
             case "up":
               if (tilemap[currentY - 1][currentX] === 10) {
                 player.expectedPosition.y -= 32;
                 io.emit('move', player);
-                //emit valid
-              } else {
-                // emit not valid
               }
               break;
             case "down":
               if (tilemap[currentY + 1][currentX] === 10) {
                 player.expectedPosition.y += 32;
                 io.emit('move', player);
-                //emit valid
-              } else {
-                // emit not valid
               }
               break;
             default:
@@ -90,7 +79,6 @@ function main() {
       client.on('disconnect', function() {
         io.emit('remove', client.playerId);
         delete entities.players[client.playerId];
-        //console.log('disconnecting: ' + client.player.id);
       });
     });
 
@@ -139,7 +127,5 @@ function initialPlayerPosition(tilemap) {
     'worldX': x * 32,
     'worldY': y * 32,
     'tileId': randomTile,
-    'arrayX': x, // not sure if we need these?
-    'arrayY': y,
   };
 }
