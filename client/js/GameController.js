@@ -15,7 +15,7 @@ function main() {
 
 function preload() {
   game.load.image('sprite', 'assets/coin.png');
-  game.load.tilemap('map1', 'assets/maps/map-demo.json', null, Phaser.Tilemap.TILED_JSON);
+  game.load.tilemap('map1', 'assets/maps/tilemap.json', null, Phaser.Tilemap.TILED_JSON);
   game.load.image('maze-template', 'assets/maps/maze-template.png');
 }
 
@@ -25,12 +25,11 @@ function create() {
 
   client = new Client();
   client.sendTest();
-  client.askNewPlayer();
+  client.addClientToServer();
   game.gameWorld = new GameWorld();
 
   game.cursors = game.input.keyboard.createCursorKeys();
   game.physics.startSystem(Phaser.Physics.ARCADE);
-
 
   //enable tile debugging
   game.input.onDown.add(getTileProperties, this);
@@ -43,8 +42,10 @@ function getTileProperties() {
 }
 
 function update() {
-  handleMovement();
-  handleCollisions();
+  handleCursorInput();
+  if (game.playerMap[client.ID]) {
+    client.updatePlayerInput(client.ID, client.direction);
+  }
 }
 
 function getCoordinates(pointer) {
@@ -52,40 +53,21 @@ function getCoordinates(pointer) {
 }
 
 function addNewPlayer(id, x, y) {
-  console.log('add player');
   game.playerMap[id] = game.add.sprite(x, y, 'sprite');
-  game.physics.arcade.enable(game.playerMap[id]);
-  game.playerMap[id].enableBody = true;
-  game.playerMap[id].physicsBodyType = Phaser.Physics.ARCADE;
-  game.playerMap[id].body.collideWorldBounds = true;
 }
 
-function movePlayer(id, x, y, direction) {
+function movePlayer(id, targetX, targetY) {
   var player = game.playerMap[id];
-  var distance = Phaser.Math.distance(player.x, player.y, x, y);
-
-  if (player.x !== x || player.y !== y) {
-    switch (direction) {
-      case "left":
-        player.body.velocity.x = -50;
-        player.body.velocity.y = 0;
-        break;
-      case "right":
-        player.body.velocity.x = 50;
-        player.body.velocity.y = 0;
-        break;
-      case "up":
-        player.body.velocity.y = -50;
-        player.body.velocity.x = 0;
-        break;
-      case "down":
-        player.body.velocity.y = 50;
-        player.body.velocity.x = 0;
-        break;
-      default:
-        break;
-    }
-  }
+  var tween = game.add.tween(player);
+  var duration = 320;
+  tween.to({
+    x: targetX,
+    y: targetY
+  }, duration);
+  tween.start();
+  tween.onComplete.add(() => {
+    client.targetReached()
+  });
 }
 
 function removePlayer(id) {
@@ -93,29 +75,11 @@ function removePlayer(id) {
   delete game.playerMap[id];
 }
 
-function handleMovement() {
-  var currentKey;
+function handleCursorInput() {
   var directions = ["up", "down", "left", "right"];
   directions.forEach((direction) => {
-    if (game.cursors[direction].isDown && currentKey != direction) {
-      client.sendCursor(direction);
-      currentKey = direction;
+    if (game.cursors[direction].isDown && client.direction != direction) {
+      client.direction = direction;
     }
   });
-}
-
-function handleCollisions() {
-  let playerIds = Object.keys(game.playerMap);
-  playerIds.forEach((id) => {
-    game.physics.arcade.collide(game.playerMap[id], game.gameWorld.layer, () => {
-      playerWallCollision(game.playerMap[id])
-    }, null, this);
-    game.debug.body(game.playerMap[id], 'blue', false);
-  });
-}
-
-function playerWallCollision(player) {
-  console.log("hit!");
-  player.body.velocity.x = 0;
-  player.body.velocity.y = 0;
 }
