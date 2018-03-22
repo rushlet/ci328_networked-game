@@ -9,7 +9,6 @@ var entities = {
   players: {}
 };
 
-
 main();
 
 function main() {
@@ -33,6 +32,14 @@ function main() {
       entities.players[client.playerId].ready = true;
       if (checkAllReady() && Object.keys(entities.players).length > 1) {
         console.log("All players ready");
+        client.emit('loadGame');
+        client.broadcast.emit('loadGame');
+      }
+    });
+
+    client.on('gameLoaded', function(){
+      entities.players[client.playerId].gameReady = true;
+      if (checkAllGameReady()) {
         client.emit('startGame');
         client.broadcast.emit('startGame');
       }
@@ -108,6 +115,16 @@ function main() {
 
 }
 
+function checkAllGameReady() {
+  var ready = true;
+  Object.keys(entities.players).forEach(function(id) {
+    if (!entities.players[id].gameReady) {
+      ready = false;
+    }
+  });
+  return ready;
+}
+
 function checkAllReady() {
   var ready = true;
   Object.keys(entities.players).forEach(function(id) {
@@ -132,6 +149,7 @@ function createEntity(type, id, x, y) {
       y: y
     };
     entities[type][id]["ready"] = false;
+    entities[type][id]["gameReady"] = false;
   }
 }
 

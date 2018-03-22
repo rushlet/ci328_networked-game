@@ -37,8 +37,8 @@ class SceneController {
         break;
       case "InGame":
         this.showUI("InGame");
-        client.addClientToServer();
         game.gameWorld = new GameWorld();
+        client.addClientToServer();
         break;
       case "GameOver":
         this.showUI("InGame");

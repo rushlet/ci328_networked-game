@@ -7,6 +7,7 @@ class Client {
     this.allPlayers();
     this.setID();
     this.startGame();
+    this.loadGame();
   }
 
   // Client Socket On Functions
@@ -49,7 +50,14 @@ class Client {
 
   startGame(){
     this.socket.on('startGame', function(){
+      game.gameReady = true;
+    });
+  }
+
+  loadGame(){
+    this.socket.on('loadGame', function(){
       sceneController.setScreen("InGame");
+      client.gameLoaded();
     });
   }
 
@@ -76,6 +84,10 @@ class Client {
 
   playerReady(){
     this.socket.emit('playerReady');
+  }
+
+  gameLoaded(){
+    this.socket.emit('gameLoaded');
   }
 
 }

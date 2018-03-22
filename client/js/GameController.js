@@ -22,7 +22,7 @@ function preload() {
 function create() {
   game.stage.disableVisibilityChange = true;
   game.playerMap = {};
-  game.gameStartTimer = 0;
+  game.gameReady = false;
 
   client = new Client();
   client.sendTest();
@@ -32,12 +32,11 @@ function create() {
 }
 
 function update() {
-  if (sceneController.screen === "InGame") {
-    game.gameStartTimer++;
-    if (game.gameStartTimer / 60 > 3) {
+  // if everyone ready
+  if (game.gameReady) {
       handleCursorInput();
       client.updatePlayerInput(client.direction);
-    }
+
   }
 }
 
