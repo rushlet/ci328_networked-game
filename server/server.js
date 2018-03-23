@@ -1,5 +1,4 @@
 //Global Vaiables
-require('console.table');
 const PORT = 55000;
 var server = require('http').createServer();
 var io = require('socket.io')(server);
