@@ -1,13 +1,15 @@
 //Global Vaiables
-require('console.table');
 const PORT = 55000;
 var server = require('http').createServer();
 var io = require('socket.io')(server);
 var tilemapper = require('./utils/tilemap-array-generator.js');
 var lastPlayerID = 1;
 var entities = {
-  players: {}
+  players: {},
+  dots: {},
+  powerups: {}
 };
+var gameReady = false;
 
 main();
 
@@ -37,11 +39,13 @@ function main() {
       }
     });
 
-    client.on('gameLoaded', function(){
+    client.on('gameLoaded', function() {
       entities.players[client.playerId].gameReady = true;
       if (checkAllGameReady()) {
         client.emit('startGame');
         client.broadcast.emit('startGame');
+        gameReady = true;
+        gameLoop();
       }
     });
 
@@ -58,8 +62,7 @@ function main() {
       client.broadcast.emit('newplayer', entities.players[client.playerId]);
 
       client.on('movement', function(direction) {
-        console.log("Player " + client.playerId + " is moving " + direction);
-        var player = entities.players[client.playerId ];
+        var player = entities.players[client.playerId];
         var currentX = player.x / 32;
         var currentY = player.y / 32;
         if (player.x === player.expectedPosition.x && player.y === player.expectedPosition.y) {
@@ -92,11 +95,12 @@ function main() {
             default:
               break;
           }
+          checkCollisions(player);
         }
       });
 
       client.on('targetReached', function() {
-        var player = entities.players[client.playerId ];
+        var player = entities.players[client.playerId];
         player.x = player.expectedPosition.x;
         player.y = player.expectedPosition.y;
       });
@@ -106,7 +110,6 @@ function main() {
         delete entities.players[client.playerId];
       });
     });
-
   });
 
   server.listen(PORT, function() {
@@ -114,6 +117,38 @@ function main() {
   });
 
 }
+
+function gameLoop() {
+  /*var countdown = 120000;
+  setInterval(function() {
+    countdown--;
+    io.sockets.emit('timer', {
+      countdown: countdown
+    });
+  }, 120000);*/
+
+  // while (gameReady) {
+  //   //generatedots();
+  //   //generatepowerups();
+  // }
+}
+
+function generateDots(){
+  //check how many dots already exist
+  //if less than 5 then create new dot (in valid location)
+  //tell clients of new dots
+}
+
+function checkCollisions(player) {
+  Object.keys(entities.players).forEach(function(id) {
+    if(id != player.id) {
+      if(player.x === entities.players[id].x && player.y === entities.players[id].y) {
+        console.log("Player Collision");
+      }
+    }
+  });
+}
+
 
 function checkAllGameReady() {
   var ready = true;
