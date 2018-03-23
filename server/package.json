@@ -1,33 +1,27 @@
 {
-  "name": "ci328-mp",
+  "name": "croaked_server",
   "version": "1.0.0",
-  "description": " Sem2 code example ",
+  "description": "server package for croaked ci328 coursework",
   "main": "server.js",
+  "dependencies": {
+    "console.table": "^0.10.0"
+  },
+  "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \\\"Error: no test specified\\\" && exit 1",
     "start": "node server.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AlmasB/CI328.git"
+    "url": "git+https://github.com/rushlet/ci328_networked-game.git"
   },
-  "keywords": [
-    "Phaser",
-    "Multiplayer",
-    "game",
-    "Node.js",
-    "socket.io"
-  ],
-  "author": "Almas Baimagambetov",
+  "author": "Becky Rush & Cai Lehwald",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/AlmasB/CI328/issues"
+    "url": "https://github.com/rushlet/ci328_networked-game/issues"
   },
-  "homepage": "https://github.com/AlmasB/CI328#readme",
+  "homepage": "https://github.com/rushlet/ci328_networked-game#readme",
   "dependencies": {
     "socket.io": "^2.0.4"
-  },
-  "devDependencies": {
-    "console.table": "^0.10.0"
   }
 }
