@@ -22,29 +22,21 @@ function preload() {
 function create() {
   game.stage.disableVisibilityChange = true;
   game.playerMap = {};
+  game.gameReady = false;
 
   client = new Client();
   client.sendTest();
-  client.addClientToServer();
-  game.gameWorld = new GameWorld();
 
-  game.cursors = game.input.keyboard.createCursorKeys();
-  game.physics.startSystem(Phaser.Physics.ARCADE);
-
-  //enable tile debugging
-  game.input.onDown.add(getTileProperties, this);
-}
-
-function getTileProperties() {
-  var x = game.gameWorld.layer.getTileX(game.input.activePointer.worldX);
-  var y = game.gameWorld.layer.getTileY(game.input.activePointer.worldY);
-  console.log(game.gameWorld.map.getTile(x, y, game.gameWorld.layer));
+  sceneController = new SceneController();
+  sceneController.setScreen("MainMenu");
 }
 
 function update() {
-  handleCursorInput();
-  if (game.playerMap[client.ID]) {
-    client.updatePlayerInput(client.ID, client.direction);
+  // if everyone ready
+  if (game.gameReady) {
+      handleCursorInput();
+      client.updatePlayerInput(client.direction);
+
   }
 }
 
@@ -57,6 +49,7 @@ function addNewPlayer(id, x, y) {
 }
 
 function movePlayer(id, targetX, targetY) {
+
   var player = game.playerMap[id];
   var tween = game.add.tween(player);
   var duration = 320;
@@ -80,6 +73,7 @@ function handleCursorInput() {
   directions.forEach((direction) => {
     if (game.cursors[direction].isDown && client.direction != direction) {
       client.direction = direction;
+      console.log(direction + "Detected");
     }
   });
 }

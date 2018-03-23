@@ -1,11 +1,13 @@
 class Client {
 
   constructor() {
-    this.ID;
     this.direction;
     this.socket = io(location.hostname + ':55000');
     this.newPlayer();
     this.allPlayers();
+    this.setID();
+    this.startGame();
+    this.loadGame();
   }
 
   // Client Socket On Functions
@@ -20,7 +22,6 @@ class Client {
     this.socket.on('allplayers', function(data) {
       for (var i = 0; i < data.length; i++) {
         addNewPlayer(data[i].id, data[i].x, data[i].y);
-        client.ID = data[i].id;
       }
       client.move();
       client.remove();
@@ -29,6 +30,8 @@ class Client {
 
   move() {
     this.socket.on('move', function(data) {
+      console.log("move");
+      console.log(data);
       movePlayer(data.id, data.expectedPosition.x, data.expectedPosition.y);
     });
   }
@@ -36,6 +39,25 @@ class Client {
   remove() {
     this.socket.on('remove', function(id) {
       removePlayer(id);
+    });
+  }
+
+  setID(){
+    this.socket.on('setID', function(id){
+      client.ID = id;
+    });
+  }
+
+  startGame(){
+    this.socket.on('startGame', function(){
+      game.gameReady = true;
+    });
+  }
+
+  loadGame(){
+    this.socket.on('loadGame', function(){
+      sceneController.setScreen("InGame");
+      client.gameLoaded();
     });
   }
 
@@ -48,17 +70,24 @@ class Client {
     this.socket.emit('newplayer');
   }
 
-  updatePlayerInput(id, direction) {
-    this.socket.emit('movement', {
-      direction: direction,
-      id: id
-    });
+  updatePlayerInput(direction) {
+    this.socket.emit('movement', direction);
   }
 
   targetReached() {
-    this.socket.emit('targetReached', {
-      id: client.ID
-    });
+    this.socket.emit('targetReached');
+  }
+
+  joinLobby(){
+    this.socket.emit('joinLobby');
+  }
+
+  playerReady(){
+    this.socket.emit('playerReady');
+  }
+
+  gameLoaded(){
+    this.socket.emit('gameLoaded');
   }
 
 }
