@@ -8,6 +8,7 @@ class Client {
     this.setID();
     this.startGame();
     this.loadGame();
+    this.drawDots();
   }
 
   // Client Socket On Functions
@@ -25,6 +26,15 @@ class Client {
       }
       client.move();
       client.remove();
+    });
+  }
+
+  drawDots() {
+    this.socket.on('drawDots', function(data) {
+      console.log('drawing dots');
+      for (var i = 0; i < data.length; i++) {
+        addNewDot(data[i].id, data[i].x, data[i].y);
+      }
     });
   }
 
