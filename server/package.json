@@ -3,10 +3,6 @@
   "version": "1.0.0",
   "description": "server package for croaked ci328 coursework",
   "main": "server.js",
-  "dependencies": {
-    "console.table": "^0.10.0"
-  },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \\\"Error: no test specified\\\" && exit 1",
     "start": "node server.js"
