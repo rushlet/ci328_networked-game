@@ -10,12 +10,13 @@ var entities = {
   powerups: {}
 };
 var gameReady = false;
+var tilemap;
 
 main();
 
 function main() {
   io.on('connection', function(client) {
-    var tilemap = tilemapper.create2dArrayFromTilemap(0); // number refers to which map to use, can be randomly generated when we have multiple maps
+    tilemap = tilemapper.create2dArrayFromTilemap(0); // number refers to which map to use, can be randomly generated when we have multiple maps
 
     client.on('test', function() {
       console.log('test received');
@@ -42,23 +43,22 @@ function main() {
     client.on('gameLoaded', function() {
       entities.players[client.playerId].gameReady = true;
       if (checkAllGameReady()) {
+        gameReady = true;
+        gamePrep();
+        client.emit('drawDots', getAllEntitiesOfType('dots'));
+        client.broadcast.emit('drawDots', getAllEntitiesOfType('dots'));
         client.emit('startGame');
         client.broadcast.emit('startGame');
-        gameReady = true;
-        gameLoop();
       }
     });
 
     client.on('newplayer', function() {
-      playerPosition = initialPlayerPosition(tilemap);
-      if (playerPosition.tileId !== 10) { //tried to make it recursive but returned wrong data, so using this check for now
-        playerPosition = initialPlayerPosition(tilemap);
-      }
+      playerPosition = initialEntityPosition(tilemap);
       entities.players[client.playerId].x = playerPosition.worldX;
       entities.players[client.playerId].y = playerPosition.worldY;
       entities.players[client.playerId].expectedPosition.x = playerPosition.worldX;
       entities.players[client.playerId].expectedPosition.y = playerPosition.worldY;
-      client.emit('allplayers', getAllPlayers());
+      client.emit('allplayers', getAllEntitiesOfType('players'));
       client.broadcast.emit('newplayer', entities.players[client.playerId]);
 
       client.on('movement', function(direction) {
@@ -95,7 +95,9 @@ function main() {
             default:
               break;
           }
-          checkCollisions(player);
+          if (checkCollisions(player)) {
+            //emit to update everything
+          }
         }
       });
 
@@ -118,7 +120,8 @@ function main() {
 
 }
 
-function gameLoop() {
+function gamePrep() {
+  console.log('in game loop');
   /*var countdown = 120000;
   setInterval(function() {
     countdown--;
@@ -127,28 +130,30 @@ function gameLoop() {
     });
   }, 120000);*/
 
-  // while (gameReady) {
-  //   //generatedots();
-  //   //generatepowerups();
-  // }
+  generateDots();
 }
 
-function generateDots(){
-  //check how many dots already exist
-  //if less than 5 then create new dot (in valid location)
-  //tell clients of new dots
+function generateDots() {
+// generate 5 dots
+  for (var i = 0; i < 5; i++) {
+    var location = initialEntityPosition(tilemap);
+    createEntity('dots', i, location.worldX, location.worldY);
+  }
 }
 
 function checkCollisions(player) {
-  Object.keys(entities.players).forEach(function(id) {
-    if(id != player.id) {
-      if(player.x === entities.players[id].x && player.y === entities.players[id].y) {
-        console.log("Player Collision");
+  Object.keys(entities).forEach(function(type) {
+    Object.keys(entities[type]).forEach(function(id) {
+      if(player != entities[type][id]) {
+        if(player.x === entities[type][id].x && player.y === entities[type][id].y) {
+          console.log(type, "Collision");
+          return true;
+        }
       }
-    }
+    });
   });
+  return false;
 }
-
 
 function checkAllGameReady() {
   var ready = true;
@@ -188,23 +193,36 @@ function createEntity(type, id, x, y) {
   }
 }
 
-function getAllPlayers() {
-  var players = [];
-  Object.keys(entities.players).forEach(function(id) {
-    var player = entities.players[id];
-    if (player) players.push(player);
+function getAllEntitiesOfType(type) {
+  var output = [];
+  Object.keys(entities[type]).forEach(function(id) {
+    var entity = entities[type][id];
+    if (entity) output.push(entity);
   });
-  return players;
+  return output;
 }
 
 function randomInt(low, high) {
   return Math.floor(Math.random() * (high - low) + low);
 }
 
-function initialPlayerPosition(tilemap) {
+function initialEntityPosition(tilemap) {
   var y = randomInt(3, 18);
   var x = randomInt(1, 38);
   var randomTile = tilemap[y][x];
+  console.log(randomTile);
+  if (randomTile != 10) {
+    return initialEntityPosition(tilemap);
+  } else {
+    Object.keys(entities).forEach(function(entityType) {
+      Object.keys(entities[entityType]).forEach(function(id) {
+        var entity = entities[entityType][id];
+        if (entity.x == x && entity.y == y) {
+          return initialEntityPosition(tilemap);
+        }
+      });
+    });
+  }
   return {
     'worldX': x * 32,
     'worldY': y * 32,
