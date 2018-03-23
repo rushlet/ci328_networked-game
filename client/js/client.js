@@ -9,6 +9,7 @@ class Client {
     this.startGame();
     this.loadGame();
     this.drawDots();
+    this.updateDots();
   }
 
   // Client Socket On Functions
@@ -38,10 +39,17 @@ class Client {
     });
   }
 
+  updateDots() {
+    this.socket.on('updateDots', function(data) {
+      console.log('update dots called');
+      for (var i = 0; i < data.length; i++) {
+        updateDots(data[i].id, data[i].x, data[i].y);
+      }
+    });
+  }
+
   move() {
     this.socket.on('move', function(data) {
-      console.log("move");
-      console.log(data);
       movePlayer(data.id, data.expectedPosition.x, data.expectedPosition.y);
     });
   }

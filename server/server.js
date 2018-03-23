@@ -96,8 +96,11 @@ function main() {
               break;
           }
           if (checkCollisions(player)) {
-            //emit to update everything
+            console.log('check collision true');
+            client.emit('updateDots', getAllEntitiesOfType('dots'));
+            client.broadcast.emit('updateDots', getAllEntitiesOfType('dots'));
           }
+          console.log(checkCollisions(player));
         }
       });
 
@@ -134,7 +137,7 @@ function gamePrep() {
 }
 
 function generateDots() {
-// generate 5 dots
+  // generate 5 dots
   for (var i = 0; i < 5; i++) {
     var location = initialEntityPosition(tilemap);
     createEntity('dots', i, location.worldX, location.worldY);
@@ -142,17 +145,24 @@ function generateDots() {
 }
 
 function checkCollisions(player) {
+  var collision = false;
   Object.keys(entities).forEach(function(type) {
     Object.keys(entities[type]).forEach(function(id) {
-      if(player != entities[type][id]) {
-        if(player.x === entities[type][id].x && player.y === entities[type][id].y) {
+      if (player != entities[type][id]) {
+        if (player.x === entities[type][id].x && player.y === entities[type][id].y) {
           console.log(type, "Collision");
-          return true;
+          if (type == 'dots') {
+            console.log('collided!! update dot position');
+            var location = initialEntityPosition(tilemap);
+            entities[type][id].x = location.worldX;
+            entities[type][id].y = location.worldY;
+          }
+          collision = true;
         }
       }
     });
   });
-  return false;
+  return collision;
 }
 
 function checkAllGameReady() {

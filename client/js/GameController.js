@@ -55,6 +55,11 @@ function addNewDot(id, x, y) {
   game.dotMap[id] = game.add.sprite(x, y, 'dot');
 }
 
+function updateDots(id, x, y) {
+  game.dotMap[id].x = x;
+  game.dotMap[id].y = y;
+}
+
 function movePlayer(id, targetX, targetY) {
 
   var player = game.playerMap[id];
