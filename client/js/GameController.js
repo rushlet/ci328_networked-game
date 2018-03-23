@@ -15,6 +15,7 @@ function main() {
 
 function preload() {
   game.load.image('sprite', 'assets/coin.png');
+  game.load.image('dot', 'assets/img/dot.png');
   game.load.tilemap('map1', 'assets/maps/tilemap.json', null, Phaser.Tilemap.TILED_JSON);
   game.load.image('maze-template', 'assets/maps/maze-template.png');
 }
@@ -22,6 +23,7 @@ function preload() {
 function create() {
   game.stage.disableVisibilityChange = true;
   game.playerMap = {};
+  game.dotMap = {};
   game.gameReady = false;
 
   client = new Client();
@@ -46,6 +48,11 @@ function getCoordinates(pointer) {
 
 function addNewPlayer(id, x, y) {
   game.playerMap[id] = game.add.sprite(x, y, 'sprite');
+}
+
+function addNewDot(id, x, y) {
+  console.log('add new dot', id, x, y);
+  game.dotMap[id] = game.add.sprite(x, y, 'dot');
 }
 
 function movePlayer(id, targetX, targetY) {
