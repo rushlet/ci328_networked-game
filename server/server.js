@@ -95,12 +95,18 @@ function main() {
             default:
               break;
           }
-          if (checkCollisions(player)) {
-            console.log('check collision true');
-            client.emit('updateDots', getAllEntitiesOfType('dots'));
-            client.broadcast.emit('updateDots', getAllEntitiesOfType('dots'));
+
+          switch (checkCollisions(player)) {
+            case "dot":
+              client.emit('updateDots', getAllEntitiesOfType('dots'));
+              client.broadcast.emit('updateDots', getAllEntitiesOfType('dots'));
+              break;
+            case "player":
+              // TO DO
+              break;
+            default:
+              break;
           }
-          console.log(checkCollisions(player));
         }
       });
 
@@ -132,8 +138,15 @@ function gamePrep() {
       countdown: countdown
     });
   }, 120000);*/
-
+  chooseHero();
   generateDots();
+}
+
+function chooseHero() {
+  var hero = randomInt(1, 2);
+  console.log(hero);
+  entities.players[hero].hero = true;
+  console.log(entities.players);
 }
 
 function generateDots() {
@@ -145,19 +158,26 @@ function generateDots() {
 }
 
 function checkCollisions(player) {
-  var collision = false;
+  var collision = "false";
   Object.keys(entities).forEach(function(type) {
     Object.keys(entities[type]).forEach(function(id) {
       if (player != entities[type][id]) {
         if (player.x === entities[type][id].x && player.y === entities[type][id].y) {
           console.log(type, "Collision");
-          if (type == 'dots') {
+          if (type == 'dots' && player.hero) {
             console.log('collided!! update dot position');
             var location = initialEntityPosition(tilemap);
             entities[type][id].x = location.worldX;
             entities[type][id].y = location.worldY;
+            collision = "dot";
           }
-          collision = true;
+          if (type == 'player' && player.hero) {
+            console.log('player collision');
+            // switch hero status
+            entities[type][id].hero = true;
+            player.hero = false;
+            collision = "player";
+          }
         }
       }
     });
@@ -190,6 +210,7 @@ function createEntity(type, id, x, y) {
     };
     entities[type][id]["ready"] = false;
     entities[type][id]["gameReady"] = false;
+    entities[type][id]["hero"] = false;
   }
 }
 
