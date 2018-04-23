@@ -102,11 +102,13 @@ function main() {
             case "dot":
               client.emit('updateDots', getAllEntitiesOfType('dots'));
               client.broadcast.emit('updateDots', getAllEntitiesOfType('dots'));
+              client.emit('updateScore', player.score);
               break;
             case "player":
               console.log('player collision switch');
               client.emit('updateHero', getAllEntitiesOfType('players'));
               client.broadcast.emit('updateHero', getAllEntitiesOfType('players'));
+              client.emit('updateScore', player.score);
               break;
             default:
               break;
@@ -171,13 +173,15 @@ function checkCollisions(player) {
             entities[type][id].x = location.worldX;
             entities[type][id].y = location.worldY;
             collision = "dot";
+            entities.players[player.id].score += 1;
           } else if (entities[type][id].hero && !player.hero) {
-            // switch hero status
             entities[type][id].hero = false;
-            entities[type][playerID].hero = true;
+            entities[type][player.id].hero = true;
+            entities[type][player.id].score += 3;
             collision = "player";
           } else if (!entities[type][id].hero && player.hero) {
             entities[type][id].hero = true;
+            entities[type][id].score += 3;
             entities[type][player.id].hero = false;
             collision = "player";
           }
@@ -214,6 +218,7 @@ function createEntity(type, id, x, y) {
     entities[type][id]["ready"] = false;
     entities[type][id]["gameReady"] = false;
     entities[type][id]["hero"] = false;
+    entities[type][id]["score"] = 0;
   }
 }
 

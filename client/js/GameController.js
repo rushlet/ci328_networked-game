@@ -16,6 +16,7 @@ function main() {
 function preload() {
   game.load.image('sprite', 'assets/coin.png');
   game.load.image('dot', 'assets/img/dot.png');
+  game.load.image('ghost', 'assets/img/ghost.png');
   game.load.tilemap('map1', 'assets/maps/tilemap.json', null, Phaser.Tilemap.TILED_JSON);
   game.load.image('maze-template', 'assets/maps/maze-template.png');
 }
@@ -38,7 +39,6 @@ function update() {
   if (game.gameReady) {
       handleCursorInput();
       client.updatePlayerInput(client.direction);
-
   }
 }
 
@@ -60,8 +60,15 @@ function updateDots(id, x, y) {
   game.dotMap[id].y = y;
 }
 
-function movePlayer(id, targetX, targetY) {
+function updateSprites(id, hero) {
+  if (hero) {
+    game.playerMap[id].loadTexture('sprite');
+  } else {
+    game.playerMap[id].loadTexture('ghost');
+  }
+}
 
+function movePlayer(id, targetX, targetY) {
   var player = game.playerMap[id];
   var tween = game.add.tween(player);
   var duration = 320;

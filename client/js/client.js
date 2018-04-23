@@ -10,6 +10,8 @@ class Client {
     this.loadGame();
     this.drawDots();
     this.updateDots();
+    this.updateHero();
+    this.updateScore();
   }
 
   // Client Socket On Functions
@@ -32,19 +34,32 @@ class Client {
 
   drawDots() {
     this.socket.on('drawDots', function(data) {
-      console.log('drawing dots');
       for (var i = 0; i < data.length; i++) {
         addNewDot(data[i].id, data[i].x, data[i].y);
+
+      }
+    });
+  }
+
+  updateHero() {
+    this.socket.on('updateHero', function(players) {
+      for (var i = 0; i < players.length; i++) {
+        updateSprites(players[i].id, players[i].hero);
       }
     });
   }
 
   updateDots() {
     this.socket.on('updateDots', function(data) {
-      console.log('update dots called');
       for (var i = 0; i < data.length; i++) {
         updateDots(data[i].id, data[i].x, data[i].y);
       }
+    });
+  }
+
+  updateScore() {
+    this.socket.on('updateScore', function(score) {
+      sceneController.setText("ScoreText", `Score: ${score}`);
     });
   }
 
