@@ -33,7 +33,7 @@ function main() {
     client.on('playerReady', function() {
       console.log("Client " + client.playerId + " is ready");
       entities.players[client.playerId].ready = true;
-      if (checkAllReady() && Object.keys(entities.players).length > 1) {
+      if (checkAllReady('ready') && Object.keys(entities.players).length > 1) {
         console.log("All players ready");
         client.emit('loadGame');
         client.broadcast.emit('loadGame');
@@ -42,7 +42,7 @@ function main() {
 
     client.on('gameLoaded', function() {
       entities.players[client.playerId].gameReady = true;
-      if (checkAllGameReady()) {
+      if (checkAllReady('gameReady')) {
         gameReady = true;
         gamePrep();
         client.emit('drawDots', getAllEntitiesOfType('dots'));
@@ -165,20 +165,10 @@ function checkCollisions(player) {
   return collision;
 }
 
-function checkAllGameReady() {
+function checkAllReady(state) {
   var ready = true;
   Object.keys(entities.players).forEach(function(id) {
-    if (!entities.players[id].gameReady) {
-      ready = false;
-    }
-  });
-  return ready;
-}
-
-function checkAllReady() {
-  var ready = true;
-  Object.keys(entities.players).forEach(function(id) {
-    if (!entities.players[id].ready) {
+    if (!entities.players[id][state]) {
       ready = false;
     }
   });
