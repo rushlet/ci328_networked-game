@@ -47,6 +47,8 @@ function main() {
         gamePrep();
         client.emit('drawDots', getAllEntitiesOfType('dots'));
         client.broadcast.emit('drawDots', getAllEntitiesOfType('dots'));
+        client.emit('updateHero', getAllEntitiesOfType('players'));
+        client.broadcast.emit('updateHero', getAllEntitiesOfType('players'));
         client.emit('startGame');
         client.broadcast.emit('startGame');
       }
@@ -102,7 +104,9 @@ function main() {
               client.broadcast.emit('updateDots', getAllEntitiesOfType('dots'));
               break;
             case "player":
-              // TO DO
+              console.log('player collision switch');
+              client.emit('updateHero', getAllEntitiesOfType('players'));
+              client.broadcast.emit('updateHero', getAllEntitiesOfType('players'));
               break;
             default:
               break;
@@ -143,9 +147,8 @@ function gamePrep() {
 }
 
 function chooseHero() {
-  var hero = randomInt(1, 2);
-  console.log(hero);
-  entities.players[hero].hero = true;
+  var id = randomInt(1, 2);
+  entities.players[id]['hero'] = true;
   console.log(entities.players);
 }
 
@@ -158,24 +161,24 @@ function generateDots() {
 }
 
 function checkCollisions(player) {
-  var collision = "false";
+  var collision = false;
   Object.keys(entities).forEach(function(type) {
     Object.keys(entities[type]).forEach(function(id) {
       if (player != entities[type][id]) {
         if (player.x === entities[type][id].x && player.y === entities[type][id].y) {
-          console.log(type, "Collision");
           if (type == 'dots' && player.hero) {
-            console.log('collided!! update dot position');
             var location = initialEntityPosition(tilemap);
             entities[type][id].x = location.worldX;
             entities[type][id].y = location.worldY;
             collision = "dot";
-          }
-          if (type == 'player' && player.hero) {
-            console.log('player collision');
+          } else if (entities[type][id].hero && !player.hero) {
             // switch hero status
+            entities[type][id].hero = false;
+            entities[type][playerID].hero = true;
+            collision = "player";
+          } else if (!entities[type][id].hero && player.hero) {
             entities[type][id].hero = true;
-            player.hero = false;
+            entities[type][player.id].hero = false;
             collision = "player";
           }
         }
