@@ -16,6 +16,7 @@ class Client {
     this.updateOtherScores();
     this.startGameTimer();
     this.endGame();
+    this.powerups();
   }
 
   // Client Socket On Functions
@@ -85,6 +86,33 @@ class Client {
           count ++;
         }
       }
+    });
+  }
+
+  powerups() {
+    this.socket.on('addPowerup', function(x, y) {
+      game.gameWorld.addPowerup(x, y);
+    });
+
+    this.socket.on('updatePowerup', function(visibility, x, y) {
+      game.gameWorld.updatePowerup(visibility, x, y);
+    });
+
+    this.socket.on('powerupCaught', function(powerup) {
+      console.log('caught a powerup!');
+      if (!sceneController.doesTextExist()) {
+        sceneController.createText("PowerupText", "InGame", game.width / 2, game.height / 2, "Powerup!", 20);
+      }
+      sceneController.setText("PowerupText", `Power Up! ${powerup}`);
+      sceneController.textVisible("PowerupText", true);
+      setTimeout(() => {
+        sceneController.textVisible("PowerupText", false);
+      }, 2000);
+      game.gameWorld.updatePowerup(false, 0, 0);
+    });
+
+    this.socket.on('powerupExpire', function(visibility, x, y) {
+      // game.gameWorld.updatePowerup(visibility, x, y);
     });
   }
 

@@ -19,7 +19,7 @@ class SceneController {
       // set player ready sprite
     }, null);
     // In Game UI
-    this.createText("ScoreText", "InGame", game.width / 4, 25, `Score: 0`, 20);
+    this.createText("ScoreText", "InGame", game.width / 4, 25, "Score: 0", 20);
     this.createText("GameTimer", "InGame", game.width / 2, 25, "", 20);
     // Game Over UI
 
@@ -49,7 +49,7 @@ class SceneController {
     }
   }
 
-  createText(name, ui, x, y, string, size) {
+  createText(name, ui, x, y, string, size, visible = true) {
     var textObject = game.add.text(x, y, string, {
       font: size + 'px Arial',
       fill: '#fff'
@@ -66,6 +66,17 @@ class SceneController {
     this.elements.forEach((element) => {
       if (element.name == name) {
         element.object.text = string;
+      }
+    });
+  }
+
+  textVisible(name, visible) {
+    console.log('visibility called');
+    this.elements.forEach((element) => {
+      if (element.name == name) {
+        element.object.visible = visible;
+        element.object.style["z-index"] = 100;
+        console.log(element.object);
       }
     });
   }
@@ -109,5 +120,15 @@ class SceneController {
     this.elements.forEach(function(element) {
       element.object.visible = false;
     });
+  }
+
+  doesTextExist(name) {
+    let exists = false
+    this.elements.forEach((element) => {
+      if (element.name == name) {
+        exists = true;
+      }
+    });
+    return exists;
   }
 }

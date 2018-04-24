@@ -44,4 +44,15 @@ class GameWorld {
     seconds = ('0' + (seconds % 60)).slice(-2);
     return `${minutes}:${seconds}`;
   }
+
+  addPowerup(x, y) {
+    game.gameWorld.powerup = game.add.sprite(x, y, 'powerup');
+    game.gameWorld.powerup.visible = false;
+  }
+
+  updatePowerup(visibility, x, y) {
+    game.gameWorld.powerup.visible = visibility;
+    game.gameWorld.powerup.x = x;
+    game.gameWorld.powerup.y = y;
+  }
 }
