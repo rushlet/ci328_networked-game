@@ -12,6 +12,8 @@ class Client {
     this.updateDots();
     this.updateHero();
     this.updateScore();
+    this.addUI();
+    this.updateOtherScores();
   }
 
   // Client Socket On Functions
@@ -36,7 +38,6 @@ class Client {
     this.socket.on('drawDots', function(data) {
       for (var i = 0; i < data.length; i++) {
         addNewDot(data[i].id, data[i].x, data[i].y);
-
       }
     });
   }
@@ -63,6 +64,28 @@ class Client {
     });
   }
 
+  updateOtherScores() {
+    this.socket.on('updateOtherScores', function(players) {
+      // iterate over each player, update their scores on each client
+      for (var i = 0; i < players.length; i++) {
+        sceneController.setText(`player${players[i].id}_score`, `Player${players[i].id} score: ${players[i].score}`, 12);
+      }
+    });
+  }
+
+  addUI() {
+    this.socket.on('addUI', function(players) {
+      // iterate over each player, add score text on each client - except for client score
+      let count = 0;
+      for (var i = 0; i < players.length; i++) {
+        if (players[i].id !== client.ID) {
+          sceneController.createText(`player${players[i].id}_score`, "InGame", game.width * 0.65 + (count * 150), 25, `Player${players[i].id} score: 0`, 12);
+          count ++;
+        }
+      }
+    });
+  }
+
   move() {
     this.socket.on('move', function(data) {
       movePlayer(data.id, data.expectedPosition.x, data.expectedPosition.y);
@@ -75,20 +98,20 @@ class Client {
     });
   }
 
-  setID(){
-    this.socket.on('setID', function(id){
+  setID() {
+    this.socket.on('setID', function(id) {
       client.ID = id;
     });
   }
 
-  startGame(){
-    this.socket.on('startGame', function(){
+  startGame() {
+    this.socket.on('startGame', function() {
       game.gameReady = true;
     });
   }
 
-  loadGame(){
-    this.socket.on('loadGame', function(){
+  loadGame() {
+    this.socket.on('loadGame', function() {
       sceneController.setScreen("InGame");
       client.gameLoaded();
     });
@@ -111,15 +134,15 @@ class Client {
     this.socket.emit('targetReached');
   }
 
-  joinLobby(){
+  joinLobby() {
     this.socket.emit('joinLobby');
   }
 
-  playerReady(){
+  playerReady() {
     this.socket.emit('playerReady');
   }
 
-  gameLoaded(){
+  gameLoaded() {
     this.socket.emit('gameLoaded');
   }
 

@@ -27,7 +27,7 @@ function main() {
       client.playerId = lastPlayerID;
       lastPlayerID++;
       console.log("Client " + client.playerId + " joined lobby");
-      io.emit('setID', client.playerId);
+      client.emit('setID', client.playerId);
     });
 
     client.on('playerReady', function() {
@@ -49,6 +49,8 @@ function main() {
         client.broadcast.emit('drawDots', getAllEntitiesOfType('dots'));
         client.emit('updateHero', getAllEntitiesOfType('players'));
         client.broadcast.emit('updateHero', getAllEntitiesOfType('players'));
+        client.emit('addUI', getAllEntitiesOfType('players'), client.playerId);
+        client.broadcast.emit('addUI', getAllEntitiesOfType('players'), client.playerId);
         client.emit('startGame');
         client.broadcast.emit('startGame');
       }
@@ -103,12 +105,16 @@ function main() {
               client.emit('updateDots', getAllEntitiesOfType('dots'));
               client.broadcast.emit('updateDots', getAllEntitiesOfType('dots'));
               client.emit('updateScore', player.score);
+              client.emit('updateOtherScores', getAllEntitiesOfType('players'));
+              client.broadcast.emit('updateOtherScores', getAllEntitiesOfType('players'));
               break;
             case "player":
               console.log('player collision switch');
               client.emit('updateHero', getAllEntitiesOfType('players'));
               client.broadcast.emit('updateHero', getAllEntitiesOfType('players'));
               client.emit('updateScore', player.score);
+              client.emit('updateOtherScores', getAllEntitiesOfType('players'));
+              client.broadcast.emit('updateOtherScores', getAllEntitiesOfType('players'));
               break;
             default:
               break;
