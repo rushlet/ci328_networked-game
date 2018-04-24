@@ -1,5 +1,5 @@
 var User = require('./user.js');
-module.exports = class lobby {
+module.exports = class Lobby {
   constructor() {
     this.users = [];
     this.maximumPlayers = 2;
