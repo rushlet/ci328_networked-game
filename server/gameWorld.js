@@ -3,7 +3,7 @@ module.exports = class gameWorld {
 
   constructor() {
     this.tilemap = tilemapper.create2dArrayFromTilemap(0);
-
+    this.gameOverTimer;
     this.entities = {
       players: {},
       dots: {},
@@ -126,12 +126,11 @@ module.exports = class gameWorld {
   }
 
   startGameTimer(io) {
-    let duration = 10000;
+    let duration = 150000;
     io.emit('startGameTimer', duration);
-    const gameOverTimer = setTimeout(() => {
+    this.gameOverTimer = setTimeout(() => {
       io.emit('endGame', duration);
-      clearTimeout(gameOverTimer);
+      clearTimeout(this.gameOverTimer);
     }, duration);
   }
-
 }
