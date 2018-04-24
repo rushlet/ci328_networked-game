@@ -60,20 +60,20 @@ class Client {
     });
   }
 
-  setID(){
-    this.socket.on('setID', function(id){
+  setID() {
+    this.socket.on('setID', function(id) {
       client.ID = id;
     });
   }
 
-  startGame(){
-    this.socket.on('startGame', function(){
+  startGame() {
+    this.socket.on('startGame', function() {
       game.gameReady = true;
     });
   }
 
-  loadGame(){
-    this.socket.on('loadGame', function(){
+  loadGame() {
+    this.socket.on('loadGame', function() {
       sceneController.setScreen("InGame");
       client.gameLoaded();
     });
@@ -96,15 +96,15 @@ class Client {
     this.socket.emit('targetReached');
   }
 
-  joinLobby(){
+  joinLobby() {
     this.socket.emit('joinLobby');
   }
 
-  playerReady(){
+  playerReady() {
     this.socket.emit('playerReady');
   }
 
-  gameLoaded(){
+  gameLoaded() {
     this.socket.emit('gameLoaded');
   }
 
