@@ -43,7 +43,7 @@ function main() {
     client.on('gameLoaded', function() {
       client.user.gameLoaded = true;
       if (lobby.checkGameReady())
-        gameWorld.gamePrep(io);
+        gameWorld.gamePrep(io, client);
     });
 
     client.on('newplayer', function() {
@@ -89,7 +89,7 @@ function main() {
             default:
               break;
           }
-          gameWorld.checkCollisions(player, io);
+          gameWorld.checkCollisions(player, io, client);
         }
       });
 
@@ -104,14 +104,4 @@ function main() {
   server.listen(PORT, function() {
     console.log('Listening on ' + server.address().port);
   });
-}
-
-function startGameTimer() {
-  let duration = 10000;
-  countdown = duration;
-  io.emit('startGameTimer', duration);
-  const gameOverTimer = setTimeout(() => {
-    io.emit('endGame', duration);
-    clearTimeout(gameOverTimer);
-  }, duration);
 }
