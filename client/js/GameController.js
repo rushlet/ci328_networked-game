@@ -17,6 +17,7 @@ function preload() {
   game.load.image('sprite', 'assets/coin.png');
   game.load.image('dot', 'assets/img/dot.png');
   game.load.image('ghost', 'assets/img/ghost.png');
+  game.load.image('powerup', 'assets/img/star.png');
   game.load.tilemap('map1', 'assets/maps/tilemap.json', null, Phaser.Tilemap.TILED_JSON);
   game.load.image('maze-template', 'assets/maps/maze-template.png');
 }
