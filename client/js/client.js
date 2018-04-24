@@ -10,6 +10,12 @@ class Client {
     this.loadGame();
     this.drawDots();
     this.updateDots();
+    this.updateHero();
+    this.updateScore();
+    this.addUI();
+    this.updateOtherScores();
+    this.startGameTimer();
+    this.endGame();
   }
 
   // Client Socket On Functions
@@ -32,19 +38,59 @@ class Client {
 
   drawDots() {
     this.socket.on('drawDots', function(data) {
-      console.log('drawing dots');
       for (var i = 0; i < data.length; i++) {
         addNewDot(data[i].id, data[i].x, data[i].y);
       }
     });
   }
 
+  updateHero() {
+    this.socket.on('updateHero', function(players) {
+      for (var i = 0; i < players.length; i++) {
+        updateSprites(players[i].id, players[i].hero);
+      }
+    });
+  }
+
   updateDots() {
     this.socket.on('updateDots', function(data) {
-      console.log('update dots called');
       for (var i = 0; i < data.length; i++) {
         updateDots(data[i].id, data[i].x, data[i].y);
       }
+    });
+  }
+
+  updateScore() {
+    this.socket.on('updateScore', function(score) {
+      sceneController.setText("ScoreText", `Score: ${score}`);
+    });
+  }
+
+  updateOtherScores() {
+    this.socket.on('updateOtherScores', function(players) {
+      // iterate over each player, update their scores on each client
+      for (var i = 0; i < players.length; i++) {
+        sceneController.setText(`player${players[i].id}_score`, `Player${players[i].id} score: ${players[i].score}`);
+      }
+    });
+  }
+
+  addUI() {
+    this.socket.on('addUI', function(players) {
+      // iterate over each player, add score text on each client - except for client score
+      let count = 0;
+      for (var i = 0; i < players.length; i++) {
+        if (players[i].id !== client.ID) {
+          sceneController.createText(`player${players[i].id}_score`, "InGame", game.width * 0.65 + (count * 150), 25, `Player${players[i].id} score: 0`, 12);
+          count ++;
+        }
+      }
+    });
+  }
+
+  startGameTimer() {
+    this.socket.on('startGameTimer', function(countdown) {
+      game.gameWorld.setGameTimer(countdown);
     });
   }
 
@@ -69,6 +115,13 @@ class Client {
   startGame() {
     this.socket.on('startGame', function() {
       game.gameReady = true;
+    });
+  }
+
+  endGame() {
+    this.socket.on('endGame', function() {
+      console.log("%cGAME OVER", "color: red; font-size: 32px;");
+      game.gameWorld.stopTimers();
     });
   }
 
@@ -107,5 +160,9 @@ class Client {
   gameLoaded() {
     this.socket.emit('gameLoaded');
   }
+
+  // checkServerTimer() {
+  //   this.socket.emit('whatsTheTimeMrWolf?');
+  // }
 
 }

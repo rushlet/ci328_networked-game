@@ -19,7 +19,8 @@ class SceneController {
       // set player ready sprite
     }, null);
     // In Game UI
-
+    this.createText("ScoreText", "InGame", game.width / 4, 25, `Score: 0`, 20);
+    this.createText("GameTimer", "InGame", game.width / 2, 25, "", 20);
     // Game Over UI
 
   }
@@ -58,6 +59,14 @@ class SceneController {
       ui: ui,
       type: "Text",
       object: textObject
+    });
+  }
+
+  setText(name, string) {
+    this.elements.forEach((element) => {
+      if (element.name == name) {
+        element.object.text = string;
+      }
     });
   }
 

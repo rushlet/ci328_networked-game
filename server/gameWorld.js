@@ -11,15 +11,19 @@ module.exports = class gameWorld {
     };
   }
 
-  gamePrep(io) {
+  gamePrep(io, client) {
     this.chooseHero();
     this.generateDots();
     io.emit('drawDots', this.getArrayOfEntityType('dots'));
+    io.emit('updateHero', this.getArrayOfEntityType('players'));
+    io.emit('addUI', this.getArrayOfEntityType('players'), client.user.id);
     io.emit('startGame');
+    this.startGameTimer(io);
   }
 
   chooseHero() {
     var hero = this.randomInt(1, 2);
+    console.log('hero is ', hero);
     this.entities.players[hero].hero = true;
   }
 
@@ -44,13 +48,14 @@ module.exports = class gameWorld {
         y: y
       };
       this.entities[type][id]["hero"] = false;
+      this.entities[type][id]["score"] = 0;
     }
   }
   randomInt(low, high) {
     return Math.floor(Math.random() * (high - low) + low);
   }
 
-  checkCollisions(player, io) {
+  checkCollisions(player, io, client) {
     var gameWorld = this;
     var entities = this.entities;
     var collision = "false";
@@ -61,18 +66,24 @@ module.exports = class gameWorld {
           if (player.x === entities[type][id].x && player.y === entities[type][id].y) {
             console.log(type, "Collision");
             if (type == 'dots' && player.hero) {
-              console.log('collided!! update dot position');
               var location = gameWorld.initialEntityPosition(tilemap);
               entities[type][id].x = location.worldX;
               entities[type][id].y = location.worldY;
               io.emit('updateDots', gameWorld.getArrayOfEntityType('dots'));
-            }
-            if (type == 'player' && player.hero) {
-              console.log('player collision');
-              // switch hero status
+              entities.players[player.id].score += 1;
+            } else if (entities[type][id].hero && !player.hero) {
+              entities[type][id].hero = false;
+              entities[type][player.id].hero = true;
+              entities[type][player.id].score += 3;
+              io.emit('updateHero', gameWorld.getArrayOfEntityType('players'));
+            } else if (!entities[type][id].hero && player.hero) {
               entities[type][id].hero = true;
-              player.hero = false;
+              entities[type][id].score += 3;
+              entities[type][player.id].hero = false;
+              io.emit('updateHero', gameWorld.getArrayOfEntityType('players'));
             }
+            client.emit('updateScore', player.score);
+            io.emit('updateOtherScores', gameWorld.getArrayOfEntityType('players'));
           }
         }
       });
@@ -112,6 +123,15 @@ module.exports = class gameWorld {
       if (entity) output.push(entity);
     });
     return output;
+  }
+
+  startGameTimer(io) {
+    let duration = 10000;
+    io.emit('startGameTimer', duration);
+    const gameOverTimer = setTimeout(() => {
+      io.emit('endGame', duration);
+      clearTimeout(gameOverTimer);
+    }, duration);
   }
 
 }
