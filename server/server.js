@@ -35,8 +35,7 @@ function main() {
       entities.players[client.playerId].ready = true;
       if (checkAllReady('ready') && Object.keys(entities.players).length > 1) {
         console.log("All players ready");
-        client.emit('loadGame');
-        client.broadcast.emit('loadGame');
+        io.emit('loadGame');
       }
     });
 
@@ -44,15 +43,11 @@ function main() {
       entities.players[client.playerId].gameReady = true;
       if (checkAllReady('gameReady')) {
         gameReady = true;
-        gamePrep();
-        client.emit('drawDots', getAllEntitiesOfType('dots'));
-        client.broadcast.emit('drawDots', getAllEntitiesOfType('dots'));
-        client.emit('updateHero', getAllEntitiesOfType('players'));
-        client.broadcast.emit('updateHero', getAllEntitiesOfType('players'));
-        client.emit('addUI', getAllEntitiesOfType('players'), client.playerId);
-        client.broadcast.emit('addUI', getAllEntitiesOfType('players'), client.playerId);
-        client.emit('startGame');
-        client.broadcast.emit('startGame');
+        gamePrep(client);
+        // io.emit('drawDots', getAllEntitiesOfType('dots'));
+        // io.emit('updateHero', getAllEntitiesOfType('players'));
+        // io.emit('addUI', getAllEntitiesOfType('players'), client.playerId);
+        // io.emit('startGame');
       }
     });
 
@@ -102,19 +97,15 @@ function main() {
 
           switch (checkCollisions(player)) {
             case "dot":
-              client.emit('updateDots', getAllEntitiesOfType('dots'));
-              client.broadcast.emit('updateDots', getAllEntitiesOfType('dots'));
+              io.emit('updateDots', getAllEntitiesOfType('dots'));
               client.emit('updateScore', player.score);
-              client.emit('updateOtherScores', getAllEntitiesOfType('players'));
-              client.broadcast.emit('updateOtherScores', getAllEntitiesOfType('players'));
+              io.emit('updateOtherScores', getAllEntitiesOfType('players'));
               break;
             case "player":
               console.log('player collision switch');
-              client.emit('updateHero', getAllEntitiesOfType('players'));
-              client.broadcast.emit('updateHero', getAllEntitiesOfType('players'));
+              io.emit('updateHero', getAllEntitiesOfType('players'));
               client.emit('updateScore', player.score);
-              client.emit('updateOtherScores', getAllEntitiesOfType('players'));
-              client.broadcast.emit('updateOtherScores', getAllEntitiesOfType('players'));
+              io.emit('updateOtherScores', getAllEntitiesOfType('players'));
               break;
             default:
               break;
@@ -141,7 +132,7 @@ function main() {
 
 }
 
-function gamePrep() {
+function gamePrep(client) {
   console.log('in game loop');
   /*var countdown = 120000;
   setInterval(function() {
@@ -152,6 +143,10 @@ function gamePrep() {
   }, 120000);*/
   chooseHero();
   generateDots();
+  io.emit('drawDots', getAllEntitiesOfType('dots'));
+  io.emit('updateHero', getAllEntitiesOfType('players'));
+  io.emit('addUI', getAllEntitiesOfType('players'), client.playerId);
+  io.emit('startGame');
 }
 
 function chooseHero() {
