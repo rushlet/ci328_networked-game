@@ -14,6 +14,8 @@ class Client {
     this.updateScore();
     this.addUI();
     this.updateOtherScores();
+    this.startGameTimer();
+    this.endGame();
   }
 
   // Client Socket On Functions
@@ -68,7 +70,7 @@ class Client {
     this.socket.on('updateOtherScores', function(players) {
       // iterate over each player, update their scores on each client
       for (var i = 0; i < players.length; i++) {
-        sceneController.setText(`player${players[i].id}_score`, `Player${players[i].id} score: ${players[i].score}`, 12);
+        sceneController.setText(`player${players[i].id}_score`, `Player${players[i].id} score: ${players[i].score}`);
       }
     });
   }
@@ -83,6 +85,12 @@ class Client {
           count ++;
         }
       }
+    });
+  }
+
+  startGameTimer() {
+    this.socket.on('startGameTimer', function(countdown) {
+      game.gameWorld.setGameTimer(countdown);
     });
   }
 
@@ -107,6 +115,13 @@ class Client {
   startGame() {
     this.socket.on('startGame', function() {
       game.gameReady = true;
+    });
+  }
+
+  endGame() {
+    this.socket.on('endGame', function() {
+      console.log("%cGAME OVER", "color: red; font-size: 32px;");
+      game.gameWorld.stopTimers();
     });
   }
 
@@ -145,5 +160,9 @@ class Client {
   gameLoaded() {
     this.socket.emit('gameLoaded');
   }
+
+  // checkServerTimer() {
+  //   this.socket.emit('whatsTheTimeMrWolf?');
+  // }
 
 }

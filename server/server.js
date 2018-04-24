@@ -44,10 +44,6 @@ function main() {
       if (checkAllReady('gameReady')) {
         gameReady = true;
         gamePrep(client);
-        // io.emit('drawDots', getAllEntitiesOfType('dots'));
-        // io.emit('updateHero', getAllEntitiesOfType('players'));
-        // io.emit('addUI', getAllEntitiesOfType('players'), client.playerId);
-        // io.emit('startGame');
       }
     });
 
@@ -119,6 +115,10 @@ function main() {
         player.y = player.expectedPosition.y;
       });
 
+      // client.on('whatsTheTimeMrWolf?' function() {
+      //
+      // })
+
       client.on('disconnect', function() {
         io.emit('remove', client.playerId);
         delete entities.players[client.playerId];
@@ -133,20 +133,13 @@ function main() {
 }
 
 function gamePrep(client) {
-  console.log('in game loop');
-  /*var countdown = 120000;
-  setInterval(function() {
-    countdown--;
-    io.sockets.emit('timer', {
-      countdown: countdown
-    });
-  }, 120000);*/
   chooseHero();
   generateDots();
   io.emit('drawDots', getAllEntitiesOfType('dots'));
   io.emit('updateHero', getAllEntitiesOfType('players'));
   io.emit('addUI', getAllEntitiesOfType('players'), client.playerId);
   io.emit('startGame');
+  startGameTimer();
 }
 
 function chooseHero() {
@@ -258,4 +251,14 @@ function initialEntityPosition(tilemap) {
     'worldY': y * 32,
     'tileId': randomTile,
   };
+}
+
+function startGameTimer() {
+  let duration = 10000;
+  countdown = duration;
+  io.emit('startGameTimer', duration);
+  const gameOverTimer = setTimeout(() => {
+    io.emit('endGame', duration);
+    clearTimeout(gameOverTimer);
+  }, duration);
 }

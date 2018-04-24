@@ -37,8 +37,8 @@ function create() {
 function update() {
   // if everyone ready
   if (game.gameReady) {
-      handleCursorInput();
-      client.updatePlayerInput(client.direction);
+    handleCursorInput();
+    client.updatePlayerInput(client.direction);
   }
 }
 
