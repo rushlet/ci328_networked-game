@@ -8,6 +8,8 @@ class Client {
     this.setID();
     this.startGame();
     this.loadGame();
+    this.drawDots();
+    this.updateDots();
   }
 
   // Client Socket On Functions
@@ -28,10 +30,26 @@ class Client {
     });
   }
 
+  drawDots() {
+    this.socket.on('drawDots', function(data) {
+      console.log('drawing dots');
+      for (var i = 0; i < data.length; i++) {
+        addNewDot(data[i].id, data[i].x, data[i].y);
+      }
+    });
+  }
+
+  updateDots() {
+    this.socket.on('updateDots', function(data) {
+      console.log('update dots called');
+      for (var i = 0; i < data.length; i++) {
+        updateDots(data[i].id, data[i].x, data[i].y);
+      }
+    });
+  }
+
   move() {
     this.socket.on('move', function(data) {
-      console.log("move");
-      console.log(data);
       movePlayer(data.id, data.expectedPosition.x, data.expectedPosition.y);
     });
   }
@@ -42,20 +60,20 @@ class Client {
     });
   }
 
-  setID(){
-    this.socket.on('setID', function(id){
+  setID() {
+    this.socket.on('setID', function(id) {
       client.ID = id;
     });
   }
 
-  startGame(){
-    this.socket.on('startGame', function(){
+  startGame() {
+    this.socket.on('startGame', function() {
       game.gameReady = true;
     });
   }
 
-  loadGame(){
-    this.socket.on('loadGame', function(){
+  loadGame() {
+    this.socket.on('loadGame', function() {
       sceneController.setScreen("InGame");
       client.gameLoaded();
     });
@@ -78,15 +96,15 @@ class Client {
     this.socket.emit('targetReached');
   }
 
-  joinLobby(){
+  joinLobby() {
     this.socket.emit('joinLobby');
   }
 
-  playerReady(){
+  playerReady() {
     this.socket.emit('playerReady');
   }
 
-  gameLoaded(){
+  gameLoaded() {
     this.socket.emit('gameLoaded');
   }
 
