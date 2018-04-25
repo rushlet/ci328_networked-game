@@ -1,6 +1,5 @@
 var tilemapper = require('./utils/tilemap-array-generator.js');
 module.exports = class gameWorld {
-
   constructor() {
     this.tilemap = tilemapper.create2dArrayFromTilemap(0);
     this.gameOverTimer;

@@ -14,6 +14,7 @@ module.exports = class lobby {
           user.connected = true;
           client.user = user;
           user.inLobby = true;
+          user.AI.Active = false;
         }
       });
     } else if (this.users.length != this.maximumPlayers) {
@@ -58,6 +59,18 @@ module.exports = class lobby {
       }
     });
     return disconnected;
+  }
+
+  startAIUpdateTimer(io, entities) {
+    var lobby = this;
+    let duration = 1000;
+    io.emit('startGameTimer', duration);
+    this.AIUpdateTimer = setInterval(() => {
+      lobby.users.forEach(function(user) {
+          user.AI.update(io , entities);
+      });
+      clearInterval(this.AIUpdateTimer);
+    }, duration);
   }
 
 }

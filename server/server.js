@@ -17,6 +17,7 @@ function main() {
           user.connected = false;
           user.isReady = false;
           user.inLobby = false;
+          user.AI.active = true;
         }
       });
       console.log(lobby.users);
@@ -44,6 +45,7 @@ function main() {
       client.user.gameLoaded = true;
       if (lobby.checkGameReady())
         gameWorld.gamePrep(io, client);
+        lobby.startAIUpdateTimer(io, gameWorld.entities);
     });
 
     client.on('newplayer', function() {

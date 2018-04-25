@@ -1,3 +1,4 @@
+var AI = require('./ai.js');
 module.exports = class User {
   constructor(id){
     this.id = id;
@@ -5,5 +6,6 @@ module.exports = class User {
     this.inLobby = false;
     this.isReady = false;
     this.gameLoaded = false;
+    this.AI = new AI(id);
   }
 }
