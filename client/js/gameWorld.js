@@ -23,14 +23,6 @@ class GameWorld {
       countdown -= 1000;
       sceneController.setText("GameTimer", this.millisecondsToMinutes(countdown));
     }, this);
-    game.gameWorld.gameTimer.loop(30000, () => {
-      // check if server has same time
-      // request current time from server
-      // checkServerTimer();
-      // if current time +/- 1000 from client time all good
-      // otherwise, update time (in correct format) to match
-      // sceneController.setText("GameTimer", this.millisecondsToMinutes(countdown));
-    }, this);
     game.gameWorld.gameTimer.start();
   }
 
@@ -43,5 +35,27 @@ class GameWorld {
     var minutes = ('0' + (parseInt(seconds / 60))).slice(-2);
     seconds = ('0' + (seconds % 60)).slice(-2);
     return `${minutes}:${seconds}`;
+  }
+
+  addPowerupToGame(x, y) {
+    game.gameWorld.powerup = game.add.sprite(x, y, 'powerup');
+    game.gameWorld.powerup.visible = false;
+  }
+
+  updatePowerup(visibility, x, y) {
+    game.gameWorld.powerup.visible = visibility;
+    game.gameWorld.powerup.x = x;
+    game.gameWorld.powerup.y = y;
+  }
+
+  powerupText(powerup) {
+    if (!sceneController.checkObjectExists()) {
+      sceneController.createText("PowerupText", "InGame", game.width / 2, game.height / 2, "Powerup!", 20);
+    }
+    sceneController.setText("PowerupText", `${powerup}!`);
+    sceneController.setObjectVisibility("PowerupText", true);
+    setTimeout(() => {
+      sceneController.setObjectVisibility("PowerupText", false);
+    }, 2000);
   }
 }
