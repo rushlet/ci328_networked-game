@@ -98,12 +98,15 @@ class Client {
       game.gameWorld.updatePowerup(visibility, x, y);
     });
 
-    this.socket.on('powerupCaught', function(powerup) {
+    this.socket.on('powerupCaught', function(powerup, playerPowerupValues) {
       console.log('caught a powerup!');
+      if (powerup == 'Double Speed' || powerup == 'Half Speed') {
+        game.playerMap[client.ID].speedMultiplier = playerPowerupValues.speedMultiplier;
+      }
       if (!sceneController.doesTextExist()) {
         sceneController.createText("PowerupText", "InGame", game.width / 2, game.height / 2, "Powerup!", 20);
       }
-      sceneController.setText("PowerupText", `Power Up! ${powerup}`);
+      sceneController.setText("PowerupText", `${powerup}!`);
       sceneController.textVisible("PowerupText", true);
       setTimeout(() => {
         sceneController.textVisible("PowerupText", false);
@@ -113,6 +116,7 @@ class Client {
 
     this.socket.on('powerupExpire', function(visibility, x, y) {
       // game.gameWorld.updatePowerup(visibility, x, y);
+      game.playerMap[client.ID].speedMultiplier = 1;
     });
   }
 
