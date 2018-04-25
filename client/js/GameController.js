@@ -49,6 +49,7 @@ function getCoordinates(pointer) {
 
 function addNewPlayer(id, x, y) {
   game.playerMap[id] = game.add.sprite(x, y, 'sprite');
+  game.playerMap[id].speedMultiplier = 1;
 }
 
 function addNewDot(id, x, y) {
@@ -72,7 +73,7 @@ function updateSprites(id, hero) {
 function movePlayer(id, targetX, targetY) {
   var player = game.playerMap[id];
   var tween = game.add.tween(player);
-  var duration = 320;
+  var duration = 320 / player.speedMultiplier;
   tween.to({
     x: targetX,
     y: targetY

@@ -64,25 +64,25 @@ function main() {
           switch (direction) {
             case "left":
               if (gameWorld.tilemap[currentY][currentX - 1] === 10) {
-                player.expectedPosition.x -= 32 * player.powerups.speedMultiplier;
+                player.expectedPosition.x -= 32;
                 io.emit('move', player);
               }
               break;
             case "right":
               if (gameWorld.tilemap[currentY][currentX + 1] === 10) {
-                player.expectedPosition.x += 32 * player.powerups.speedMultiplier;
+                player.expectedPosition.x += 32;
                 io.emit('move', player);
               }
               break;
             case "up":
               if (gameWorld.tilemap[currentY - 1][currentX] === 10) {
-                player.expectedPosition.y -= 32 * player.powerups.speedMultiplier;
+                player.expectedPosition.y -= 32;
                 io.emit('move', player);
               }
               break;
             case "down":
               if (gameWorld.tilemap[currentY + 1][currentX] === 10) {
-                player.expectedPosition.y += 32 * player.powerups.speedMultiplier;
+                player.expectedPosition.y += 32;
                 io.emit('move', player);
               }
               break;
