@@ -16,6 +16,7 @@ class Client {
     this.updateOtherScores();
     this.startGameTimer();
     this.endGame();
+    this.powerups();
   }
 
   // Client Socket On Functions
@@ -85,6 +86,32 @@ class Client {
           count ++;
         }
       }
+    });
+  }
+
+  powerups() {
+    this.socket.on('addPowerup', function(x, y) {
+      game.gameWorld.addPowerupToGame(x, y);
+    });
+
+    this.socket.on('updatePowerup', function(visibility, x, y) {
+      game.gameWorld.updatePowerup(visibility, x, y);
+    });
+
+    this.socket.on('powerupCaught', function(powerup, player) {
+      console.log('caught a powerup!');
+      if (powerup == 'Double Speed' || powerup == 'Half Speed') {
+        game.playerMap[player.id].speedMultiplier = player.powerups.speedMultiplier;
+      }
+      if (client.ID == player.id) {
+        game.gameWorld.powerupText(powerup);
+      }
+      game.gameWorld.updatePowerup(false, 0, 0);
+    });
+
+    this.socket.on('powerupExpire', function(visibility, x, y) {
+      // game.gameWorld.updatePowerup(visibility, x, y);
+      game.playerMap[client.ID].speedMultiplier = 1;
     });
   }
 

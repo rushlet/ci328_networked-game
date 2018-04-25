@@ -19,7 +19,7 @@ class SceneController {
       // set player ready sprite
     }, null);
     // In Game UI
-    this.createText("ScoreText", "InGame", game.width / 4, 25, `Score: 0`, 20);
+    this.createText("ScoreText", "InGame", game.width / 4, 25, "Score: 0", 20);
     this.createText("GameTimer", "InGame", game.width / 2, 25, "", 20);
     // Game Over UI
 
@@ -70,6 +70,14 @@ class SceneController {
     });
   }
 
+  setObjectVisibility(name, visible) {
+    this.elements.forEach((element) => {
+      if (element.name == name) {
+        element.object.visible = visible;
+      }
+    });
+  }
+
   createSprite(name, ui, x, y, width, height, image) {
     var sprite = game.add.sprite(x, y, image);
     sprite.width = width;
@@ -109,5 +117,15 @@ class SceneController {
     this.elements.forEach(function(element) {
       element.object.visible = false;
     });
+  }
+
+  checkObjectExists(name) {
+    let exists = false
+    this.elements.forEach((element) => {
+      if (element.name == name) {
+        exists = true;
+      }
+    });
+    return exists;
   }
 }

@@ -17,6 +17,7 @@ function preload() {
   game.load.image('sprite', 'assets/coin.png');
   game.load.image('dot', 'assets/img/dot.png');
   game.load.image('ghost', 'assets/img/ghost.png');
+  game.load.image('powerup', 'assets/img/star.png');
   game.load.tilemap('map1', 'assets/maps/tilemap.json', null, Phaser.Tilemap.TILED_JSON);
   game.load.image('maze-template', 'assets/maps/maze-template.png');
 }
@@ -48,6 +49,7 @@ function getCoordinates(pointer) {
 
 function addNewPlayer(id, x, y) {
   game.playerMap[id] = game.add.sprite(x, y, 'sprite');
+  game.playerMap[id].speedMultiplier = 1;
 }
 
 function addNewDot(id, x, y) {
@@ -71,7 +73,7 @@ function updateSprites(id, hero) {
 function movePlayer(id, targetX, targetY) {
   var player = game.playerMap[id];
   var tween = game.add.tween(player);
-  var duration = 320;
+  var duration = 320 / player.speedMultiplier;
   tween.to({
     x: targetX,
     y: targetY
