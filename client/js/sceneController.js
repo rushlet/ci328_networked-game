@@ -49,7 +49,7 @@ class SceneController {
     }
   }
 
-  createText(name, ui, x, y, string, size, visible = true) {
+  createText(name, ui, x, y, string, size) {
     var textObject = game.add.text(x, y, string, {
       font: size + 'px Arial',
       fill: '#fff'
