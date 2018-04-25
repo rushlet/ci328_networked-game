@@ -9,7 +9,7 @@ module.exports = class GameWorld {
       dots: {},
       powerups: {}
     };
-    this.powerups = ['doubleSpeed', 'doublePoints'];
+    this.powerups = ['Double Speed', 'Double Points', 'Half Speed', 'Half Points'];
   }
 
   gamePrep(io, client) {
@@ -96,18 +96,18 @@ module.exports = class GameWorld {
     this.entities.dots[id].x = location.worldX;
     this.entities.dots[id].y = location.worldY;
     io.emit('updateDots', this.getArrayOfEntityType('dots'));
-    this.entities.players[player.id].score += 1 * player.powerups.pointMultiplier;
+    this.entities.players[player.id].score += 2 * player.powerups.pointMultiplier;
   }
 
   heroCollision(id, io, player) {
     if (this.entities.players[id].hero && !player.hero) {
       this.entities.players[id].hero = false;
       this.entities.players[player.id].hero = true;
-      this.entities.players[player.id].score += 3 * player.powerups.pointMultiplier;
+      this.entities.players[player.id].score += 4 * player.powerups.pointMultiplier;
       io.emit('updateHero', this.getArrayOfEntityType('players'));
     } else if (!this.entities.players[id].hero && player.hero) {
       this.entities.players[id].hero = true;
-      this.entities.players[id].score += 3 * player.powerups.pointMultiplier;
+      this.entities.players[id].score += 4 * player.powerups.pointMultiplier;
       this.entities.players[player.id].hero = false;
       io.emit('updateHero', this.getArrayOfEntityType('players'));
     }
@@ -115,30 +115,35 @@ module.exports = class GameWorld {
 
   powerupCollision(id, io, player) {
     var gameWorld = this;
-    let selectedPowerup = gameWorld.powerups[gameWorld.randomInt(0, 3)];
-    switch (selectedPowerup) {
-      case 'doubleSpeed':
-        player.powerups.speedMultiplier = 2;
-        break;
-      case 'doublePoints':
-        player.powerups.pointMultiplier = 2;
-        break;
-      // case halfSpeed:
-      //   player.powerups.speedMultiplier = 0.5;
-      //   break;
-      // case halfPoints:
-      //   player.powerups.pointMultiplier = 0.5;
-      //   break;
-      default:
-        break;
-    }
-    io.emit('powerupCaught', selectedPowerup);
+    var random = gameWorld.randomInt(0, gameWorld.powerups.length-1);
+    let selectedPowerup = gameWorld.powerups[gameWorld.randomInt(0, gameWorld.powerups.length)];
+    gameWorld.applyPowerup(selectedPowerup, player);
+    io.emit('powerupCaught', selectedPowerup, player.powerups);
     let powerupExpire = setTimeout(() => {
       player.powerups.speedMultiplier = 1;
       player.powerups.pointMultiplier = 1;
       io.emit('powerupExpire');
       clearTimeout(powerupExpire);
     }, 5000);
+  }
+
+  applyPowerup(selectedPowerup, player) {
+    switch (selectedPowerup) {
+      case 'Double Speed':
+        player.powerups.speedMultiplier = 2;
+        break;
+      case 'Double Points':
+        player.powerups.pointMultiplier = 2;
+        break;
+      case 'Half Speed':
+        player.powerups.speedMultiplier = 0.5;
+        break;
+      case 'Half Points':
+        player.powerups.pointMultiplier = 0.5;
+        break;
+      default:
+        break;
+    }
   }
 
   initialEntityPosition(tilemap) {
