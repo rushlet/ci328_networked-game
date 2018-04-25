@@ -9,7 +9,7 @@ module.exports = class GameWorld {
       dots: {},
       powerups: {}
     };
-    this.powerups = ['halfSpeed', 'doubleSpeed', 'halfPoints', 'doublePoints'];
+    this.powerups = ['doubleSpeed', 'doubleSpeed', 'doublePoints', 'doublePoints'];
   }
 
   gamePrep(io, client) {
@@ -56,10 +56,10 @@ module.exports = class GameWorld {
       this.entities[type][id]["hero"] = false;
       this.entities[type][id]["score"] = 0;
       this.entities[type][id]["powerups"] = {
-        halfSpeed: false,
         doubleSpeed: false,
-        halfPoints: false,
-        doublePoints: false
+        halfSpeed: false,
+        doublePoints: false,
+        halfPoints: false
       };
     }
   }
@@ -71,40 +71,22 @@ module.exports = class GameWorld {
   checkCollisions(player, io, client) {
     var gameWorld = this;
     var entities = this.entities;
-    var collision = "false";
-    var tilemap = this.tilemap
+    var tilemap = this.tilemap;
+    let collision = "false";
+    let dotScore;
+    let heroScore;
     Object.keys(entities).forEach(function(type) {
       Object.keys(entities[type]).forEach(function(id) {
         if (player != entities[type][id]) {
           if (player.x === entities[type][id].x && player.y === entities[type][id].y) {
             console.log(type, "Collision");
+            !player.powerups['doublePoints'] ? (dotScore = 1, heroScore = 3) : (dotScore = 2, heroScore = 6);
             if (type == 'dots' && player.hero) {
-              var location = gameWorld.initialEntityPosition(tilemap);
-              entities[type][id].x = location.worldX;
-              entities[type][id].y = location.worldY;
-              io.emit('updateDots', gameWorld.getArrayOfEntityType('dots'));
-              entities.players[player.id].score += 1;
-            } else if (type == 'players' && entities[type][id].hero && !player.hero) {
-              entities[type][id].hero = false;
-              entities[type][player.id].hero = true;
-              entities[type][player.id].score += 3;
-              io.emit('updateHero', gameWorld.getArrayOfEntityType('players'));
-            } else if (type == 'players' && !entities[type][id].hero && player.hero) {
-              entities[type][id].hero = true;
-              entities[type][id].score += 3;
-              entities[type][player.id].hero = false;
-              io.emit('updateHero', gameWorld.getArrayOfEntityType('players'));
+              gameWorld.dotCollision(id, io, player.id, dotScore, tilemap);
+            } else if (type == 'players') {
+              gameWorld.heroCollision(id, io, player, heroScore);
             } else if (type == "powerups" && entities.powerups[0].visible) {
-              console.log('power up collision if');
-              // select random powerup
-              let selectedPowerup = gameWorld.powerups[gameWorld.randomInt(0, 4)];
-              // add relevant boolean to player
-              entities.players[player.id].powerups[selectedPowerup] = true;
-              io.emit('powerupCaught', selectedPowerup);
-              let powerupExpire = setTimeout(() => {
-                io.emit('powerupExpire');
-                clearTimeout(powerupExpire);
-              }, 2000);
+              gameWorld.powerupCollision(id, io, player)
             }
             client.emit('updateScore', player.score);
             io.emit('updateOtherScores', gameWorld.getArrayOfEntityType('players'));
@@ -112,6 +94,40 @@ module.exports = class GameWorld {
         }
       });
     });
+  }
+
+  dotCollision(id, io, playerID, dotScore, tilemap) {
+    var location = this.initialEntityPosition(tilemap);
+    this.entities.dots[id].x = location.worldX;
+    this.entities.dots[id].y = location.worldY;
+    io.emit('updateDots', this.getArrayOfEntityType('dots'));
+    this.entities.players[playerID].score += dotScore;
+  }
+
+  heroCollision(id, io, player, heroScore) {
+    if (this.entities.players[id].hero && !player.hero) {
+      this.entities.players[id].hero = false;
+      this.entities.players[player.id].hero = true;
+      this.entities.players[player.id].score += heroScore;
+      io.emit('updateHero', this.getArrayOfEntityType('players'));
+    } else if (!this.entities.players[id].hero && player.hero) {
+      this.entities.players[id].hero = true;
+      this.entities.players[id].score += heroScore;
+      this.entities.players[player.id].hero = false;
+      io.emit('updateHero', this.getArrayOfEntityType('players'));
+    }
+  }
+
+  powerupCollision(id, io, player) {
+    var gameWorld = this;
+    let selectedPowerup = gameWorld.powerups[gameWorld.randomInt(0, 3)];
+    this.entities.players[player.id].powerups[selectedPowerup] = true;
+    io.emit('powerupCaught', selectedPowerup);
+    let powerupExpire = setTimeout(() => {
+      gameWorld.entities.players[player.id].powerups[selectedPowerup] = false;
+      io.emit('powerupExpire');
+      clearTimeout(powerupExpire);
+    }, 5000);
   }
 
   initialEntityPosition(tilemap) {
@@ -178,7 +194,7 @@ module.exports = class GameWorld {
   }
 
   stopTimers() {
-    clearTimeout(gameWorld.gameOverTimer);
-    clearInterval(gameWorld.powerupTimer);
+    clearTimeout(this.gameOverTimer);
+    clearInterval(this.powerupTimer);
   }
 }

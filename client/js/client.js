@@ -91,7 +91,7 @@ class Client {
 
   powerups() {
     this.socket.on('addPowerup', function(x, y) {
-      game.gameWorld.addPowerup(x, y);
+      game.gameWorld.addPowerupToGame(x, y);
     });
 
     this.socket.on('updatePowerup', function(visibility, x, y) {

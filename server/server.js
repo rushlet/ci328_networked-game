@@ -59,30 +59,34 @@ function main() {
         var player = gameWorld.entities.players[client.user.id];
         var currentX = player.x / 32;
         var currentY = player.y / 32;
+        var speed = 32;
         if (player.x === player.expectedPosition.x && player.y === player.expectedPosition.y) {
           player.direction = direction;
+          if (player.powerups['doubleSpeed']) {
+            speed = 64;
+          }
           switch (direction) {
             case "left":
               if (gameWorld.tilemap[currentY][currentX - 1] === 10) {
-                player.expectedPosition.x -= 32;
+                player.expectedPosition.x -= speed;
                 io.emit('move', player);
               }
               break;
             case "right":
               if (gameWorld.tilemap[currentY][currentX + 1] === 10) {
-                player.expectedPosition.x += 32;
+                player.expectedPosition.x += speed;
                 io.emit('move', player);
               }
               break;
             case "up":
               if (gameWorld.tilemap[currentY - 1][currentX] === 10) {
-                player.expectedPosition.y -= 32;
+                player.expectedPosition.y -= speed;
                 io.emit('move', player);
               }
               break;
             case "down":
               if (gameWorld.tilemap[currentY + 1][currentX] === 10) {
-                player.expectedPosition.y += 32;
+                player.expectedPosition.y += speed;
                 io.emit('move', player);
               }
               break;
