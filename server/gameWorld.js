@@ -13,6 +13,7 @@ module.exports = class GameWorld {
   }
 
   gamePrep(io, client) {
+    var gameWorld = this;
     this.chooseHero();
     this.generateEntity('dots', 5);
     this.generateEntity('powerups', 1);
@@ -22,6 +23,19 @@ module.exports = class GameWorld {
     io.emit('startGame');
     this.startGameTimer(io);
     this.addPowerups(io);
+
+    Object.keys(this.entities.players).forEach(function(id) {
+      var player = gameWorld.entities.players[id];
+      io.emit('move', player);
+    });
+  }
+
+  setPlayerStartingPosition(id){
+    var playerPosition = this.initialEntityPosition(this.tilemap);
+    this.entities.players[id].x = playerPosition.worldX;
+    this.entities.players[id].y = playerPosition.worldY;
+    this.entities.players[id].expectedPosition.x = playerPosition.worldX;
+    this.entities.players[id].expectedPosition.y = playerPosition.worldY;
   }
 
   chooseHero() {
@@ -46,8 +60,7 @@ module.exports = class GameWorld {
     }
     if (type === "powerups") {
       this.entities[type][id]["visible"] = false;
-    }
-    else if (type === "players") {
+    } else if (type === "players") {
       this.entities[type][id]["direction"] = "";
       this.entities[type][id]["expectedPosition"] = {
         x: x,
@@ -115,7 +128,7 @@ module.exports = class GameWorld {
 
   powerupCollision(id, io, player) {
     var gameWorld = this;
-    var random = gameWorld.randomInt(0, gameWorld.powerups.length-1);
+    var random = gameWorld.randomInt(0, gameWorld.powerups.length - 1);
     let selectedPowerup = gameWorld.powerups[gameWorld.randomInt(0, gameWorld.powerups.length)];
     gameWorld.applyPowerup(selectedPowerup, player);
     io.emit('powerupCaught', selectedPowerup, player);

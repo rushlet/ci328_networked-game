@@ -36,6 +36,7 @@ function main() {
     client.on('playerReady', function() {
       console.log("Client " + client.user.id + " is ready");
       client.user.isReady = true;
+      gameWorld.setPlayerStartingPosition(client.user.id);
       if (lobby.checkAllReady() === true) {
         io.emit('loadGame');
       }
@@ -49,13 +50,7 @@ function main() {
     });
 
     client.on('newplayer', function() {
-      playerPosition = gameWorld.initialEntityPosition(gameWorld.tilemap);
-      gameWorld.entities.players[client.user.id].x = playerPosition.worldX;
-      gameWorld.entities.players[client.user.id].y = playerPosition.worldY;
-      gameWorld.entities.players[client.user.id].expectedPosition.x = playerPosition.worldX;
-      gameWorld.entities.players[client.user.id].expectedPosition.y = playerPosition.worldY;
       client.emit('allplayers',gameWorld.getArrayOfEntityType('players'));
-      client.broadcast.emit('newplayer', gameWorld.entities.players[client.user.id]);
 
       client.on('movement', function(direction) {
         var player = gameWorld.entities.players[client.user.id];
