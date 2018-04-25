@@ -80,7 +80,9 @@ function movePlayer(id, targetX, targetY) {
   }, duration);
   tween.start();
   tween.onComplete.add(() => {
-    client.targetReached()
+    if (id === client.ID) {
+      client.targetReached();
+    }
   });
 }
 
