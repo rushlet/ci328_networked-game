@@ -70,13 +70,10 @@ class SceneController {
     });
   }
 
-  textVisible(name, visible) {
-    console.log('visibility called');
+  setObjectVisibility(name, visible) {
     this.elements.forEach((element) => {
       if (element.name == name) {
         element.object.visible = visible;
-        element.object.style["z-index"] = 100;
-        console.log(element.object);
       }
     });
   }
@@ -122,7 +119,7 @@ class SceneController {
     });
   }
 
-  doesTextExist(name) {
+  checkObjectExists(name) {
     let exists = false
     this.elements.forEach((element) => {
       if (element.name == name) {

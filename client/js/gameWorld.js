@@ -47,4 +47,15 @@ class GameWorld {
     game.gameWorld.powerup.x = x;
     game.gameWorld.powerup.y = y;
   }
+
+  powerupText(powerup) {
+    if (!sceneController.checkObjectExists()) {
+      sceneController.createText("PowerupText", "InGame", game.width / 2, game.height / 2, "Powerup!", 20);
+    }
+    sceneController.setText("PowerupText", `${powerup}!`);
+    sceneController.setObjectVisibility("PowerupText", true);
+    setTimeout(() => {
+      sceneController.setObjectVisibility("PowerupText", false);
+    }, 2000);
+  }
 }
