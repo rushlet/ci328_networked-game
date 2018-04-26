@@ -3,33 +3,33 @@ module.exports = class Ai {
   constructor(id) {
     var AI = this;
     this.playerID = id;
-    this.active = false;
+    this.active = true;
     this.actions = [{
         name: "MoveToDot",
         score: 0,
-        function: (io) => {
-          AI.moveToDot(io);
+        function: (io, entity) => {
+          AI.moveToDot(io, entity);
         }
       },
       {
         name: "MoveToHero",
         score: 0,
-        function: (io) => {
-          AI.moveToHero(io);
+        function: (io, entity) => {
+          AI.moveToHero(io, entity);
         }
       },
       {
         name: "MoveToPowerUp",
         score: 0,
-        function: (io) => {
-          AI.moveToPowerUp(io);
+        function: (io, entity) => {
+          AI.moveToPowerUp(io, entity);
         }
       },
       {
         name: "AvoidGhost",
         score: 0,
-        function: (io) => {
-          AI.avoidGhost(io);
+        function: (io, entity) => {
+          AI.avoidGhost(io, entity);
         }
       },
     ];
@@ -39,8 +39,7 @@ module.exports = class Ai {
     if (this.active) {
       var entity = entities.players[this.playerID];
       this.checkConditions(entity, entities);
-      console.log(entity);
-      this.activateAction(io);
+      this.activateAction(io, entity);
     }
   }
 
@@ -51,6 +50,7 @@ module.exports = class Ai {
         case "MoveToDot":
           if (entity.hero) {
             action.score++;
+
           }
           break;
         case "MoveToHero":
@@ -78,7 +78,7 @@ module.exports = class Ai {
     });
   }
 
-  activateAction(io) {
+  activateAction(io, entity) {
     var activeAction;
     var highScore = 0;
     this.actions.forEach(function(action) {
@@ -87,22 +87,26 @@ module.exports = class Ai {
         highScore = action.score;
       }
     });
-    activeAction.function(io);
+    activeAction.function(io, entity);
   }
 
-  moveToDot(io) {
+  moveToDot(io, entity) {
+    console.log("entity: " + entity.id + " moveToDot");
+    entity.expectedPosition.x -= 32;
+    io.emit('move', entity);
+  }
+
+  moveToHero(io, entity) {
+    console.log("entity: " + entity.id + " moveToHero");
+    entity.expectedPosition.x -= 32;
+    io.emit('move', entity);
+  }
+
+  moveToPowerUp(io, entity) {
     // TODO:
   }
 
-  moveToHero(io) {
-    // TODO:
-  }
-
-  moveToPowerUp(io) {
-    // TODO:
-  }
-
-  avoidGhost(io) {
+  avoidGhost(io, entity) {
     // TODO:
   }
 

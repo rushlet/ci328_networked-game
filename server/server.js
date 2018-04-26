@@ -6,17 +6,16 @@ var GameWorld = require('./gameWorld.js');
 main();
 
 function main() {
-  var lobby = new Lobby();
   var gameWorld = new GameWorld();
+  var lobby = new Lobby(gameWorld);
   io.on('connection', function(client) {
 
     client.on('disconnect', function() {
       lobby.users.forEach(function(user) {
         if (user === client.user) {
+          lobby.connectedPlayers--;
           console.log("disconnecting player" + client.user.id)
           user.connected = false;
-          user.isReady = false;
-          user.inLobby = false;
           user.AI.active = true;
         }
       });
@@ -36,7 +35,6 @@ function main() {
     client.on('playerReady', function() {
       console.log("Client " + client.user.id + " is ready");
       client.user.isReady = true;
-      gameWorld.setPlayerStartingPosition(client.user.id);
       if (lobby.checkAllReady() === true) {
         io.emit('loadGame');
       }
@@ -45,7 +43,7 @@ function main() {
     client.on('gameLoaded', function() {
       client.user.gameLoaded = true;
       if (lobby.checkGameReady())
-        gameWorld.gamePrep(io, client);
+        gameWorld.gamePrep(io, client, lobby);
         lobby.startAIUpdateTimer(io, gameWorld.entities);
     });
 

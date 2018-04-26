@@ -12,7 +12,7 @@ module.exports = class GameWorld {
     this.powerups = ['Double Speed', 'Double Points', 'Half Speed', 'Half Points'];
   }
 
-  gamePrep(io, client) {
+  gamePrep(io, client, lobby) {
     var gameWorld = this;
     this.chooseHero();
     this.generateEntity('dots', 5);
@@ -21,7 +21,7 @@ module.exports = class GameWorld {
     io.emit('updateHero', this.getArrayOfEntityType('players'));
     io.emit('addUI', this.getArrayOfEntityType('players'), client.user.id);
     io.emit('startGame');
-    this.startGameTimer(io);
+    this.startGameTimer(io, lobby);
     this.addPowerups(io);
 
     Object.keys(this.entities.players).forEach(function(id) {
@@ -30,12 +30,15 @@ module.exports = class GameWorld {
     });
   }
 
-  setPlayerStartingPosition(id){
-    var playerPosition = this.initialEntityPosition(this.tilemap);
-    this.entities.players[id].x = playerPosition.worldX;
-    this.entities.players[id].y = playerPosition.worldY;
-    this.entities.players[id].expectedPosition.x = playerPosition.worldX;
-    this.entities.players[id].expectedPosition.y = playerPosition.worldY;
+  setPlayerStartingPositions(){
+    var gameWorld = this;
+    Object.keys(this.entities.players).forEach(function(id) {
+      var playerPosition = gameWorld.initialEntityPosition(gameWorld.tilemap);
+      gameWorld.entities.players[id].x = playerPosition.worldX;
+      gameWorld.entities.players[id].y = playerPosition.worldY;
+      gameWorld.entities.players[id].expectedPosition.x = playerPosition.worldX;
+      gameWorld.entities.players[id].expectedPosition.y = playerPosition.worldY;
+    });
   }
 
   chooseHero() {
@@ -194,12 +197,12 @@ module.exports = class GameWorld {
     return output;
   }
 
-  startGameTimer(io) {
+  startGameTimer(io, lobby) {
     let duration = 150000;
     io.emit('startGameTimer', duration);
     this.gameOverTimer = setTimeout(() => {
       io.emit('endGame', duration);
-      this.stopTimers();
+      this.stopTimers(lobby);
     }, duration);
   }
 
@@ -222,8 +225,9 @@ module.exports = class GameWorld {
     }, duration);
   }
 
-  stopTimers() {
+  stopTimers(lobby) {
     clearTimeout(this.gameOverTimer);
     clearInterval(this.powerupTimer);
+    clearInterval(lobby.AIUpdateTimer);
   }
 }
