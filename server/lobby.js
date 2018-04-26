@@ -8,7 +8,7 @@ module.exports = class Lobby {
     this.gameReady = false;
 
     for (var i = 0; i < this.maximumPlayers; i++) {
-      var user = new User(this.users.length + 1);
+      var user = new User(this.users.length + 1, gameWorld);
       this.users.push(user);
       gameWorld.createEntity("players", user.id, 0, 0);
     }
@@ -26,10 +26,10 @@ module.exports = class Lobby {
           user.isReady = false;
           user.AI.active = false;
           client.user = user;
-          connectedPlayers ++;
+          connectedPlayers++;
         }
       });
-    } else{
+    } else {
       console.log("All slots full");
     }
   }
@@ -37,13 +37,13 @@ module.exports = class Lobby {
   checkAllReady() {
     var ready = true;
 
-    if(this.connectedPlayers <= 2){
+    if (this.connectedPlayers <= 2) {
       this.users.forEach(function(user) {
         if (user.isReady === false) {
           ready = false;
         }
       });
-    }else {
+    } else {
       ready = false;
     }
 
@@ -63,7 +63,6 @@ module.exports = class Lobby {
   }
 
   checkSlotAvailable() {
-    console.log(this.users);
     var available = false;
     this.users.forEach(function(user) {
       if (user.connected === false) {
@@ -73,14 +72,13 @@ module.exports = class Lobby {
     return available;
   }
 
-  startAIUpdateTimer(io, entities) {
+  startAIUpdateTimer(io, gameWorld) {
     var lobby = this;
     let duration = 1000;
     io.emit('startGameTimer', duration);
     this.AIUpdateTimer = setInterval(() => {
-      console.log("AITimer");
       lobby.users.forEach(function(user) {
-          user.AI.update(io , entities);
+        user.AI.update(io, gameWorld);
       });
     }, duration);
   }

@@ -30,7 +30,7 @@ module.exports = class GameWorld {
     });
   }
 
-  setPlayerStartingPositions(){
+  setPlayerStartingPositions() {
     var gameWorld = this;
     Object.keys(this.entities.players).forEach(function(id) {
       var playerPosition = gameWorld.initialEntityPosition(gameWorld.tilemap);
@@ -42,7 +42,7 @@ module.exports = class GameWorld {
   }
 
   chooseHero() {
-    var hero = this.randomInt(1, 2);
+    var hero = this.randomInt(1, 4);
     console.log('hero is ', hero);
     this.entities.players[hero].hero = true;
   }
@@ -91,7 +91,6 @@ module.exports = class GameWorld {
       Object.keys(entities[type]).forEach(function(id) {
         if (player != entities[type][id]) {
           if (player.x === entities[type][id].x && player.y === entities[type][id].y) {
-            console.log(type, "Collision");
             if (type == 'dots' && player.hero) {
               gameWorld.dotCollision(id, io, player, tilemap);
             } else if (type == 'players') {
@@ -99,7 +98,9 @@ module.exports = class GameWorld {
             } else if (type == "powerups" && entities.powerups[0].visible) {
               gameWorld.powerupCollision(id, io, player)
             }
-            client.emit('updateScore', player.score);
+            if (client != null) {
+              client.emit('updateScore', player.score);
+            }
             io.emit('updateOtherScores', gameWorld.getArrayOfEntityType('players'));
           }
         }
@@ -167,7 +168,6 @@ module.exports = class GameWorld {
     var y = this.randomInt(3, 18);
     var x = this.randomInt(1, 38);
     var randomTile = tilemap[y][x];
-    console.log(randomTile);
     if (randomTile != 10) {
       return this.initialEntityPosition(tilemap);
     } else {
@@ -208,7 +208,6 @@ module.exports = class GameWorld {
 
   addPowerups(io) {
     let duration = 10000;
-    console.log(this.entities.powerups);
     io.emit('addPowerup', this.entities.powerups[0].x, this.entities.powerups[0].y);
     this.powerupTimer = setInterval(() => {
       if (this.entities.powerups[0].visible) {
@@ -216,10 +215,8 @@ module.exports = class GameWorld {
         let location = this.initialEntityPosition(this.tilemap)
         this.entities.powerups[0].x = location.worldX;
         this.entities.powerups[0].y = location.worldY;
-        console.log(this.entities.powerups[0]);
       } else {
         this.entities.powerups[0].visible = true;
-        console.log(this.entities.powerups[0]);
       }
       io.emit('updatePowerup', this.entities.powerups[0].visible, this.entities.powerups[0].x, this.entities.powerups[0].y);
     }, duration);

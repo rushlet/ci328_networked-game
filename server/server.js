@@ -19,7 +19,6 @@ function main() {
           user.AI.active = true;
         }
       });
-      console.log(lobby.users);
     });
 
     client.on('test', function() {
@@ -29,7 +28,6 @@ function main() {
     client.on('joinLobby', function() {
       lobby.addPlayer(client, gameWorld);
       client.emit('setID', client.user.id);
-      console.log(lobby.users);
     });
 
     client.on('playerReady', function() {
@@ -44,11 +42,11 @@ function main() {
       client.user.gameLoaded = true;
       if (lobby.checkGameReady())
         gameWorld.gamePrep(io, client, lobby);
-        lobby.startAIUpdateTimer(io, gameWorld.entities);
+      lobby.startAIUpdateTimer(io, gameWorld);
     });
 
     client.on('newplayer', function() {
-      client.emit('allplayers',gameWorld.getArrayOfEntityType('players'));
+      client.emit('allplayers', gameWorld.getArrayOfEntityType('players'));
 
       client.on('movement', function(direction) {
         var player = gameWorld.entities.players[client.user.id];

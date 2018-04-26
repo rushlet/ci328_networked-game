@@ -1,9 +1,10 @@
 module.exports = class Ai {
 
-  constructor(id) {
+  constructor(id, gameWorld) {
     var AI = this;
     this.playerID = id;
     this.active = true;
+    this.gameWorld = gameWorld;
     this.actions = [{
         name: "MoveToDot",
         score: 0,
@@ -35,22 +36,25 @@ module.exports = class Ai {
     ];
   }
 
-  update(io, entities) {
+  update(io) {
     if (this.active) {
-      var entity = entities.players[this.playerID];
-      this.checkConditions(entity, entities);
+      var entity = this.gameWorld.entities.players[this.playerID];
+      this.checkConditions(entity, this.gameWorld.entities);
       this.activateAction(io, entity);
+      this.gameWorld.checkCollisions(entity, io);
+      io.emit('move', entity);
     }
   }
 
   checkConditions(entity, entities) {
+    var ai = this;
     this.resetScores();
     this.actions.forEach(function(action) {
       switch (action.name) {
         case "MoveToDot":
           if (entity.hero) {
             action.score++;
-
+            //  ai.checkDistanceToEntity(entity, entities, "dots");
           }
           break;
         case "MoveToHero":
@@ -90,16 +94,62 @@ module.exports = class Ai {
     activeAction.function(io, entity);
   }
 
+  checkDistanceToEntity(entity, entities, targetType) {
+    var xIndex = entity.x / 32;
+    var yIndex = entity.y / 32;
+
+    Object.keys(entities).forEach(function(type) {
+      if (type === targetType) {
+        Object.keys(entities).forEach(function(id) {
+
+          console.log(xIndex + " " + yIndex);
+          var targetTypeXIndex = entities[type][id].x / 32;
+          var targetTypeYIndex = entities[type][id].y / 32;
+          console.log(targetTypeXIndex + " " + targetTypeYIndex);
+        });
+      }
+    });
+  }
+
+  move(direction, entity) {
+    var currentX = entity.x / 32;
+    var currentY = entity.y / 32;
+    switch (direction) {
+      case "left":
+        if (this.gameWorld.tilemap[currentY][currentX - 1] === 10) {
+          entity.x -= 32;
+          entity.expectedPosition.x -= 32;
+        }
+        break;
+      case "right":
+        if (this.gameWorld.tilemap[currentY][currentX + 1] === 10) {
+          entity.x += 32;
+          entity.expectedPosition.x += 32;
+        }
+        break;
+      case "up":
+        if (this.gameWorld.tilemap[currentY - 1][currentX] === 10) {
+          entity.y -= 32;
+          entity.expectedPosition.y -= 32;
+        }
+        break;
+      case "down":
+        if (this.gameWorld.tilemap[currentY + 1][currentX] === 10) {
+          entity.y += 32;
+          entity.expectedPosition.y += 32;
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
   moveToDot(io, entity) {
-    console.log("entity: " + entity.id + " moveToDot");
-    entity.expectedPosition.x -= 32;
-    io.emit('move', entity);
+    this.move("right", entity);
   }
 
   moveToHero(io, entity) {
-    console.log("entity: " + entity.id + " moveToHero");
-    entity.expectedPosition.x -= 32;
-    io.emit('move', entity);
+    this.move("left", entity);
   }
 
   moveToPowerUp(io, entity) {
