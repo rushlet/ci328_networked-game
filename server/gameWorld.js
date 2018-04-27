@@ -118,8 +118,7 @@ module.exports = class GameWorld {
     var random = gameWorld.randomInt(0, gameWorld.powerups.length-1);
     let selectedPowerup = gameWorld.powerups[gameWorld.randomInt(0, gameWorld.powerups.length)];
     gameWorld.applyPowerup(selectedPowerup, player);
-    gameWorld.entities.powerups[0].x = 0;
-    gameWorld.entities.powerups[0].x = 0;
+    gameWorld.entities.powerups[0].visibility = false;
     io.emit('powerupCaught', selectedPowerup, player);
     let powerupExpire = setTimeout(() => {
       player.powerups.speedMultiplier = 1;
@@ -193,19 +192,17 @@ module.exports = class GameWorld {
   }
 
   addPowerups(io) {
-    let duration = 10000;
+    let duration = gameWorld.randomInt(5000, 15000);
     console.log(this.entities.powerups);
     io.emit('addPowerup', this.entities.powerups[0].x, this.entities.powerups[0].y);
     this.powerupTimer = setInterval(() => {
+      let location = this.initialEntityPosition(this.tilemap)
+      this.entities.powerups[0].x = location.worldX;
+      this.entities.powerups[0].y = location.worldY;
       if (this.entities.powerups[0].visible) {
         this.entities.powerups[0].visible = false;
-        let location = this.initialEntityPosition(this.tilemap)
-        this.entities.powerups[0].x = location.worldX;
-        this.entities.powerups[0].y = location.worldY;
-        console.log(this.entities.powerups[0]);
       } else {
         this.entities.powerups[0].visible = true;
-        console.log(this.entities.powerups[0]);
       }
       io.emit('updatePowerup', this.entities.powerups[0].visible, this.entities.powerups[0].x, this.entities.powerups[0].y);
     }, duration);
