@@ -138,11 +138,10 @@ module.exports = class GameWorld {
   }
 
   powerupCollision(id, io, player) {
-    var gameWorld = this;
-    var random = gameWorld.randomInt(0, gameWorld.powerups.length - 1);
-    let selectedPowerup = gameWorld.powerups[gameWorld.randomInt(0, gameWorld.powerups.length)];
-    gameWorld.applyPowerup(selectedPowerup, player);
-    gameWorld.entities.powerups[0].visibility = false;
+    this.entities.powerups[0].visible = false;
+    var random = this.randomInt(0, this.powerups.length - 1);
+    let selectedPowerup = this.powerups[this.randomInt(0, this.powerups.length)];
+    this.applyPowerup(selectedPowerup, player);
     io.emit('powerupCaught', selectedPowerup, player);
     let powerupExpire = setTimeout(() => {
       player.powerups.speedMultiplier = 1;
@@ -215,7 +214,7 @@ module.exports = class GameWorld {
   }
 
   addPowerups(io) {
-    let duration = gameWorld.randomInt(5000, 15000);
+    let duration = this.randomInt(5000, 15000);
     io.emit('addPowerup', this.entities.powerups[0].x, this.entities.powerups[0].y);
     this.powerupTimer = setInterval(() => {
       let location = this.initialEntityPosition(this.tilemap)
