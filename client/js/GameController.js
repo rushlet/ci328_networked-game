@@ -14,9 +14,11 @@ function main() {
 }
 
 function preload() {
-  game.load.image('sprite', 'assets/coin.png');
-  game.load.image('dot', 'assets/img/dot.png');
-  game.load.image('ghost', 'assets/img/ghost.png');
+  // game.load.image('dot', 'assets/img/dot.png');
+  game.load.spritesheet('frog', 'assets/img/spritesheets/frog1.png', 32, 32);
+  game.load.spritesheet('ghost', 'assets/img/spritesheets/ghosty.png', 32, 32);
+  // game.load.spritesheet('powerup2', 'assets/img/spritesheets/bat-thing2.png', 24, 24, 3);
+  game.load.spritesheet('collectable', 'assets/img/spritesheets/coin.png', 30, 30, 6);
   game.load.image('powerup', 'assets/img/star.png');
   game.load.tilemap('map1', 'assets/maps/tilemap.json', null, Phaser.Tilemap.TILED_JSON);
   game.load.image('maze-template', 'assets/maps/maze-template.png');
@@ -48,13 +50,16 @@ function getCoordinates(pointer) {
 }
 
 function addNewPlayer(id, x, y) {
-  game.playerMap[id] = game.add.sprite(x, y, 'sprite');
+  game.playerMap[id] = game.add.sprite(x, y, 'frog');
   game.playerMap[id].speedMultiplier = 1;
+  game.playerMap[id].anchor.setTo(.5, 0);
 }
 
 function addNewDot(id, x, y) {
   console.log('add new dot', id, x, y);
-  game.dotMap[id] = game.add.sprite(x, y, 'dot');
+  game.dotMap[id] = game.add.sprite(x, y, 'collectable');
+  game.dotMap[id].animations.add('spin');
+  game.dotMap[id].animations.play('spin', 6, true);
 }
 
 function updateDots(id, x, y) {
@@ -64,14 +69,21 @@ function updateDots(id, x, y) {
 
 function updateSprites(id, hero) {
   if (hero) {
-    game.playerMap[id].loadTexture('sprite');
+    game.playerMap[id].loadTexture('frog');
   } else {
     game.playerMap[id].loadTexture('ghost');
   }
+  game.playerMap[id].animations.add('move');
 }
 
-function movePlayer(id, targetX, targetY) {
+function movePlayer(id, targetX, targetY, direction) {
   var player = game.playerMap[id];
+  if (direction == "left") {
+    player.scale.x = -1;
+  }
+  if (direction == "right") {
+    player.scale.x = 1;
+  }
   var tween = game.add.tween(player);
   var duration = 320 / player.speedMultiplier;
   tween.to({
@@ -79,6 +91,7 @@ function movePlayer(id, targetX, targetY) {
     y: targetY
   }, duration);
   tween.start();
+  game.playerMap[id].animations.play('move', 3, true);
   tween.onComplete.add(() => {
     client.targetReached()
   });
@@ -95,6 +108,7 @@ function handleCursorInput() {
     if (game.cursors[direction].isDown && client.direction != direction) {
       client.direction = direction;
       console.log(direction + "Detected");
+      //flip sprite
     }
   });
 }

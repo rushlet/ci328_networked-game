@@ -99,14 +99,13 @@ class Client {
     });
 
     this.socket.on('powerupCaught', function(powerup, player) {
-      console.log('caught a powerup!');
+      game.gameWorld.updatePowerup(false, 0, 0);
       if (powerup == 'Double Speed' || powerup == 'Half Speed') {
         game.playerMap[player.id].speedMultiplier = player.powerups.speedMultiplier;
       }
       if (client.ID == player.id) {
         game.gameWorld.powerupText(powerup);
       }
-      game.gameWorld.updatePowerup(false, 0, 0);
     });
 
     this.socket.on('powerupExpire', function(visibility, x, y) {
@@ -123,7 +122,7 @@ class Client {
 
   move() {
     this.socket.on('move', function(data) {
-      movePlayer(data.id, data.expectedPosition.x, data.expectedPosition.y);
+      movePlayer(data.id, data.expectedPosition.x, data.expectedPosition.y, data.direction);
     });
   }
 
