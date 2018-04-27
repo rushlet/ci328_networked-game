@@ -3,7 +3,6 @@ class Client {
   constructor() {
     this.direction;
     this.socket = io(location.hostname + ':55000');
-    this.newPlayer();
     this.allPlayers();
     this.setID();
     this.startGame();
@@ -20,12 +19,6 @@ class Client {
   }
 
   // Client Socket On Functions
-  newPlayer() {
-    this.socket.on('newplayer', function(data) {
-      addNewPlayer(data.id, data.x, data.y);
-    });
-  }
-
   allPlayers() {
     let client = this;
     this.socket.on('allplayers', function(data) {
@@ -108,9 +101,8 @@ class Client {
       }
     });
 
-    this.socket.on('powerupExpire', function(visibility, x, y) {
-      // game.gameWorld.updatePowerup(visibility, x, y);
-      game.playerMap[client.ID].speedMultiplier = 1;
+    this.socket.on('powerupExpire', function(id) {
+      game.playerMap[id].speedMultiplier = 1;
     });
   }
 
@@ -186,9 +178,5 @@ class Client {
   gameLoaded() {
     this.socket.emit('gameLoaded');
   }
-
-  // checkServerTimer() {
-  //   this.socket.emit('whatsTheTimeMrWolf?');
-  // }
 
 }

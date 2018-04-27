@@ -93,7 +93,9 @@ function movePlayer(id, targetX, targetY, direction) {
   tween.start();
   game.playerMap[id].animations.play('move', 3, true);
   tween.onComplete.add(() => {
-    client.targetReached()
+    if (id === client.ID) {
+      client.targetReached();
+    }
   });
 }
 

@@ -12,7 +12,8 @@ module.exports = class GameWorld {
     this.powerups = ['Double Speed', 'Double Points', 'Half Speed', 'Half Points'];
   }
 
-  gamePrep(io, client) {
+  gamePrep(io, client, lobby) {
+    var gameWorld = this;
     this.chooseHero();
     this.generateEntity('dots', 5);
     this.generateEntity('powerups', 1);
@@ -20,12 +21,28 @@ module.exports = class GameWorld {
     io.emit('updateHero', this.getArrayOfEntityType('players'));
     io.emit('addUI', this.getArrayOfEntityType('players'), client.user.id);
     io.emit('startGame');
-    this.startGameTimer(io);
+    this.startGameTimer(io, lobby);
     this.addPowerups(io);
+
+    Object.keys(this.entities.players).forEach(function(id) {
+      var player = gameWorld.entities.players[id];
+      io.emit('move', player);
+    });
+  }
+
+  setPlayerStartingPositions() {
+    var gameWorld = this;
+    Object.keys(this.entities.players).forEach(function(id) {
+      var playerPosition = gameWorld.initialEntityPosition(gameWorld.tilemap);
+      gameWorld.entities.players[id].x = playerPosition.worldX;
+      gameWorld.entities.players[id].y = playerPosition.worldY;
+      gameWorld.entities.players[id].expectedPosition.x = playerPosition.worldX;
+      gameWorld.entities.players[id].expectedPosition.y = playerPosition.worldY;
+    });
   }
 
   chooseHero() {
-    var hero = this.randomInt(1, 2);
+    var hero = this.randomInt(1, 4);
     console.log('hero is ', hero);
     this.entities.players[hero].hero = true;
   }
@@ -42,12 +59,11 @@ module.exports = class GameWorld {
     this.entities[type][id] = {
       id: id,
       x: x,
-      y: y
+      y: y,
     }
     if (type === "powerups") {
       this.entities[type][id]["visible"] = false;
-    }
-    else if (type === "players") {
+    } else if (type === "players") {
       this.entities[type][id]["direction"] = "";
       this.entities[type][id]["expectedPosition"] = {
         x: x,
@@ -75,7 +91,6 @@ module.exports = class GameWorld {
       Object.keys(entities[type]).forEach(function(id) {
         if (player != entities[type][id]) {
           if (player.x === entities[type][id].x && player.y === entities[type][id].y) {
-            console.log(type, "Collision");
             if (type == 'dots' && player.hero) {
               gameWorld.dotCollision(id, io, player, tilemap);
             } else if (type == 'players') {
@@ -83,7 +98,9 @@ module.exports = class GameWorld {
             } else if (type == "powerups" && entities.powerups[0].visible) {
               gameWorld.powerupCollision(id, io, player)
             }
-            client.emit('updateScore', player.score);
+            if (client != null) {
+              client.emit('updateScore', player.score);
+            }
             io.emit('updateOtherScores', gameWorld.getArrayOfEntityType('players'));
           }
         }
@@ -104,6 +121,13 @@ module.exports = class GameWorld {
       this.entities.players[id].hero = false;
       this.entities.players[player.id].hero = true;
       this.entities.players[player.id].score += 4 * player.powerups.pointMultiplier;
+      //Needs refactoring
+      var playerPosition = this.initialEntityPosition(this.tilemap);
+      this.entities.players[id].x = playerPosition.worldX;
+      this.entities.players[id].y = playerPosition.worldY;
+      this.entities.players[id].expectedPosition.x = playerPosition.worldX;
+      this.entities.players[id].expectedPosition.y = playerPosition.worldY;
+      io.emit('move', this.entities.players[id]);
       io.emit('updateHero', this.getArrayOfEntityType('players'));
     } else if (!this.entities.players[id].hero && player.hero) {
       this.entities.players[id].hero = true;
@@ -114,15 +138,15 @@ module.exports = class GameWorld {
   }
 
   powerupCollision(id, io, player) {
-    var gameWorld = this;
-    var random = gameWorld.randomInt(0, gameWorld.powerups.length-1);
-    let selectedPowerup = gameWorld.powerups[gameWorld.randomInt(0, gameWorld.powerups.length)];
-    gameWorld.applyPowerup(selectedPowerup, player);
+    this.entities.powerups[0].visible = false;
+    var random = this.randomInt(0, this.powerups.length - 1);
+    let selectedPowerup = this.powerups[this.randomInt(0, this.powerups.length)];
+    this.applyPowerup(selectedPowerup, player);
     io.emit('powerupCaught', selectedPowerup, player);
     let powerupExpire = setTimeout(() => {
       player.powerups.speedMultiplier = 1;
       player.powerups.pointMultiplier = 1;
-      io.emit('powerupExpire');
+      io.emit('powerupExpire', player.id);
       clearTimeout(powerupExpire);
     }, 5000);
   }
@@ -151,7 +175,6 @@ module.exports = class GameWorld {
     var y = this.randomInt(3, 18);
     var x = this.randomInt(1, 38);
     var randomTile = tilemap[y][x];
-    console.log(randomTile);
     if (randomTile != 10) {
       return this.initialEntityPosition(tilemap);
     } else {
@@ -181,36 +204,34 @@ module.exports = class GameWorld {
     return output;
   }
 
-  startGameTimer(io) {
+  startGameTimer(io, lobby) {
     let duration = 150000;
     io.emit('startGameTimer', duration);
     this.gameOverTimer = setTimeout(() => {
       io.emit('endGame', duration);
-      this.stopTimers();
+      this.stopTimers(lobby);
     }, duration);
   }
 
   addPowerups(io) {
-    let duration = 10000;
-    console.log(this.entities.powerups);
+    let duration = this.randomInt(5000, 15000);
     io.emit('addPowerup', this.entities.powerups[0].x, this.entities.powerups[0].y);
     this.powerupTimer = setInterval(() => {
+      let location = this.initialEntityPosition(this.tilemap)
+      this.entities.powerups[0].x = location.worldX;
+      this.entities.powerups[0].y = location.worldY;
       if (this.entities.powerups[0].visible) {
         this.entities.powerups[0].visible = false;
-        let location = this.initialEntityPosition(this.tilemap)
-        this.entities.powerups[0].x = location.worldX;
-        this.entities.powerups[0].y = location.worldY;
-        console.log(this.entities.powerups[0]);
       } else {
         this.entities.powerups[0].visible = true;
-        console.log(this.entities.powerups[0]);
       }
       io.emit('updatePowerup', this.entities.powerups[0].visible, this.entities.powerups[0].x, this.entities.powerups[0].y);
     }, duration);
   }
 
-  stopTimers() {
+  stopTimers(lobby) {
     clearTimeout(this.gameOverTimer);
     clearInterval(this.powerupTimer);
+    clearInterval(lobby.AIUpdateTimer);
   }
 }

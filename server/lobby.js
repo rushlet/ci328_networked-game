@@ -1,40 +1,52 @@
 var User = require('./user.js');
 module.exports = class Lobby {
-  constructor() {
+  constructor(gameWorld) {
     this.users = [];
-    this.maximumPlayers = 2;
+    this.connectedPlayers = 0;
+    this.minimumPlayers = 1;
+    this.maximumPlayers = 4;
     this.gameReady = false;
+
+    for (var i = 0; i < this.maximumPlayers; i++) {
+      var user = new User(this.users.length + 1, gameWorld);
+      this.users.push(user);
+      gameWorld.createEntity("players", user.id, 0, 0);
+    }
+    gameWorld.setPlayerStartingPositions();
   }
 
-  addPlayer(client, gameWorld) {
+  addPlayer(client) {
     console.log("adding player to Lobby");
-    if (this.checkDisconnected() === true) {
+    var connectedPlayers = this.connectedPlayers;
+    if (this.checkSlotAvailable() === true) {
       this.users.forEach(function(user) {
-        if (user.connected === false) {
+        if (user.connected === false && client.user == null) {
           user.connected = true;
+          user.gameLoaded = false;
+          user.isReady = false;
+          user.AI.active = false;
           client.user = user;
-          user.inLobby = true;
+          connectedPlayers++;
         }
       });
-    } else if (this.users.length != this.maximumPlayers) {
-      client.user = new User(this.users.length + 1);
-      client.user.inLobby = true;
-      gameWorld.createEntity("players", client.user.id, 0, 0);
-      this.users.push(client.user);
+    } else {
+      console.log("All slots full");
     }
   }
 
   checkAllReady() {
     var ready = true;
-    if (this.users.length === this.maximumPlayers) {
-      this.users.forEach(function(playerInLobby) {
-        if (playerInLobby.isReady === false) {
+
+    if (this.connectedPlayers <= 2) {
+      this.users.forEach(function(user) {
+        if (user.isReady === false) {
           ready = false;
         }
       });
     } else {
       ready = false;
     }
+
     console.log("Checking Ready : " + ready);
     return ready;
   }
@@ -50,14 +62,25 @@ module.exports = class Lobby {
     return this.gameReady;
   }
 
-  checkDisconnected() {
-    var disconnected = false;
-    this.users.forEach(function(player) {
-      if (player.connected === false) {
-        disconnected = true;
+  checkSlotAvailable() {
+    var available = false;
+    this.users.forEach(function(user) {
+      if (user.connected === false) {
+        available = true;
       }
     });
-    return disconnected;
+    return available;
+  }
+
+  startAIUpdateTimer(io, gameWorld) {
+    var lobby = this;
+    let duration = 500;
+    io.emit('startGaeTimer', duration);
+    this.AIUpdateTimer = setInterval(() => {
+      lobby.users.forEach(function(user) {
+        user.AI.update(io, gameWorld);
+      });
+    }, duration);
   }
 
 }
