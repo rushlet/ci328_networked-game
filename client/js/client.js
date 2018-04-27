@@ -3,7 +3,6 @@ class Client {
   constructor() {
     this.direction;
     this.socket = io(location.hostname + ':55000');
-    this.newPlayer();
     this.allPlayers();
     this.setID();
     this.startGame();
@@ -20,12 +19,6 @@ class Client {
   }
 
   // Client Socket On Functions
-  newPlayer() {
-    this.socket.on('newplayer', function(data) {
-      addNewPlayer(data.id, data.x, data.y);
-    });
-  }
-
   allPlayers() {
     let client = this;
     this.socket.on('allplayers', function(data) {
@@ -186,9 +179,5 @@ class Client {
   gameLoaded() {
     this.socket.emit('gameLoaded');
   }
-
-  // checkServerTimer() {
-  //   this.socket.emit('whatsTheTimeMrWolf?');
-  // }
 
 }

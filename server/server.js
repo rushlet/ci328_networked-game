@@ -6,20 +6,19 @@ var GameWorld = require('./gameWorld.js');
 main();
 
 function main() {
-  var lobby = new Lobby();
   var gameWorld = new GameWorld();
+  var lobby = new Lobby(gameWorld);
   io.on('connection', function(client) {
 
     client.on('disconnect', function() {
       lobby.users.forEach(function(user) {
         if (user === client.user) {
+          lobby.connectedPlayers--;
           console.log("disconnecting player" + client.user.id)
           user.connected = false;
-          user.isReady = false;
-          user.inLobby = false;
+          user.AI.active = true;
         }
       });
-      console.log(lobby.users);
     });
 
     client.on('test', function() {
@@ -29,7 +28,6 @@ function main() {
     client.on('joinLobby', function() {
       lobby.addPlayer(client, gameWorld);
       client.emit('setID', client.user.id);
-      console.log(lobby.users);
     });
 
     client.on('playerReady', function() {
@@ -43,17 +41,12 @@ function main() {
     client.on('gameLoaded', function() {
       client.user.gameLoaded = true;
       if (lobby.checkGameReady())
-        gameWorld.gamePrep(io, client);
+        gameWorld.gamePrep(io, client, lobby);
+      lobby.startAIUpdateTimer(io, gameWorld);
     });
 
     client.on('newplayer', function() {
-      playerPosition = gameWorld.initialEntityPosition(gameWorld.tilemap);
-      gameWorld.entities.players[client.user.id].x = playerPosition.worldX;
-      gameWorld.entities.players[client.user.id].y = playerPosition.worldY;
-      gameWorld.entities.players[client.user.id].expectedPosition.x = playerPosition.worldX;
-      gameWorld.entities.players[client.user.id].expectedPosition.y = playerPosition.worldY;
-      client.emit('allplayers',gameWorld.getArrayOfEntityType('players'));
-      client.broadcast.emit('newplayer', gameWorld.entities.players[client.user.id]);
+      client.emit('allplayers', gameWorld.getArrayOfEntityType('players'));
 
       client.on('movement', function(direction) {
         var player = gameWorld.entities.players[client.user.id];

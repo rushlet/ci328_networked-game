@@ -1,9 +1,11 @@
+var AI = require('./ai.js');
 module.exports = class User {
-  constructor(id){
+  constructor(id, gameWorld) {
     this.id = id;
-    this.connected = true;
-    this.inLobby = false;
-    this.isReady = false;
-    this.gameLoaded = false;
+    this.connected = false;
+    this.inLobby = true;
+    this.isReady = true;
+    this.gameLoaded = true;
+    this.AI = new AI(id, gameWorld);
   }
 }
