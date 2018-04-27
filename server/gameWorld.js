@@ -142,11 +142,13 @@ module.exports = class GameWorld {
     var random = gameWorld.randomInt(0, gameWorld.powerups.length - 1);
     let selectedPowerup = gameWorld.powerups[gameWorld.randomInt(0, gameWorld.powerups.length)];
     gameWorld.applyPowerup(selectedPowerup, player);
+    gameWorld.entities.powerups[0].x = 0;
+    gameWorld.entities.powerups[0].x = 0;
     io.emit('powerupCaught', selectedPowerup, player);
     let powerupExpire = setTimeout(() => {
       player.powerups.speedMultiplier = 1;
       player.powerups.pointMultiplier = 1;
-      io.emit('powerupExpire');
+      io.emit('powerupExpire', player.id);
       clearTimeout(powerupExpire);
     }, 5000);
   }

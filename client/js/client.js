@@ -102,9 +102,8 @@ class Client {
       game.gameWorld.updatePowerup(false, 0, 0);
     });
 
-    this.socket.on('powerupExpire', function(visibility, x, y) {
-      // game.gameWorld.updatePowerup(visibility, x, y);
-      game.playerMap[client.ID].speedMultiplier = 1;
+    this.socket.on('powerupExpire', function(id) {
+      game.playerMap[id].speedMultiplier = 1;
     });
   }
 
