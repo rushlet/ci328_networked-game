@@ -54,20 +54,85 @@ module.exports = class Ai {
         case "MoveToDot":
           if (entity.hero) {
             action.score++;
+            var target = ai.getClosestEntity(entity, ai.gameWorld.entities, "dots")
+            if (target.distance < 3) {
+              action.score++;
+            }
+            if (target.distance < 5) {
+              action.score++;
+            }
+            if (target.distance < 7) {
+              action.score++;
+            }
+            if (target.distance < 9) {
+              action.score++;
+            }
+            if (target.distance < 13) {
+              action.score++;
+            }
           }
           break;
         case "MoveToHero":
           if (!entity.hero) {
             action.score++;
+            var target = ai.getClosestEntity(entity, ai.gameWorld.entities, "hero")
+            if (target.distance < 3) {
+              action.score++;
+            }
+            if (target.distance < 5) {
+              action.score++;
+            }
+            if (target.distance < 7) {
+              action.score++;
+            }
+            if (target.distance < 9) {
+              action.score++;
+            }
+            if (target.distance < 13) {
+              action.score++;
+            }
           }
           break;
         case "MoveToPowerUp":
-          //if (entities.powerups[0].visible === true) {
-          //  action.score++;
-          //}
+          if (entities.powerups[0].visible === true) {
+            var target = ai.getClosestEntity(entity, ai.gameWorld.entities, "powerups")
+            if (target.distance < 3) {
+              action.score++;
+            }
+            if (target.distance < 5) {
+              action.score++;
+            }
+            if (target.distance < 7) {
+              action.score++;
+            }
+            if (target.distance < 9) {
+              action.score++;
+            }
+            if (target.distance < 13) {
+              action.score++;
+            }
+          }
           break;
         case "AvoidGhost":
-
+          // if (entity.hero) {
+          //   action.score++;
+          //   var target = ai.getClosestEntity(entity, ai.gameWorld.entities, "players")
+          //   if (target.distance < 3) {
+          //     action.score++;
+          //   }
+          //   if (target.distance < 5) {
+          //     action.score++;
+          //   }
+          //   if (target.distance < 7) {
+          //     action.score++;
+          //   }
+          //   if (target.distance < 9) {
+          //     action.score++;
+          //   }
+          //   if (target.distance < 13) {
+          //     action.score++;
+          //   }
+          // }
           break;
         default:
           break;
@@ -105,8 +170,6 @@ module.exports = class Ai {
         Object.keys(entities[type]).forEach(function(id) {
           var targetXIndex = entities[type][id].x / 32;
           var targetYIndex = entities[type][id].y / 32;
-
-
           var targetDistance = ai.calculateDistance(entity.x / 32, entity.y / 32, targetXIndex, targetYIndex);
           if (target.distance > targetDistance) {
             target.x = targetXIndex;
@@ -114,24 +177,17 @@ module.exports = class Ai {
             target.distance = targetDistance;
           }
         });
+      } else if (targetType === "hero") {
+        Object.keys(ai.gameWorld.entities.players).forEach(function(id) {
+          if (ai.gameWorld.entities.players[id].hero) {
+            target.x = ai.gameWorld.entities.players[id].x / 32;
+            target.y = ai.gameWorld.entities.players[id].y / 32;
+            target.distance = ai.calculateDistance(entity.x / 32, entity.y / 32, ai.gameWorld.entities.players[id].x / 32, ai.gameWorld.entities.players[id].y / 32);
+          }
+        });
       }
     });
     return target;
-  }
-
-  getHero(entity){
-    var target = {
-      x : 0,
-      y : 0
-    }
-    var ai = this;
-    Object.keys(ai.gameWorld.entities.players).forEach(function(id) {
-      if(ai.gameWorld.entities.players[id].hero){
-          target.x = ai.gameWorld.entities.players[id].x / 32;;
-          target.y = ai.gameWorld.entities.players[id].y / 32;;
-        }
-      });
-      return target;
   }
 
   calculatePath(target, entity) {
@@ -222,7 +278,7 @@ module.exports = class Ai {
     }
   }
 
-  processPath(path){
+  processPath(path) {
     var directions = [];
     var child = path;
     var gScore = child.g;
@@ -232,8 +288,8 @@ module.exports = class Ai {
     while (gScore != 0) {
       child = parent;
       parent = child.parent;
-      if(child.direction != ""){
-          directions.push(child.direction);
+      if (child.direction != "") {
+        directions.push(child.direction);
       }
       gScore = child.g;
     }
@@ -345,23 +401,25 @@ module.exports = class Ai {
   }
 
   moveToDot(io, entity) {
-    var target = this.getClosestEntity(entity, this.gameWorld.entities, "dots")
+    var target = this.getClosestEntity(entity, this.gameWorld.entities, "dots");
     var directions = this.calculatePath(target, entity);
     this.move(directions[0], entity);
   }
 
   moveToHero(io, entity) {
-    var target = this.getHero(entity)
+    var target = this.getClosestEntity(entity, this.gameWorld.entities, "hero");
     var directions = this.calculatePath(target, entity);
     this.move(directions[0], entity);
   }
 
   moveToPowerUp(io, entity) {
-    // TODO:
+    var target = this.getClosestEntity(entity, this.gameWorld.entities, "powerups");
+    var directions = this.calculatePath(target, entity);
+    this.move(directions[0], entity);
   }
 
   avoidGhost(io, entity) {
-    // TODO:
+    // TO DO
   }
 
 }

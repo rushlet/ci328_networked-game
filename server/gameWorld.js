@@ -121,6 +121,13 @@ module.exports = class GameWorld {
       this.entities.players[id].hero = false;
       this.entities.players[player.id].hero = true;
       this.entities.players[player.id].score += 4 * player.powerups.pointMultiplier;
+      //Needs refactoring
+      var playerPosition = this.initialEntityPosition(this.tilemap);
+      this.entities.players[id].x = playerPosition.worldX;
+      this.entities.players[id].y = playerPosition.worldY;
+      this.entities.players[id].expectedPosition.x = playerPosition.worldX;
+      this.entities.players[id].expectedPosition.y = playerPosition.worldY;
+      io.emit('move', this.entities.players[id]);
       io.emit('updateHero', this.getArrayOfEntityType('players'));
     } else if (!this.entities.players[id].hero && player.hero) {
       this.entities.players[id].hero = true;
