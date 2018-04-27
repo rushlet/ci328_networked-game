@@ -59,7 +59,7 @@ module.exports = class GameWorld {
     this.entities[type][id] = {
       id: id,
       x: x,
-      y: y
+      y: y,
     }
     if (type === "powerups") {
       this.entities[type][id]["visible"] = false;

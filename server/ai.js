@@ -54,10 +54,6 @@ module.exports = class Ai {
         case "MoveToDot":
           if (entity.hero) {
             action.score++;
-
-            if (ai.checkDistanceToEntity(entity, entities, "dots") > 2) {
-              action.score++;
-            }
           }
           break;
         case "MoveToHero":
@@ -97,134 +93,180 @@ module.exports = class Ai {
     activeAction.function(io, entity);
   }
 
-  checkDistanceToEntity(entity, entities, targetType) {
-    var xIndex = entity.x / 32;
-    var yIndex = entity.y / 32;
-    var xDirection = "";
-    var yDirection = "";
+  getClosestEntity(entity, entities, targetType) {
     var ai = this;
-    console.log("////////////////");
+    var target = {
+      x: 0,
+      y: 0,
+      distance: 999
+    };
     Object.keys(entities).forEach(function(type) {
       if (type === targetType) {
         Object.keys(entities[type]).forEach(function(id) {
+          var targetXIndex = entities[type][id].x / 32;
+          var targetYIndex = entities[type][id].y / 32;
 
 
-          var targetTypeXIndex = entities[type][id].x / 32;
-          var targetTypeYIndex = entities[type][id].y / 32;
-
-          var xDistance = xIndex - targetTypeXIndex;
-          var yDistance = yIndex - targetTypeYIndex;
-
-          if (xDistance < 0) {
-            xDirection = "left";
-            xDistance = xDistance - (xDistance * 2)
-          } else {
-            xDirection = "right";
+          var targetDistance = ai.calculateDistance(entity.x / 32, entity.y / 32, targetXIndex, targetYIndex);
+          if (target.distance > targetDistance) {
+            target.x = targetXIndex;
+            target.y = targetYIndex;
+            target.distance = targetDistance;
           }
-
-          if (yDistance < 0) {
-            yDirection = "up";
-            yDistance = yDistance - (yDistance * 2);
-          } else {
-            yDirection = "down";
-          }
-          var target = {
-            yDirection: yDirection,
-            xDirection: xDirection,
-            xIndex: targetTypeXIndex,
-            yIndex: targetTypeYIndex,
-            xDistance: xDistance,
-            yDistance: yDistance
-          }
-          ai.calculatePath(target, entity);
-
-
-          console.log("xDistance: " + xDistance + " xDirection: " + xDirection + " yDistance: " + yDistance + " yDirection: " + yDirection)
         });
       }
     });
+    return target;
+  }
 
-    console.log("\\\\\\\\\\\\\\");
+  getHero(entity){
+    var target = {
+      x : 0,
+      y : 0
+    }
+    var ai = this;
+    Object.keys(ai.gameWorld.entities.players).forEach(function(id) {
+      if(ai.gameWorld.entities.players[id].hero){
+          target.x = ai.gameWorld.entities.players[id].x / 32;;
+          target.y = ai.gameWorld.entities.players[id].y / 32;;
+        }
+      });
+      return target;
   }
 
   calculatePath(target, entity) {
     // based on an introduction to A* path finding article found here : https://www.raywenderlich.com/4946/introduction-to-a-pathfinding
+    var ai = this;
     var open = [];
     var closed = [];
     var tilemap = this.gameWorld.tilemap;
     var walkable = 10;
     var currentTile = {
-        x: entity.x / 32,
-        y: entity.y / 32,
-      f: 0,
-      g: 0,
-      h: target.xDistance + target.yDistance,
+      x: entity.x / 32,
+      y: entity.y / 32,
+      f: 0, // overall Score g + h
+      g: 0, // distance from starting tile
+      h: ai.calculateDistance(entity.x / 32, entity.y / 32, target.x, target.y), // distance to target
+      direction: "",
       parent: {}
     };
+
     currentTile.f = currentTile.g + currentTile.h;
     var pathFound = false;
+    var path = {};
 
     open.push(currentTile)
     do {
-    	currentTile = this.getLowestFScoreTile(open); // Get the square with the lowest F score
+      currentTile = this.getLowestFScoreTile(open); // Get the square with the lowest F score
 
-    	closed.push(currentTile); // add the current square to the closed list
+      closed.push(currentTile); // add the current square to the closed list
       var indexOTile = open.indexOf(currentTile);
       open.splice(indexOTile, 1); // remove it from the open list
-
       closed.forEach(function(tile) { // if we added the destination to the closed list, we've found a path
-        if (tile.x == target.xIndex && tile.y == target.yIndex){// PATH FOUND
+        if (tile.x == target.x && tile.y == target.y) { // PATH FOUND
           pathFound = true;
-          break;
+          path = tile;
         }
       });
-      if(pathFound === true){ // break the loop
+      if (pathFound === true) { // break the loop
         break;
       }
 
-    	var adjacentTiles = this.getAdjacentTiles(currentTile); // Retrieve all its walkable adjacent tiles
+      var adjacentTiles = this.getAdjacentTiles(currentTile); // Retrieve all its walkable adjacent tiles
 
-      adjacentTiles.forEach(function(tile){
+      adjacentTiles.forEach(function(tile) {
         var tileFoundInClosed = false;
         closed.forEach(function(closedTile) {
-          if (closedTile.x == tile.x && closedTile.y == tile.y){
+          if (closedTile.x == tile.x && closedTile.y == tile.y) {
             tileFoundInClosed = true;
-            break;
           }
         });
-        if(tileFoundInClosed === true){ // skip the tile
-          continue;
+        if (tileFoundInClosed === true) { // skip the tile
+          return;
         }
 
         var tileFoundInOpen = false;
         open.forEach(function(openTile) {
-          if (openTile.x == tile.x && openTile.y == tile.y){
+          if (openTile.x == tile.x && openTile.y == tile.y) {
             tileFoundInOpen = true;
-            break;
           }
         });
 
-        if(!tileFoundInOpen){
-          // Compute score , set parent
-          // add to open list
-        }else{
+        if (!tileFoundInOpen) {
+          open.push({
+            x: tile.x,
+            y: tile.y,
+            f: (currentTile.g + 1) + ai.calculateDistance(tile.x, tile.y, target.x, target.y), // overall Score g + h
+            g: currentTile.g + 1, // distance from starting tile
+            h: ai.calculateDistance(tile.x, tile.y, target), // distance to target
+            direction: tile.direction,
+            parent: currentTile
+          })
+        } else {
           // if its already in the open list
-
-      			// test if using the current G score make the aSquare F score lower, if yes update the parent because it means its a better path
-
+          // test if using the current G score make the aSquare F score lower, if yes update the parent because it means its a better path
+          open.forEach(function(openTile) {
+            if (openTile.x == tile.x && openTile.y == tile.y) {
+              if (openTile.f > ((currentTile.g + 1) + ai.calculateDistance(tile.x, tile.y, target.x, target.y))) {
+                openTile.parent = currentTile;
+              }
+            }
+          });
         }
-
       });
-
-    } while(open.length > 0); // Continue until there is no more available square in the open list (which means there is no path)
-
+    } while (open.length > 0); // Continue until there is no more available tiles in the open list (which means there is no path)
+    if (path != null) {
+      return this.processPath(path);
+    } else {
+      console.log("Path Not Found");
+    }
   }
 
-  getLowestFScoreTile(open){
+  processPath(path){
+    var directions = [];
+    var child = path;
+    var gScore = child.g;
+    var parent = child.parent;
+    directions.push(child.direction);
+
+    while (gScore != 0) {
+      child = parent;
+      parent = child.parent;
+      if(child.direction != ""){
+          directions.push(child.direction);
+      }
+      gScore = child.g;
+    }
+    return directions.reverse();
+  }
+
+  printParents(tile) {
+    if (tile.parent != null) {
+      console.log(tile.parent);
+      this.printParents(tile.parent);
+    }
+  }
+
+  calculateDistance(tileX, tileY, targetX, targetY) {
+    var xDistance = tileX - targetX;
+    var yDistance = tileY - targetY;
+
+    if (xDistance < 0) {
+      xDistance = xDistance - (xDistance * 2)
+    }
+
+    if (yDistance < 0) {
+      yDistance = yDistance - (yDistance * 2);
+    }
+
+    return xDistance + yDistance;
+  }
+
+  getLowestFScoreTile(open) {
     var lowestScore = 100;
     var bestTile;
     open.forEach(function(tile) {
-      if (tile.f < lowestScore){
+      if (tile.f < lowestScore) {
         lowestScore = tile.f;
         bestTile = tile;
       }
@@ -232,36 +274,40 @@ module.exports = class Ai {
     return bestTile;
   }
 
-  getAdjacentTiles(currentTile){
-    var tiles = {};
+  getAdjacentTiles(currentTile) {
+    var tiles = [];
     if (this.gameWorld.tilemap[currentTile.y][currentTile.x - 1] === 10) {
       tiles.push({
-          x: currentTile.x - 1,
-          y: currentTile.y
-        })
+        x: currentTile.x - 1,
+        y: currentTile.y,
+        direction: "left"
+      })
     }
 
     if (this.gameWorld.tilemap[currentTile.y][currentTile.x + 1] === 10) {
       tiles.push({
-          x: currentTile.x + 1,
-          y: currentTile.y
-        })
+        x: currentTile.x + 1,
+        y: currentTile.y,
+        direction: "right"
+      })
     }
 
     if (this.gameWorld.tilemap[currentTile.y - 1][currentTile.x] === 10) {
-      tiles.push( {
-          x: currentTile.x,
-          y: currentTile.y - 1
-        })
+      tiles.push({
+        x: currentTile.x,
+        y: currentTile.y - 1,
+        direction: "up"
+      })
     }
 
     if (this.gameWorld.tilemap[currentTile.y + 1][currentTile.x] === 10) {
       tiles.push({
-          x: currentTile.x,
-          y: currentTile.y + 1
-        })
+        x: currentTile.x,
+        y: currentTile.y + 1,
+        direction: "down"
+      })
     }
-        return tiles;
+    return tiles;
   }
 
 
@@ -299,11 +345,15 @@ module.exports = class Ai {
   }
 
   moveToDot(io, entity) {
-    this.move("right", entity);
+    var target = this.getClosestEntity(entity, this.gameWorld.entities, "dots")
+    var directions = this.calculatePath(target, entity);
+    this.move(directions[0], entity);
   }
 
   moveToHero(io, entity) {
-    this.move("left", entity);
+    var target = this.getHero(entity)
+    var directions = this.calculatePath(target, entity);
+    this.move(directions[0], entity);
   }
 
   moveToPowerUp(io, entity) {
