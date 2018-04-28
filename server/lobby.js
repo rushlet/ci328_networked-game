@@ -74,8 +74,7 @@ module.exports = class Lobby {
 
   startAIUpdateTimer(io, gameWorld) {
     var lobby = this;
-    let duration = 500;
-    io.emit('startGaeTimer', duration);
+    let duration = 750;
     this.AIUpdateTimer = setInterval(() => {
       lobby.users.forEach(function(user) {
         user.AI.update(io, gameWorld);

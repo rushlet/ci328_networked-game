@@ -55,89 +55,51 @@ module.exports = class Ai {
           if (entity.hero) {
             action.score++;
             var target = ai.getClosestEntity(entity, ai.gameWorld.entities, "dots")
-            if (target.distance < 3) {
-              action.score++;
-            }
-            if (target.distance < 5) {
-              action.score++;
-            }
-            if (target.distance < 7) {
-              action.score++;
-            }
-            if (target.distance < 9) {
-              action.score++;
-            }
-            if (target.distance < 13) {
-              action.score++;
-            }
+            action.score = ai.incrementScore(target.distance, action.score);
           }
           break;
         case "MoveToHero":
           if (!entity.hero) {
             action.score++;
             var target = ai.getClosestEntity(entity, ai.gameWorld.entities, "hero")
-            if (target.distance < 3) {
-              action.score++;
-            }
-            if (target.distance < 5) {
-              action.score++;
-            }
-            if (target.distance < 7) {
-              action.score++;
-            }
-            if (target.distance < 9) {
-              action.score++;
-            }
-            if (target.distance < 13) {
-              action.score++;
-            }
+            action.score = ai.incrementScore(target.distance, action.score);
           }
           break;
         case "MoveToPowerUp":
           if (entities.powerups[0].visible === true) {
             var target = ai.getClosestEntity(entity, ai.gameWorld.entities, "powerups")
-            if (target.distance < 3) {
-              action.score++;
-            }
-            if (target.distance < 5) {
-              action.score++;
-            }
-            if (target.distance < 7) {
-              action.score++;
-            }
-            if (target.distance < 9) {
-              action.score++;
-            }
-            if (target.distance < 13) {
-              action.score++;
-            }
+            action.score = ai.incrementScore(target.distance, action.score);
           }
           break;
         case "AvoidGhost":
           // if (entity.hero) {
           //   action.score++;
           //   var target = ai.getClosestEntity(entity, ai.gameWorld.entities, "players")
-          //   if (target.distance < 3) {
-          //     action.score++;
-          //   }
-          //   if (target.distance < 5) {
-          //     action.score++;
-          //   }
-          //   if (target.distance < 7) {
-          //     action.score++;
-          //   }
-          //   if (target.distance < 9) {
-          //     action.score++;
-          //   }
-          //   if (target.distance < 13) {
-          //     action.score++;
-          //   }
-          // }
+          // action.score = ai.incrementScore(target.distance, action.score);
           break;
         default:
           break;
       }
     });
+  }
+
+  incrementScore(distance, score) {
+    if (distance < 3) {
+      score++;
+    }
+    if (distance < 5) {
+      score++;
+    }
+    if (distance < 7) {
+      score++;
+    }
+    if (distance < 9) {
+      score++;
+    }
+    if (distance < 13) {
+      score++;
+    }
+    return score;
   }
 
   resetScores() {

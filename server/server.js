@@ -40,9 +40,10 @@ function main() {
 
     client.on('gameLoaded', function() {
       client.user.gameLoaded = true;
-      if (lobby.checkGameReady())
+      if (lobby.checkGameReady()) {
         gameWorld.gamePrep(io, client, lobby);
-      lobby.startAIUpdateTimer(io, gameWorld);
+        lobby.startAIUpdateTimer(io, gameWorld);
+      }
     });
 
     client.on('newplayer', function() {
