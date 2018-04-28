@@ -19,7 +19,6 @@ module.exports = class GameWorld {
     this.generateEntity('powerups', 1);
     io.emit('drawDots', this.getArrayOfEntityType('dots'));
     io.emit('updateHero', this.getArrayOfEntityType('players'));
-    io.emit('addUI', this.getArrayOfEntityType('players'), client.user.id);
     io.emit('startGame');
     this.startGameTimer(io, lobby);
     this.addPowerups(io);
@@ -98,10 +97,7 @@ module.exports = class GameWorld {
             } else if (type == "powerups" && entities.powerups[0].visible) {
               gameWorld.powerupCollision(id, io, player)
             }
-            if (client != null) {
-              client.emit('updateScore', player.score);
-            }
-            io.emit('updateOtherScores', gameWorld.getArrayOfEntityType('players'));
+            io.emit('updateScores', gameWorld.getArrayOfEntityType('players'));
           }
         }
       });

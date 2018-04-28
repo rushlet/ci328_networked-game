@@ -19,8 +19,9 @@ class SceneController {
       // set player ready sprite
     }, null);
     // In Game UI
-    this.createText("ScoreText", "InGame", game.width / 4, 25, "Score: 0", 20);
-    this.createText("GameTimer", "InGame", game.width / 2, 25, "", 20);
+    // this.createText("ScoreText", "InGame", game.width / 4, 25, "Score: 0", 20);
+    this.createText("GameTimer", "InGame", game.width/2 - 30, 25, "", 20);
+    this.createScoreText();
     // Game Over UI
 
   }
@@ -127,5 +128,14 @@ class SceneController {
       }
     });
     return exists;
+  }
+
+  createScoreText() {
+    for (var i = 1; i <= 4; i++) {
+      var space = (i % 2 === 0)? 150 : 0;
+      var width = (i <= 2 )? 0.15 : 0.65;
+      this.createSprite(`player${i}_sprite`, "InGame", game.width * width + space + 30, 10, 32, 32, `ghost${i}`);
+      this.createText(`player${i}_score`, "InGame", game.width * width + space, 45, `Player${i} score: 0`, 12);
+    }
   }
 }

@@ -37,12 +37,7 @@ class Client {
       }
     });
 
-    this.socket.on('updateScore', function(score) {
-      sceneController.setText("ScoreText", `Score: ${score}`);
-    });
-
-    this.socket.on('updateOtherScores', function(players) {
-      // iterate over each player, update their scores on each client
+    this.socket.on('updateScores', function(players) {
       for (var i = 0; i < players.length; i++) {
         sceneController.setText(`player${players[i].id}_score`, `Player${players[i].id} score: ${players[i].score}`);
       }
@@ -98,17 +93,6 @@ class Client {
 
     this.socket.on('startGameTimer', function(countdown) {
       game.gameWorld.setGameTimer(countdown);
-    });
-
-    this.socket.on('addUI', function(players) {
-      // iterate over each player, add score text on each client - except for client score
-      let count = 0;
-      for (var i = 0; i < players.length; i++) {
-        if (players[i].id !== client.ID) {
-          sceneController.createText(`player${players[i].id}_score`, "InGame", game.width * 0.65 + (count * 150), 25, `Player${players[i].id} score: 0`, 12);
-          count ++;
-        }
-      }
     });
 
     this.socket.on('drawDots', function(data) {
