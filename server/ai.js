@@ -370,6 +370,7 @@ module.exports = class Ai {
   move(direction, entity) {
     var currentX = entity.x / 32;
     var currentY = entity.y / 32;
+    entity.direction = direction;
     switch (direction) {
       case "left":
         if (this.gameWorld.tilemap[currentY][currentX - 1] === 10) {
