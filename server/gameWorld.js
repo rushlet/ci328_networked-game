@@ -13,25 +13,13 @@ module.exports = class GameWorld {
   }
 
   chooseTileMap() {
-    this.tileMapSelection = this.randomInt(1, 1);
+    this.tileMapSelection = Math.floor(Math.random() * 3);
     this.tilemap = tilemapper.create2dArrayFromTilemap(this.tileMapSelection)
     this.walkableTile = this.setWalkableTile(this.tileMapSelection);
-    console.log(this.tileMapSelection, this.tilemap, this.walkableTile);
   }
 
   setWalkableTile(mapNumber, io) {
-    var walkableTile;
-    switch (mapNumber) {
-      case 0:
-        walkableTile = 10;
-        break;
-      case 1:
-        walkableTile = 1;
-        break;
-      default:
-        break;
-    }
-    return walkableTile;
+    return (mapNumber == 0) ? 10 : 1;
   }
 
   gamePrep(io, client, lobby) {
@@ -72,7 +60,6 @@ module.exports = class GameWorld {
     var player = this.entities.players[id];
     var currentX = player.x / 32;
     var currentY = player.y / 32;
-    console.log('walkable', this.walkableTile);
     if (player.x === player.expectedPosition.x && player.y === player.expectedPosition.y) {
       player.direction = direction;
       switch (direction) {
@@ -80,32 +67,24 @@ module.exports = class GameWorld {
           if (this.tilemap[currentY][currentX - 1] === this.walkableTile) {
             player.expectedPosition.x -= 32;
             io.emit('move', player);
-          } else {
-            console.log('nope, that\'s a ', this.tilemap[currentY][currentX - 1]);
           }
           break;
         case "right":
           if (this.tilemap[currentY][currentX + 1] === this.walkableTile) {
             player.expectedPosition.x += 32;
             io.emit('move', player);
-          } else {
-            console.log('nope, that\'s a ', this.tilemap[currentY][currentX + 1]);
           }
           break;
         case "up":
           if (this.tilemap[currentY - 1][currentX] === this.walkableTile) {
             player.expectedPosition.y -= 32;
             io.emit('move', player);
-          } else {
-            console.log('nope, that\'s a ', this.tilemap[currentY - 1][currentX]);
           }
           break;
         case "down":
           if (this.tilemap[currentY + 1][currentX] === this.walkableTile) {
             player.expectedPosition.y += 32;
             io.emit('move', player);
-          } else {
-            console.log('nope, that\'s a ', this.tilemap[currentY + 1][currentX]);
           }
           break;
         default:

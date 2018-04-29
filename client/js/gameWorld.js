@@ -7,22 +7,8 @@ class GameWorld {
   }
 
   addTileMap(id) {
-    console.log('add tile map called');
-    var tilemap;
-    var image;
-    switch (id) {
-      case 0:
-        tilemap = 'map1';
-        image = 'maze-template';
-        break;
-      case 1:
-        tilemap = 'map2';
-        image = 'tileset';
-        break;
-      default:
-        break;
-    }
-    this.map = game.add.tilemap(tilemap);
+    var image = (id == 0) ? 'maze-template' : 'tileset';
+    this.map = game.add.tilemap(`map${id+1}`);
     this.layer = this.map.createLayer(`map${id+1}`);
     this.map.addTilesetImage(image);
     this.layer.resizeWorld();
