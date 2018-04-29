@@ -21,8 +21,12 @@ module.exports = class GameWorld {
     this.addPowerups(io);
   }
 
-  callGamePrepEmits(io) {
-    io.emit('drawDots', this.getArrayOfEntityType('dots'));
+  callGamePrepEmits(io, client) {
+    if (client == null) {
+      io.emit('drawDots', this.getArrayOfEntityType('dots'));
+    } else {
+      client.emit('drawDots', this.getArrayOfEntityType('dots'));
+    }
     io.emit('updateHero', this.getArrayOfEntityType('players'));
     io.emit('startGame');
     var gameWorld = this;

@@ -45,7 +45,7 @@ function main() {
         lobby.startAIUpdateTimer(io, gameWorld);
         lobby.gameActive = true;
       }else if( lobby.gameActive){
-        gameWorld.callGamePrepEmits(io);
+        gameWorld.callGamePrepEmits(io, client);
         gameWorld.addPowerups(io);
       }
     });
