@@ -33,10 +33,7 @@ module.exports = class GameWorld {
     var gameWorld = this;
     Object.keys(this.entities.players).forEach(function(id) {
       var playerPosition = gameWorld.initialEntityPosition(gameWorld.tilemap);
-      gameWorld.entities.players[id].x = playerPosition.worldX;
-      gameWorld.entities.players[id].y = playerPosition.worldY;
-      gameWorld.entities.players[id].expectedPosition.x = playerPosition.worldX;
-      gameWorld.entities.players[id].expectedPosition.y = playerPosition.worldY;
+      gameWorld.updateEntityPosition("players", id)
     });
   }
 
@@ -149,8 +146,7 @@ module.exports = class GameWorld {
 
   dotCollision(id, io, player, tilemap) {
     var location = this.initialEntityPosition(tilemap);
-    this.entities.dots[id].x = location.worldX;
-    this.entities.dots[id].y = location.worldY;
+    this.updateEntityPosition("dots", id);
     io.emit('updateDots', this.getArrayOfEntityType('dots'));
     this.entities.players[player.id].score += 2 * player.powerups.pointMultiplier;
   }
@@ -160,15 +156,11 @@ module.exports = class GameWorld {
       this.entities.players[id].hero = false;
       this.entities.players[player.id].hero = true;
       this.entities.players[player.id].score += 4 * player.powerups.pointMultiplier;
-      //Needs refactoring
-      var playerPosition = this.initialEntityPosition(this.tilemap);
-      this.entities.players[id].x = playerPosition.worldX;
-      this.entities.players[id].y = playerPosition.worldY;
-      this.entities.players[id].expectedPosition.x = playerPosition.worldX;
-      this.entities.players[id].expectedPosition.y = playerPosition.worldY;
+      this.updateEntityPosition("players", id)
       io.emit('move', this.entities.players[id]);
       io.emit('updateHero', this.getArrayOfEntityType('players'));
-    } else if (!this.entities.players[id].hero && player.hero) {
+    }
+    else if (!this.entities.players[id].hero && player.hero) {
       this.entities.players[id].hero = true;
       this.entities.players[id].score += 4 * player.powerups.pointMultiplier;
       this.entities.players[player.id].hero = false;
@@ -256,9 +248,7 @@ module.exports = class GameWorld {
     let duration = this.randomInt(5000, 15000);
     io.emit('addPowerup', this.entities.powerups[0].x, this.entities.powerups[0].y);
     this.powerupTimer = setInterval(() => {
-      let location = this.initialEntityPosition(this.tilemap)
-      this.entities.powerups[0].x = location.worldX;
-      this.entities.powerups[0].y = location.worldY;
+      this.updateEntityPosition("powerups", 0);
       if (this.entities.powerups[0].visible) {
         this.entities.powerups[0].visible = false;
       } else {
@@ -266,6 +256,16 @@ module.exports = class GameWorld {
       }
       io.emit('updatePowerup', this.entities.powerups[0].visible, this.entities.powerups[0].x, this.entities.powerups[0].y);
     }, duration);
+  }
+
+  updateEntityPosition(entityType, id) {
+    let location = this.initialEntityPosition(this.tilemap)
+    this.entities[entityType][id].x = location.worldX;
+    this.entities[entityType][id].y = location.worldY;
+    if (entityType === "players") {
+      this.entities.players[id].expectedPosition.x = location.worldX;
+      this.entities.players[id].expectedPosition.y = location.worldY;
+    }
   }
 
   stopTimers(lobby) {
