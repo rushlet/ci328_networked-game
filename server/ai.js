@@ -42,7 +42,6 @@ module.exports = class Ai {
       this.checkConditions(entity, this.gameWorld.entities);
       this.activateAction(io, entity);
       this.gameWorld.checkCollisions(entity, io);
-      io.emit('move', entity);
     }
   }
 
@@ -328,57 +327,22 @@ module.exports = class Ai {
     return tiles;
   }
 
-
-  move(direction, entity) {
-    var currentX = entity.x / 32;
-    var currentY = entity.y / 32;
-    entity.direction = direction;
-    switch (direction) {
-      case "left":
-        if (this.gameWorld.tilemap[currentY][currentX - 1] === 10) {
-          entity.x -= 32;
-          entity.expectedPosition.x -= 32;
-        }
-        break;
-      case "right":
-        if (this.gameWorld.tilemap[currentY][currentX + 1] === 10) {
-          entity.x += 32;
-          entity.expectedPosition.x += 32;
-        }
-        break;
-      case "up":
-        if (this.gameWorld.tilemap[currentY - 1][currentX] === 10) {
-          entity.y -= 32;
-          entity.expectedPosition.y -= 32;
-        }
-        break;
-      case "down":
-        if (this.gameWorld.tilemap[currentY + 1][currentX] === 10) {
-          entity.y += 32;
-          entity.expectedPosition.y += 32;
-        }
-        break;
-      default:
-        break;
-    }
-  }
-
   moveToDot(io, entity) {
     var target = this.getClosestEntity(entity, this.gameWorld.entities, "dots");
     var directions = this.calculatePath(target, entity);
-    this.move(directions[0], entity);
+    this.gameWorld.movePlayer(directions[0], entity.id, io, null);
   }
 
   moveToHero(io, entity) {
     var target = this.getClosestEntity(entity, this.gameWorld.entities, "hero");
     var directions = this.calculatePath(target, entity);
-    this.move(directions[0], entity);
+    this.gameWorld.movePlayer(directions[0], entity.id, io, null);
   }
 
   moveToPowerUp(io, entity) {
     var target = this.getClosestEntity(entity, this.gameWorld.entities, "powerups");
     var directions = this.calculatePath(target, entity);
-    this.move(directions[0], entity);
+    this.gameWorld.movePlayer(directions[0], entity.id, io, null);
   }
 
   avoidGhost(io, entity) {

@@ -50,41 +50,7 @@ function main() {
       client.emit('allplayers', gameWorld.getArrayOfEntityType('players'));
 
       client.on('movement', function(direction) {
-        var player = gameWorld.entities.players[client.user.id];
-        var currentX = player.x / 32;
-        var currentY = player.y / 32;
-        if (player.x === player.expectedPosition.x && player.y === player.expectedPosition.y) {
-          player.direction = direction;
-          switch (direction) {
-            case "left":
-              if (gameWorld.tilemap[currentY][currentX - 1] === 10) {
-                player.expectedPosition.x -= 32;
-                io.emit('move', player);
-              }
-              break;
-            case "right":
-              if (gameWorld.tilemap[currentY][currentX + 1] === 10) {
-                player.expectedPosition.x += 32;
-                io.emit('move', player);
-              }
-              break;
-            case "up":
-              if (gameWorld.tilemap[currentY - 1][currentX] === 10) {
-                player.expectedPosition.y -= 32;
-                io.emit('move', player);
-              }
-              break;
-            case "down":
-              if (gameWorld.tilemap[currentY + 1][currentX] === 10) {
-                player.expectedPosition.y += 32;
-                io.emit('move', player);
-              }
-              break;
-            default:
-              break;
-          }
-          gameWorld.checkCollisions(player, io, client);
-        }
+        gameWorld.movePlayer(direction, client.user.id, io, client);
       });
 
       client.on('targetReached', function() {

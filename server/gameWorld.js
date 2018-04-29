@@ -40,6 +40,49 @@ module.exports = class GameWorld {
     });
   }
 
+  movePlayer(direction, id, io, client) {
+    var player = this.entities.players[id];
+    var currentX = player.x / 32;
+    var currentY = player.y / 32;
+    if (player.x === player.expectedPosition.x && player.y === player.expectedPosition.y) {
+      player.direction = direction;
+      switch (direction) {
+        case "left":
+          if (this.tilemap[currentY][currentX - 1] === 10) {
+            player.expectedPosition.x -= 32;
+            io.emit('move', player);
+          }
+          break;
+        case "right":
+          if (this.tilemap[currentY][currentX + 1] === 10) {
+            player.expectedPosition.x += 32;
+            io.emit('move', player);
+          }
+          break;
+        case "up":
+          if (this.tilemap[currentY - 1][currentX] === 10) {
+            player.expectedPosition.y -= 32;
+            io.emit('move', player);
+          }
+          break;
+        case "down":
+          if (this.tilemap[currentY + 1][currentX] === 10) {
+            player.expectedPosition.y += 32;
+            io.emit('move', player);
+          }
+          break;
+        default:
+          break;
+      }
+      if (client == null) {
+        player.x = player.expectedPosition.x;
+        player.y = player.expectedPosition.y;
+      }
+      this.checkCollisions(player, io, client);
+
+    }
+  };
+
   chooseHero() {
     var hero = this.randomInt(1, 4);
     console.log('hero is ', hero);
