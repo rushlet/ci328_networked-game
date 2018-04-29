@@ -54,27 +54,28 @@ module.exports = class Ai {
           if (entity.hero) {
             action.score++;
             var target = ai.getClosestEntity(entity, ai.gameWorld.entities, "dots")
-            action.score = ai.incrementScore(target.distance, action.score);
+            action.score = ai.incrementScoreByDistance(target.distance, action.score);
           }
           break;
         case "MoveToHero":
           if (!entity.hero) {
             action.score++;
             var target = ai.getClosestEntity(entity, ai.gameWorld.entities, "hero")
-            action.score = ai.incrementScore(target.distance, action.score);
+            action.score = ai.incrementScoreByDistance(target.distance, action.score);
           }
           break;
         case "MoveToPowerUp":
           if (entities.powerups[0].visible === true) {
             var target = ai.getClosestEntity(entity, ai.gameWorld.entities, "powerups")
-            action.score = ai.incrementScore(target.distance, action.score);
+            action.score = ai.incrementScoreByDistance(target.distance, action.score);
           }
           break;
         case "AvoidGhost":
-          // if (entity.hero) {
-          //   action.score++;
-          //   var target = ai.getClosestEntity(entity, ai.gameWorld.entities, "players")
-          // action.score = ai.incrementScore(target.distance, action.score);
+          if (entity.hero) {
+            action.score++;
+            var target = ai.getClosestEntity(entity, ai.gameWorld.entities, "ghosts")
+            action.score = ai.incrementScoreByDistance(target.distance, action.score);
+          }
           break;
         default:
           break;
@@ -82,23 +83,44 @@ module.exports = class Ai {
     });
   }
 
-  incrementScore(distance, score) {
-    if (distance < 3) {
-      score++;
-    }
-    if (distance < 5) {
-      score++;
-    }
-    if (distance < 7) {
-      score++;
-    }
-    if (distance < 9) {
-      score++;
-    }
-    if (distance < 13) {
-      score++;
-    }
-    return score;
+  moveToDot(io, entity) {
+    var target = this.getClosestEntity(entity, this.gameWorld.entities, "dots");
+    var directions = this.calculatePath(target, entity);
+    this.gameWorld.movePlayer(directions[0], entity.id, io, null);
+  }
+
+  moveToHero(io, entity) {
+    var target = this.getClosestEntity(entity, this.gameWorld.entities, "hero");
+    var directions = this.calculatePath(target, entity);
+    this.gameWorld.movePlayer(directions[0], entity.id, io, null);
+  }
+
+  moveToPowerUp(io, entity) {
+    var target = this.getClosestEntity(entity, this.gameWorld.entities, "powerups");
+    var directions = this.calculatePath(target, entity);
+    this.gameWorld.movePlayer(directions[0], entity.id, io, null);
+  }
+
+  avoidGhost(io, entity) {
+    var target = this.getClosestEntity(entity, this.gameWorld.entities, "ghosts");
+    var directions = this.calculatePath(target, entity);
+    var currentTile = {
+      x: entity.x / 32,
+      y: entity.y / 32
+    };
+    var adjacent = this.getAdjacentTiles(currentTile);
+    var bestDirection = [];
+
+    adjacent.forEach(function(tile) {
+      if (tile.direction != directions[0] || tile.direction != directions[1]) {
+        bestDirection.push(tile.direction);
+      }
+    });
+    this.gameWorld.movePlayer(bestDirection[this.gameWorld.randomInt(0, bestDirection.length)], entity.id, io, null);
+  }
+
+  incrementScoreByDistance(distance, score) {
+    return score + (100 - distance);
   }
 
   resetScores() {
@@ -144,6 +166,19 @@ module.exports = class Ai {
             target.x = ai.gameWorld.entities.players[id].x / 32;
             target.y = ai.gameWorld.entities.players[id].y / 32;
             target.distance = ai.calculateDistance(entity.x / 32, entity.y / 32, ai.gameWorld.entities.players[id].x / 32, ai.gameWorld.entities.players[id].y / 32);
+          }
+        });
+      } else if (targetType === "ghosts") {
+        Object.keys(ai.gameWorld.entities.players).forEach(function(id) {
+          if (!ai.gameWorld.entities.players[id].hero) {
+            var targetXIndex = entities.players[id].x / 32;
+            var targetYIndex = entities.players[id].y / 32;
+            var targetDistance = ai.calculateDistance(entity.x / 32, entity.y / 32, targetXIndex, targetYIndex);
+            if (target.distance > targetDistance) {
+              target.x = targetXIndex;
+              target.y = targetYIndex;
+              target.distance = targetDistance;
+            }
           }
         });
       }
@@ -326,27 +361,4 @@ module.exports = class Ai {
     }
     return tiles;
   }
-
-  moveToDot(io, entity) {
-    var target = this.getClosestEntity(entity, this.gameWorld.entities, "dots");
-    var directions = this.calculatePath(target, entity);
-    this.gameWorld.movePlayer(directions[0], entity.id, io, null);
-  }
-
-  moveToHero(io, entity) {
-    var target = this.getClosestEntity(entity, this.gameWorld.entities, "hero");
-    var directions = this.calculatePath(target, entity);
-    this.gameWorld.movePlayer(directions[0], entity.id, io, null);
-  }
-
-  moveToPowerUp(io, entity) {
-    var target = this.getClosestEntity(entity, this.gameWorld.entities, "powerups");
-    var directions = this.calculatePath(target, entity);
-    this.gameWorld.movePlayer(directions[0], entity.id, io, null);
-  }
-
-  avoidGhost(io, entity) {
-    // TO DO
-  }
-
 }

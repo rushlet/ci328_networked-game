@@ -35,18 +35,25 @@ module.exports = class GameWorld {
   }
 
   gamePrep(io, client, lobby) {
-    var gameWorld = this;
     this.chooseHero();
     io.emit('tilemapChosen', gameWorld.tileMapSelection);
     client.emit('allplayers', gameWorld.getArrayOfEntityType('players'));
     this.generateEntity('dots', 5);
     this.generateEntity('powerups', 1);
-    io.emit('drawDots', this.getArrayOfEntityType('dots'));
-    io.emit('updateHero', this.getArrayOfEntityType('players'));
-    io.emit('startGame');
+    this.callGamePrepEmits(io);
     this.startGameTimer(io, lobby);
     this.addPowerups(io);
+  }
 
+  callGamePrepEmits(io, client) {
+    if (client == null) {
+      io.emit('drawDots', this.getArrayOfEntityType('dots'));
+    } else {
+      client.emit('drawDots', this.getArrayOfEntityType('dots'));
+    }
+    io.emit('updateHero', this.getArrayOfEntityType('players'));
+    io.emit('startGame');
+    var gameWorld = this;
     Object.keys(this.entities.players).forEach(function(id) {
       var player = gameWorld.entities.players[id];
       io.emit('move', player);

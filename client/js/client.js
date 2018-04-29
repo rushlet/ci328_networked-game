@@ -10,6 +10,8 @@ class Client {
     this.updateGame();
     this.endGame();
     this.powerups();
+    this.lobbyFull();
+    this.setLobbyScreen();
   }
 
   // Client Socket On Functions
@@ -122,6 +124,20 @@ class Client {
       client.gameLoaded();
     });
   }
+
+  lobbyFull(){
+      this.socket.on('lobbyFull', function(){
+        sceneController.setScreen("LobbyFull");
+      })
+  }
+
+  setLobbyScreen(){
+      this.socket.on('setLobbyScreen', function(){
+        sceneController.setScreen("Lobby");
+      })
+  }
+
+
 
   // Client Emit Functions
   sendTest() {
