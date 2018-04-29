@@ -16,7 +16,7 @@ module.exports = class GameWorld {
     this.tileMapSelection = this.randomInt(1, 1);
     this.tilemap = tilemapper.create2dArrayFromTilemap(this.tileMapSelection)
     this.walkableTile = this.setWalkableTile(this.tileMapSelection);
-    console.log(this.tileMapSelection, this.tilemap, this.walkableTile);
+    console.log(this.tileMapSelection, this.walkableTile);
   }
 
   setWalkableTile(mapNumber, io) {
@@ -36,8 +36,6 @@ module.exports = class GameWorld {
 
   gamePrep(io, client, lobby) {
     this.chooseHero();
-    io.emit('tilemapChosen', this.tileMapSelection);
-    client.emit('allplayers', this.getArrayOfEntityType('players'));
     this.generateEntity('dots', 5);
     this.generateEntity('powerups', 1);
     this.callGamePrepEmits(io);
@@ -46,18 +44,20 @@ module.exports = class GameWorld {
   }
 
   callGamePrepEmits(io, client) {
+    io.emit('tilemapChosen', this.tileMapSelection);
     if (client == null) {
       io.emit('drawDots', this.getArrayOfEntityType('dots'));
     } else {
       client.emit('drawDots', this.getArrayOfEntityType('dots'));
     }
-    io.emit('updateHero', this.getArrayOfEntityType('players'));
     io.emit('startGame');
     var gameWorld = this;
     Object.keys(this.entities.players).forEach(function(id) {
       var player = gameWorld.entities.players[id];
       io.emit('move', player);
     });
+    io.emit('allplayers', this.getArrayOfEntityType('players'));
+    io.emit('updateHero', this.getArrayOfEntityType('players'));
   }
 
   setPlayerStartingPositions() {
