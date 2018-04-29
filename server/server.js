@@ -32,6 +32,7 @@ function main() {
     client.on('playerReady', function() {
       console.log("Client " + client.user.id + " is ready");
       client.user.isReady = true;
+      console.log(lobby);
       if (lobby.checkAllReady() === true) {
         io.emit('loadGame');
       }
@@ -45,6 +46,7 @@ function main() {
         lobby.gameActive = true;
       }else if( lobby.gameActive){
         gameWorld.callGamePrepEmits(io);
+        gameWorld.addPowerups(io);
       }
     });
 

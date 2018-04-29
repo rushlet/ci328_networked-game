@@ -3,7 +3,7 @@ module.exports = class Lobby {
   constructor(gameWorld) {
     this.users = [];
     this.connectedPlayers = 0;
-    this.minimumPlayers = 1;
+    this.minimumPlayers = 2;
     this.maximumPlayers = 4;
     this.gameReady = false;
     this.gameActive = false;
@@ -18,7 +18,7 @@ module.exports = class Lobby {
 
   addPlayer(client) {
     console.log("adding player to Lobby");
-    var connectedPlayers = this.connectedPlayers;
+    var lobby = this;
     if (this.checkSlotAvailable() === true) {
       this.users.forEach(function(user) {
         if (user.connected === false && client.user == null) {
@@ -27,7 +27,7 @@ module.exports = class Lobby {
           user.isReady = false;
           user.AI.active = false;
           client.user = user;
-          connectedPlayers++;
+          lobby.connectedPlayers++;
           client.emit('setID', client.user.id);
           client.emit('setLobbyScreen');
         }
@@ -41,7 +41,7 @@ module.exports = class Lobby {
   checkAllReady() {
     var ready = true;
 
-    if (this.connectedPlayers <= 2) {
+    if (this.connectedPlayers >= this.minimumPlayers) {
       this.users.forEach(function(user) {
         if (user.isReady === false) {
           ready = false;
