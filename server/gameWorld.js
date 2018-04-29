@@ -24,8 +24,6 @@ module.exports = class GameWorld {
 
   gamePrep(io, client, lobby) {
     this.chooseHero();
-    io.emit('tilemapChosen', this.tileMapSelection);
-    client.emit('allplayers', this.getArrayOfEntityType('players'));
     this.generateEntity('dots', 5);
     this.generateEntity('powerups', 1);
     this.callGamePrepEmits(io);
@@ -35,17 +33,21 @@ module.exports = class GameWorld {
 
   callGamePrepEmits(io, client) {
     if (client == null) {
+      io.emit('tilemapChosen', this.tileMapSelection);
+      io.emit('allplayers', this.getArrayOfEntityType('players'));
       io.emit('drawDots', this.getArrayOfEntityType('dots'));
     } else {
+      client.emit('tilemapChosen', this.tileMapSelection);
+      client.emit('allplayers', this.getArrayOfEntityType('players'));
       client.emit('drawDots', this.getArrayOfEntityType('dots'));
     }
-    io.emit('updateHero', this.getArrayOfEntityType('players'));
     io.emit('startGame');
     var gameWorld = this;
     Object.keys(this.entities.players).forEach(function(id) {
       var player = gameWorld.entities.players[id];
       io.emit('move', player);
     });
+    io.emit('updateHero', this.getArrayOfEntityType('players'));
   }
 
   setPlayerStartingPositions() {
@@ -178,8 +180,7 @@ module.exports = class GameWorld {
       this.updateEntityPosition("players", id)
       io.emit('move', this.entities.players[id]);
       io.emit('updateHero', this.getArrayOfEntityType('players'));
-    }
-    else if (!this.entities.players[id].hero && player.hero) {
+    } else if (!this.entities.players[id].hero && player.hero) {
       this.entities.players[id].hero = true;
       this.entities.players[id].score += 4 * player.powerups.pointMultiplier;
       this.entities.players[player.id].hero = false;
