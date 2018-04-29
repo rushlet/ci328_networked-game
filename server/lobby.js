@@ -6,6 +6,7 @@ module.exports = class Lobby {
     this.minimumPlayers = 1;
     this.maximumPlayers = 4;
     this.gameReady = false;
+    this.gameActive = false;
 
     for (var i = 0; i < this.maximumPlayers; i++) {
       var user = new User(this.users.length + 1, gameWorld);

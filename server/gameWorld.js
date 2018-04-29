@@ -13,16 +13,19 @@ module.exports = class GameWorld {
   }
 
   gamePrep(io, client, lobby) {
-    var gameWorld = this;
     this.chooseHero();
     this.generateEntity('dots', 5);
     this.generateEntity('powerups', 1);
+    this.callGamePrepEmits(io);
+    this.startGameTimer(io, lobby);
+    this.addPowerups(io);
+  }
+
+  callGamePrepEmits(io) {
     io.emit('drawDots', this.getArrayOfEntityType('dots'));
     io.emit('updateHero', this.getArrayOfEntityType('players'));
     io.emit('startGame');
-    this.startGameTimer(io, lobby);
-    this.addPowerups(io);
-
+    var gameWorld = this;
     Object.keys(this.entities.players).forEach(function(id) {
       var player = gameWorld.entities.players[id];
       io.emit('move', player);

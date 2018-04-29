@@ -39,9 +39,12 @@ function main() {
 
     client.on('gameLoaded', function() {
       client.user.gameLoaded = true;
-      if (lobby.checkGameReady()) {
+      if (lobby.checkGameReady() && !lobby.gameActive) {
         gameWorld.gamePrep(io, client, lobby);
         lobby.startAIUpdateTimer(io, gameWorld);
+        lobby.gameActive = true;
+      }else if( lobby.gameActive){
+        gameWorld.callGamePrepEmits(io);
       }
     });
 
