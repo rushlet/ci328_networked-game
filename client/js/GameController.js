@@ -24,7 +24,7 @@ function preload() {
   game.load.image('maze-template', 'assets/maps/maze-template.png');
   game.load.image('tileset', 'assets/maps/base_landscape.png');
   game.load.image('splash', 'assets/img/splash.png');
-  game.load.image('background', 'assets/img/background.png');
+  game.load.image('lobby', 'assets/img/lobby.png');
   game.load.image('button', 'assets/img/button1.png');
 }
 

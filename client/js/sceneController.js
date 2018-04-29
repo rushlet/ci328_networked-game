@@ -12,9 +12,10 @@ class SceneController {
       client.joinLobby();
     }, null);
     // Lobby UI
-    this.createSprite("bg", "Lobby", 0, 0, 1280, 800, "background");
-    this.createText("SplashText", "Lobby", game.width / 2, game.height / 2, "This is the Lobby", 20);
-    this.createText("LobbyReadyText", "Lobby", game.width / 2, game.height / 2 + 30, "Ready?", 20);
+    this.createSprite("bg", "Lobby", 0, 0, 1280, 800, "lobby");
+    // this.createText("SplashText", "Lobby", game.width / 2, game.height / 2, "This is the Lobby", 20);
+    this.createSprite("button-bg", "Lobby", game.width / 2 - 75, game.height * 0.75, 150, 46, "button");
+    this.createText("LobbyReadyText", "Lobby", game.width / 2 - 35, game.height * 0.75 + 6.5, "Ready", 24);
     this.addEvent("LobbyReadyText", function() {
       client.playerReady();
     }, null);
@@ -63,7 +64,8 @@ class SceneController {
   createText(name, ui, x, y, string, size, colour = '#fff') {
     var textObject = game.add.text(x, y, string, {
       font: size + 'px Arial',
-      fill: colour
+      fill: colour,
+      align: 'center'
     });
     this.elements.push({
       name: name,
@@ -149,12 +151,13 @@ class SceneController {
 
   createPlayersInLobby() {
     for (var i = 1; i <= 4; i++) {
-      var x = (i % 2 !== 0) ? game.width * 0.65 : game.width * 0.75;
-      var y = (i <= 2) ? game.height * 0.4 : game.height * 0.6;
-      this.createSprite(`player${i}_lobby`, "Lobby", x, y, 32, 32, `ghost${i}`);
-      this.createText(`player${i}_name`, "Lobby", x, y + 35, `Player${i}`, 12);
+      var x = (i % 2 !== 0) ? game.width * 0.7 : game.width * 0.85;
+      var y = (i <= 2) ? game.height * 0.31 : game.height * 0.55;
+      this.createSprite(`player${i}_lobby`, "Lobby", x, y, 48, 48, `ghost${i}`);
+      this.createText(`player${i}_name`, "Lobby", x - 18, y + 85, `Player${i}`, 20);
       if (client.getID() == i) {
-        this.createText('playerAssigned', "Lobby", game.width * 0.15, game.height / 2 + 35, `You are Player${i}`, 18);
+        this.createText('you_are', "Lobby", game.width * 0.19, game.height * 0.42, 'You Are', 16);
+        this.createText('playerAssigned', "Lobby", game.width * 0.185, game.height * 0.475, `Player${i}`, 24);
       }
     }
   }
