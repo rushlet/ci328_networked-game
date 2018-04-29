@@ -8,7 +8,6 @@ class SceneController {
     this.createText("SplashText", "MainMenu", game.width / 2, game.height / 2, "This is the Main Menu", 20);
     this.createText("SplashJoinLobbyText", "MainMenu", game.width / 2, game.height / 2 + 30, "Join Lobby", 20);
     this.addEvent("SplashJoinLobbyText", function() {
-      sceneController.setScreen("Lobby");
       client.joinLobby();
     }, null);
     // Lobby UI
@@ -18,6 +17,14 @@ class SceneController {
       client.playerReady();
       // set player ready sprite
     }, null);
+
+    //LobbyFull UI
+    this.createText("LobbyFullText", "LobbyFull", game.width/2, game.height / 2, "The lobby is full!", 20);
+    this.createText("LobbyFullGoBackText", "LobbyFull", game.width / 2, game.height / 2 + 30, "click here to go back", 20);
+    this.addEvent("LobbyFullGoBackText", function() {
+      sceneController.setScreen("MainMenu");
+    }, null);
+
     // In Game UI
     // this.createText("ScoreText", "InGame", game.width / 4, 25, "Score: 0", 20);
     this.createText("GameTimer", "InGame", game.width/2 - 30, 25, "", 20);
@@ -36,6 +43,9 @@ class SceneController {
         break;
       case "Lobby":
         this.showUI("Lobby");
+        break;
+      case "LobbyFull":
+        this.showUI("LobbyFull");
         break;
       case "InGame":
         this.showUI("InGame");

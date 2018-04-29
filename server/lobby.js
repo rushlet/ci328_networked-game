@@ -27,10 +27,13 @@ module.exports = class Lobby {
           user.AI.active = false;
           client.user = user;
           connectedPlayers++;
+          client.emit('setID', client.user.id);
+          client.emit('setLobbyScreen');
         }
       });
     } else {
       console.log("All slots full");
+      client.emit('lobbyFull');
     }
   }
 

@@ -27,7 +27,6 @@ function main() {
 
     client.on('joinLobby', function() {
       lobby.addPlayer(client, gameWorld);
-      client.emit('setID', client.user.id);
     });
 
     client.on('playerReady', function() {
