@@ -23,7 +23,9 @@ function preload() {
   game.load.tilemap('map4', 'assets/maps/tilemap3.json', null, Phaser.Tilemap.TILED_JSON);
   game.load.image('maze-template', 'assets/maps/maze-template.png');
   game.load.image('tileset', 'assets/maps/base_landscape.png');
-
+  game.load.image('splash', 'assets/img/splash.png');
+  game.load.image('background', 'assets/img/background.png');
+  game.load.image('button', 'assets/img/button1.png');
 }
 
 function create() {

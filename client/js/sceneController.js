@@ -4,12 +4,15 @@ class SceneController {
     this.elements = [];
     this.screen = "";
     // Main Menu UI
-    this.createText("SplashText", "MainMenu", game.width / 2, game.height / 2, "This is the Main Menu", 20);
-    this.createText("SplashJoinLobbyText", "MainMenu", game.width / 2, game.height / 2 + 30, "Join Lobby", 20);
+    this.createSprite("splash", "MainMenu", 0, 0, 1280, 800, "splash");
+    this.createSprite("button-bg", "MainMenu", game.width / 2 - 120, game.height * 0.75, 246, 46, "button");
+    // this.createText("SplashText", "MainMenu", game.width / 2, game.height / 2, "This is the Main Menu", 20);
+    this.createText("SplashJoinLobbyText", "MainMenu", game.width / 2 - 50, game.height * 0.75 + 6.5, "Join Lobby", 24);
     this.addEvent("SplashJoinLobbyText", function() {
       client.joinLobby();
     }, null);
     // Lobby UI
+    this.createSprite("bg", "Lobby", 0, 0, 1280, 800, "background");
     this.createText("SplashText", "Lobby", game.width / 2, game.height / 2, "This is the Lobby", 20);
     this.createText("LobbyReadyText", "Lobby", game.width / 2, game.height / 2 + 30, "Ready?", 20);
     this.addEvent("LobbyReadyText", function() {
