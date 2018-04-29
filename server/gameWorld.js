@@ -44,10 +44,13 @@ module.exports = class GameWorld {
   }
 
   callGamePrepEmits(io, client) {
-    io.emit('tilemapChosen', this.tileMapSelection);
     if (client == null) {
+      io.emit('tilemapChosen', this.tileMapSelection);
+      io.emit('allplayers', this.getArrayOfEntityType('players'));
       io.emit('drawDots', this.getArrayOfEntityType('dots'));
     } else {
+      client.emit('tilemapChosen', this.tileMapSelection);
+      client.emit('allplayers', this.getArrayOfEntityType('players'));
       client.emit('drawDots', this.getArrayOfEntityType('dots'));
     }
     io.emit('startGame');
@@ -56,7 +59,6 @@ module.exports = class GameWorld {
       var player = gameWorld.entities.players[id];
       io.emit('move', player);
     });
-    io.emit('allplayers', this.getArrayOfEntityType('players'));
     io.emit('updateHero', this.getArrayOfEntityType('players'));
   }
 
@@ -199,8 +201,7 @@ module.exports = class GameWorld {
       this.updateEntityPosition("players", id)
       io.emit('move', this.entities.players[id]);
       io.emit('updateHero', this.getArrayOfEntityType('players'));
-    }
-    else if (!this.entities.players[id].hero && player.hero) {
+    } else if (!this.entities.players[id].hero && player.hero) {
       this.entities.players[id].hero = true;
       this.entities.players[id].score += 4 * player.powerups.pointMultiplier;
       this.entities.players[player.id].hero = false;
