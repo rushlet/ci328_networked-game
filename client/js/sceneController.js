@@ -8,7 +8,6 @@ class SceneController {
     this.createText("SplashText", "MainMenu", game.width / 2, game.height / 2, "This is the Main Menu", 20);
     this.createText("SplashJoinLobbyText", "MainMenu", game.width / 2, game.height / 2 + 30, "Join Lobby", 20);
     this.addEvent("SplashJoinLobbyText", function() {
-      sceneController.setScreen("Lobby");
       client.joinLobby();
     }, null);
     // Lobby UI
@@ -18,9 +17,18 @@ class SceneController {
       client.playerReady();
       // set player ready sprite
     }, null);
+
+    //LobbyFull UI
+    this.createText("LobbyFullText", "LobbyFull", game.width/2, game.height / 2, "The lobby is full!", 20);
+    this.createText("LobbyFullGoBackText", "LobbyFull", game.width / 2, game.height / 2 + 30, "click here to go back", 20);
+    this.addEvent("LobbyFullGoBackText", function() {
+      sceneController.setScreen("MainMenu");
+    }, null);
+
     // In Game UI
-    this.createText("ScoreText", "InGame", game.width / 4, 25, "Score: 0", 20);
-    this.createText("GameTimer", "InGame", game.width / 2, 25, "", 20);
+    // this.createText("ScoreText", "InGame", game.width / 4, 25, "Score: 0", 20);
+    this.createText("GameTimer", "InGame", game.width/2 - 30, 25, "", 20);
+    this.createScoreText();
     // Game Over UI
 
   }
@@ -35,6 +43,9 @@ class SceneController {
         break;
       case "Lobby":
         this.showUI("Lobby");
+        break;
+      case "LobbyFull":
+        this.showUI("LobbyFull");
         break;
       case "InGame":
         this.showUI("InGame");
@@ -127,5 +138,14 @@ class SceneController {
       }
     });
     return exists;
+  }
+
+  createScoreText() {
+    for (var i = 1; i <= 4; i++) {
+      var space = (i % 2 === 0)? 150 : 0;
+      var width = (i <= 2 )? 0.15 : 0.65;
+      this.createSprite(`player${i}_sprite`, "InGame", game.width * width + space + 30, 10, 32, 32, `ghost${i}`);
+      this.createText(`player${i}_score`, "InGame", game.width * width + space, 45, `Player${i} score: 0`, 12);
+    }
   }
 }

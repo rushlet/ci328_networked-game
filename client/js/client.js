@@ -7,15 +7,11 @@ class Client {
     this.setID();
     this.startGame();
     this.loadGame();
-    this.drawDots();
-    this.updateDots();
-    this.updateHero();
-    this.updateScore();
-    this.addUI();
-    this.updateOtherScores();
-    this.startGameTimer();
+    this.updateGame();
     this.endGame();
     this.powerups();
+    this.lobbyFull();
+    this.setLobbyScreen();
   }
 
   // Client Socket On Functions
@@ -30,54 +26,22 @@ class Client {
     });
   }
 
-  drawDots() {
-    this.socket.on('drawDots', function(data) {
-      for (var i = 0; i < data.length; i++) {
-        addNewDot(data[i].id, data[i].x, data[i].y);
-      }
-    });
-  }
-
-  updateHero() {
+  updateGame() {
     this.socket.on('updateHero', function(players) {
       for (var i = 0; i < players.length; i++) {
         updateSprites(players[i].id, players[i].hero);
       }
     });
-  }
 
-  updateDots() {
     this.socket.on('updateDots', function(data) {
       for (var i = 0; i < data.length; i++) {
         updateDots(data[i].id, data[i].x, data[i].y);
       }
     });
-  }
 
-  updateScore() {
-    this.socket.on('updateScore', function(score) {
-      sceneController.setText("ScoreText", `Score: ${score}`);
-    });
-  }
-
-  updateOtherScores() {
-    this.socket.on('updateOtherScores', function(players) {
-      // iterate over each player, update their scores on each client
+    this.socket.on('updateScores', function(players) {
       for (var i = 0; i < players.length; i++) {
         sceneController.setText(`player${players[i].id}_score`, `Player${players[i].id} score: ${players[i].score}`);
-      }
-    });
-  }
-
-  addUI() {
-    this.socket.on('addUI', function(players) {
-      // iterate over each player, add score text on each client - except for client score
-      let count = 0;
-      for (var i = 0; i < players.length; i++) {
-        if (players[i].id !== client.ID) {
-          sceneController.createText(`player${players[i].id}_score`, "InGame", game.width * 0.65 + (count * 150), 25, `Player${players[i].id} score: 0`, 12);
-          count ++;
-        }
       }
     });
   }
@@ -92,14 +56,13 @@ class Client {
     });
 
     this.socket.on('powerupCaught', function(powerup, player) {
-      console.log('caught a powerup!');
+      game.gameWorld.updatePowerup(false, 0, 0);
       if (powerup == 'Double Speed' || powerup == 'Half Speed') {
         game.playerMap[player.id].speedMultiplier = player.powerups.speedMultiplier;
       }
       if (client.ID == player.id) {
         game.gameWorld.powerupText(powerup);
       }
-      game.gameWorld.updatePowerup(false, 0, 0);
     });
 
     this.socket.on('powerupExpire', function(id) {
@@ -107,15 +70,9 @@ class Client {
     });
   }
 
-  startGameTimer() {
-    this.socket.on('startGameTimer', function(countdown) {
-      game.gameWorld.setGameTimer(countdown);
-    });
-  }
-
   move() {
     this.socket.on('move', function(data) {
-      movePlayer(data.id, data.expectedPosition.x, data.expectedPosition.y);
+      movePlayer(data.id, data.expectedPosition.x, data.expectedPosition.y, data.direction);
     });
   }
 
@@ -135,6 +92,16 @@ class Client {
     this.socket.on('startGame', function() {
       game.gameReady = true;
     });
+
+    this.socket.on('startGameTimer', function(countdown) {
+      game.gameWorld.setGameTimer(countdown);
+    });
+
+    this.socket.on('drawDots', function(data) {
+      for (var i = 0; i < data.length; i++) {
+        addNewDot(data[i].id, data[i].x, data[i].y);
+      }
+    });
   }
 
   endGame() {
@@ -150,6 +117,20 @@ class Client {
       client.gameLoaded();
     });
   }
+
+  lobbyFull(){
+      this.socket.on('lobbyFull', function(){
+        sceneController.setScreen("LobbyFull");
+      })
+  }
+
+  setLobbyScreen(){
+      this.socket.on('setLobbyScreen', function(){
+        sceneController.setScreen("Lobby");
+      })
+  }
+
+
 
   // Client Emit Functions
   sendTest() {

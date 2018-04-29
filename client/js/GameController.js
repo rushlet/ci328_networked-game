@@ -6,7 +6,7 @@ function main() {
   const GAMEHEIGHT = 800;
 
   // Initialize the phaser game window, give it a width of GAMEWIDTH and a height of GAMEHEIGHT, set the rendering context to auto and attach the window to a div with the ID "GameWindow"
-  game = new Phaser.Game(GAMEWIDTH, GAMEHEIGHT, Phaser.AUTO, 'GameWindow', {
+  game = new Phaser.Game(GAMEWIDTH, GAMEHEIGHT, Phaser.AUTO, 'gameWindow', {
     preload: preload,
     create: create,
     update: update
@@ -14,9 +14,14 @@ function main() {
 }
 
 function preload() {
-  game.load.image('sprite', 'assets/coin.png');
-  game.load.image('dot', 'assets/img/dot.png');
-  game.load.image('ghost', 'assets/img/ghost.png');
+  // game.load.image('dot', 'assets/img/dot.png');
+  game.load.spritesheet('frog', 'assets/img/spritesheets/frog.png', 32, 32, 6);
+  game.load.spritesheet('ghost1', 'assets/img/spritesheets/ghost.png', 32, 32, 6);
+  game.load.spritesheet('ghost2', 'assets/img/spritesheets/ghost2.png', 32, 32, 6);
+  game.load.spritesheet('ghost3', 'assets/img/spritesheets/ghost3.png', 32, 32, 6);
+  game.load.spritesheet('ghost4', 'assets/img/spritesheets/ghost4.png', 32, 32, 6);
+  // game.load.spritesheet('powerup2', 'assets/img/spritesheets/bat-thing2.png', 24, 24, 3);
+  game.load.spritesheet('coin', 'assets/img/spritesheets/coin.png', 30, 30, 6);
   game.load.image('powerup', 'assets/img/star.png');
   game.load.tilemap('map1', 'assets/maps/tilemap.json', null, Phaser.Tilemap.TILED_JSON);
   game.load.image('maze-template', 'assets/maps/maze-template.png');
@@ -48,13 +53,16 @@ function getCoordinates(pointer) {
 }
 
 function addNewPlayer(id, x, y) {
-  game.playerMap[id] = game.add.sprite(x, y, 'sprite');
+  console.log('id', id);
+  game.playerMap[id] = game.add.sprite(x, y, `ghost${id}`);
   game.playerMap[id].speedMultiplier = 1;
 }
 
 function addNewDot(id, x, y) {
   console.log('add new dot', id, x, y);
-  game.dotMap[id] = game.add.sprite(x, y, 'dot');
+  game.dotMap[id] = game.add.sprite(x, y, 'coin');
+  game.dotMap[id].animations.add('spin');
+  game.dotMap[id].animations.play('spin', 6, true);
 }
 
 function updateDots(id, x, y) {
@@ -64,14 +72,22 @@ function updateDots(id, x, y) {
 
 function updateSprites(id, hero) {
   if (hero) {
-    game.playerMap[id].loadTexture('sprite');
+    game.playerMap[id].loadTexture('frog');
   } else {
-    game.playerMap[id].loadTexture('ghost');
+    game.playerMap[id].loadTexture(`ghost${id}`);
   }
+  game.playerMap[id].animations.add('right', [0,1,2], true);
+  game.playerMap[id].animations.add('left', [3,4,5], true);
 }
 
-function movePlayer(id, targetX, targetY) {
+function movePlayer(id, targetX, targetY, direction) {
   var player = game.playerMap[id];
+  console.log(direction);
+  if (direction == "left") {
+    game.playerMap[id].animations.play('left', 3);
+  } else {
+    game.playerMap[id].animations.play('right', 3);
+  }
   var tween = game.add.tween(player);
   var duration = 320 / player.speedMultiplier;
   tween.to({
@@ -96,7 +112,7 @@ function handleCursorInput() {
   directions.forEach((direction) => {
     if (game.cursors[direction].isDown && client.direction != direction) {
       client.direction = direction;
-      console.log(direction + "Detected");
+      //flip sprite
     }
   });
 }

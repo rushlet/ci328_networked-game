@@ -13,17 +13,23 @@ module.exports = class GameWorld {
   }
 
   gamePrep(io, client, lobby) {
-    var gameWorld = this;
     this.chooseHero();
     this.generateEntity('dots', 5);
     this.generateEntity('powerups', 1);
-    io.emit('drawDots', this.getArrayOfEntityType('dots'));
-    io.emit('updateHero', this.getArrayOfEntityType('players'));
-    io.emit('addUI', this.getArrayOfEntityType('players'), client.user.id);
-    io.emit('startGame');
+    this.callGamePrepEmits(io);
     this.startGameTimer(io, lobby);
     this.addPowerups(io);
+  }
 
+  callGamePrepEmits(io, client) {
+    if (client == null) {
+      io.emit('drawDots', this.getArrayOfEntityType('dots'));
+    } else {
+      client.emit('drawDots', this.getArrayOfEntityType('dots'));
+    }
+    io.emit('updateHero', this.getArrayOfEntityType('players'));
+    io.emit('startGame');
+    var gameWorld = this;
     Object.keys(this.entities.players).forEach(function(id) {
       var player = gameWorld.entities.players[id];
       io.emit('move', player);
@@ -40,6 +46,49 @@ module.exports = class GameWorld {
       gameWorld.entities.players[id].expectedPosition.y = playerPosition.worldY;
     });
   }
+
+  movePlayer(direction, id, io, client) {
+    var player = this.entities.players[id];
+    var currentX = player.x / 32;
+    var currentY = player.y / 32;
+    if (player.x === player.expectedPosition.x && player.y === player.expectedPosition.y) {
+      player.direction = direction;
+      switch (direction) {
+        case "left":
+          if (this.tilemap[currentY][currentX - 1] === 10) {
+            player.expectedPosition.x -= 32;
+            io.emit('move', player);
+          }
+          break;
+        case "right":
+          if (this.tilemap[currentY][currentX + 1] === 10) {
+            player.expectedPosition.x += 32;
+            io.emit('move', player);
+          }
+          break;
+        case "up":
+          if (this.tilemap[currentY - 1][currentX] === 10) {
+            player.expectedPosition.y -= 32;
+            io.emit('move', player);
+          }
+          break;
+        case "down":
+          if (this.tilemap[currentY + 1][currentX] === 10) {
+            player.expectedPosition.y += 32;
+            io.emit('move', player);
+          }
+          break;
+        default:
+          break;
+      }
+      if (client == null) {
+        player.x = player.expectedPosition.x;
+        player.y = player.expectedPosition.y;
+      }
+      this.checkCollisions(player, io, client);
+
+    }
+  };
 
   chooseHero() {
     var hero = this.randomInt(1, 4);
@@ -98,10 +147,7 @@ module.exports = class GameWorld {
             } else if (type == "powerups" && entities.powerups[0].visible) {
               gameWorld.powerupCollision(id, io, player)
             }
-            if (client != null) {
-              client.emit('updateScore', player.score);
-            }
-            io.emit('updateOtherScores', gameWorld.getArrayOfEntityType('players'));
+            io.emit('updateScores', gameWorld.getArrayOfEntityType('players'));
           }
         }
       });

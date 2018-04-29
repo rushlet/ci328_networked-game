@@ -27,12 +27,12 @@ function main() {
 
     client.on('joinLobby', function() {
       lobby.addPlayer(client, gameWorld);
-      client.emit('setID', client.user.id);
     });
 
     client.on('playerReady', function() {
       console.log("Client " + client.user.id + " is ready");
       client.user.isReady = true;
+      console.log(lobby);
       if (lobby.checkAllReady() === true) {
         io.emit('loadGame');
       }
@@ -40,50 +40,21 @@ function main() {
 
     client.on('gameLoaded', function() {
       client.user.gameLoaded = true;
-      if (lobby.checkGameReady())
+      if (lobby.checkGameReady() && !lobby.gameActive) {
         gameWorld.gamePrep(io, client, lobby);
-      lobby.startAIUpdateTimer(io, gameWorld);
+        lobby.startAIUpdateTimer(io, gameWorld);
+        lobby.gameActive = true;
+      }else if( lobby.gameActive){
+        gameWorld.callGamePrepEmits(io, client);
+        gameWorld.addPowerups(io);
+      }
     });
 
     client.on('newplayer', function() {
       client.emit('allplayers', gameWorld.getArrayOfEntityType('players'));
 
       client.on('movement', function(direction) {
-        var player = gameWorld.entities.players[client.user.id];
-        var currentX = player.x / 32;
-        var currentY = player.y / 32;
-        if (player.x === player.expectedPosition.x && player.y === player.expectedPosition.y) {
-          player.direction = direction;
-          switch (direction) {
-            case "left":
-              if (gameWorld.tilemap[currentY][currentX - 1] === 10) {
-                player.expectedPosition.x -= 32;
-                io.emit('move', player);
-              }
-              break;
-            case "right":
-              if (gameWorld.tilemap[currentY][currentX + 1] === 10) {
-                player.expectedPosition.x += 32;
-                io.emit('move', player);
-              }
-              break;
-            case "up":
-              if (gameWorld.tilemap[currentY - 1][currentX] === 10) {
-                player.expectedPosition.y -= 32;
-                io.emit('move', player);
-              }
-              break;
-            case "down":
-              if (gameWorld.tilemap[currentY + 1][currentX] === 10) {
-                player.expectedPosition.y += 32;
-                io.emit('move', player);
-              }
-              break;
-            default:
-              break;
-          }
-          gameWorld.checkCollisions(player, io, client);
-        }
+        gameWorld.movePlayer(direction, client.user.id, io, client);
       });
 
       client.on('targetReached', function() {

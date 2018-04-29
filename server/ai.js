@@ -42,7 +42,6 @@ module.exports = class Ai {
       this.checkConditions(entity, this.gameWorld.entities);
       this.activateAction(io, entity);
       this.gameWorld.checkCollisions(entity, io);
-      io.emit('move', entity);
     }
   }
 
@@ -55,89 +54,73 @@ module.exports = class Ai {
           if (entity.hero) {
             action.score++;
             var target = ai.getClosestEntity(entity, ai.gameWorld.entities, "dots")
-            if (target.distance < 3) {
-              action.score++;
-            }
-            if (target.distance < 5) {
-              action.score++;
-            }
-            if (target.distance < 7) {
-              action.score++;
-            }
-            if (target.distance < 9) {
-              action.score++;
-            }
-            if (target.distance < 13) {
-              action.score++;
-            }
+            action.score = ai.incrementScoreByDistance(target.distance, action.score);
           }
           break;
         case "MoveToHero":
           if (!entity.hero) {
             action.score++;
             var target = ai.getClosestEntity(entity, ai.gameWorld.entities, "hero")
-            if (target.distance < 3) {
-              action.score++;
-            }
-            if (target.distance < 5) {
-              action.score++;
-            }
-            if (target.distance < 7) {
-              action.score++;
-            }
-            if (target.distance < 9) {
-              action.score++;
-            }
-            if (target.distance < 13) {
-              action.score++;
-            }
+            action.score = ai.incrementScoreByDistance(target.distance, action.score);
           }
           break;
         case "MoveToPowerUp":
           if (entities.powerups[0].visible === true) {
             var target = ai.getClosestEntity(entity, ai.gameWorld.entities, "powerups")
-            if (target.distance < 3) {
-              action.score++;
-            }
-            if (target.distance < 5) {
-              action.score++;
-            }
-            if (target.distance < 7) {
-              action.score++;
-            }
-            if (target.distance < 9) {
-              action.score++;
-            }
-            if (target.distance < 13) {
-              action.score++;
-            }
+            action.score = ai.incrementScoreByDistance(target.distance, action.score);
           }
           break;
         case "AvoidGhost":
-          // if (entity.hero) {
-          //   action.score++;
-          //   var target = ai.getClosestEntity(entity, ai.gameWorld.entities, "players")
-          //   if (target.distance < 3) {
-          //     action.score++;
-          //   }
-          //   if (target.distance < 5) {
-          //     action.score++;
-          //   }
-          //   if (target.distance < 7) {
-          //     action.score++;
-          //   }
-          //   if (target.distance < 9) {
-          //     action.score++;
-          //   }
-          //   if (target.distance < 13) {
-          //     action.score++;
-          //   }
-          // }
+          if (entity.hero) {
+            action.score++;
+            var target = ai.getClosestEntity(entity, ai.gameWorld.entities, "ghosts")
+            action.score = ai.incrementScoreByDistance(target.distance, action.score);
+          }
           break;
         default:
           break;
       }
     });
+  }
+
+  moveToDot(io, entity) {
+    var target = this.getClosestEntity(entity, this.gameWorld.entities, "dots");
+    var directions = this.calculatePath(target, entity);
+    this.gameWorld.movePlayer(directions[0], entity.id, io, null);
+  }
+
+  moveToHero(io, entity) {
+    var target = this.getClosestEntity(entity, this.gameWorld.entities, "hero");
+    var directions = this.calculatePath(target, entity);
+    this.gameWorld.movePlayer(directions[0], entity.id, io, null);
+  }
+
+  moveToPowerUp(io, entity) {
+    var target = this.getClosestEntity(entity, this.gameWorld.entities, "powerups");
+    var directions = this.calculatePath(target, entity);
+    this.gameWorld.movePlayer(directions[0], entity.id, io, null);
+  }
+
+  avoidGhost(io, entity) {
+    var target = this.getClosestEntity(entity, this.gameWorld.entities, "ghosts");
+    var directions = this.calculatePath(target, entity);
+    var currentTile = {
+      x: entity.x / 32,
+      y: entity.y / 32
+    };
+    var adjacent = this.getAdjacentTiles(currentTile);
+    var bestDirection = [];
+
+    adjacent.forEach(function(tile) {
+      if (tile.direction != directions[0] || tile.direction != directions[1]) {
+        bestDirection.push(tile.direction);
+      }
+    });
+    this.gameWorld.movePlayer(bestDirection[this.gameWorld.randomInt(0, bestDirection.length)], entity.id, io, null);
+  }
+
+  incrementScoreByDistance(distance, score) {
+    return score + (100 - distance);
   }
 
   resetScores() {
@@ -183,6 +166,19 @@ module.exports = class Ai {
             target.x = ai.gameWorld.entities.players[id].x / 32;
             target.y = ai.gameWorld.entities.players[id].y / 32;
             target.distance = ai.calculateDistance(entity.x / 32, entity.y / 32, ai.gameWorld.entities.players[id].x / 32, ai.gameWorld.entities.players[id].y / 32);
+          }
+        });
+      } else if (targetType === "ghosts") {
+        Object.keys(ai.gameWorld.entities.players).forEach(function(id) {
+          if (!ai.gameWorld.entities.players[id].hero) {
+            var targetXIndex = entities.players[id].x / 32;
+            var targetYIndex = entities.players[id].y / 32;
+            var targetDistance = ai.calculateDistance(entity.x / 32, entity.y / 32, targetXIndex, targetYIndex);
+            if (target.distance > targetDistance) {
+              target.x = targetXIndex;
+              target.y = targetYIndex;
+              target.distance = targetDistance;
+            }
           }
         });
       }
@@ -365,61 +361,4 @@ module.exports = class Ai {
     }
     return tiles;
   }
-
-
-  move(direction, entity) {
-    var currentX = entity.x / 32;
-    var currentY = entity.y / 32;
-    switch (direction) {
-      case "left":
-        if (this.gameWorld.tilemap[currentY][currentX - 1] === 10) {
-          entity.x -= 32;
-          entity.expectedPosition.x -= 32;
-        }
-        break;
-      case "right":
-        if (this.gameWorld.tilemap[currentY][currentX + 1] === 10) {
-          entity.x += 32;
-          entity.expectedPosition.x += 32;
-        }
-        break;
-      case "up":
-        if (this.gameWorld.tilemap[currentY - 1][currentX] === 10) {
-          entity.y -= 32;
-          entity.expectedPosition.y -= 32;
-        }
-        break;
-      case "down":
-        if (this.gameWorld.tilemap[currentY + 1][currentX] === 10) {
-          entity.y += 32;
-          entity.expectedPosition.y += 32;
-        }
-        break;
-      default:
-        break;
-    }
-  }
-
-  moveToDot(io, entity) {
-    var target = this.getClosestEntity(entity, this.gameWorld.entities, "dots");
-    var directions = this.calculatePath(target, entity);
-    this.move(directions[0], entity);
-  }
-
-  moveToHero(io, entity) {
-    var target = this.getClosestEntity(entity, this.gameWorld.entities, "hero");
-    var directions = this.calculatePath(target, entity);
-    this.move(directions[0], entity);
-  }
-
-  moveToPowerUp(io, entity) {
-    var target = this.getClosestEntity(entity, this.gameWorld.entities, "powerups");
-    var directions = this.calculatePath(target, entity);
-    this.move(directions[0], entity);
-  }
-
-  avoidGhost(io, entity) {
-    // TO DO
-  }
-
 }
