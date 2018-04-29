@@ -101,13 +101,18 @@ class Client {
         addNewDot(data[i].id, data[i].x, data[i].y);
       }
     });
+
+    this.socket.on('tilemapChosen', function(id) {
+      console.log('calling tile map', id);
+      game.gameWorld.addTileMap(id);
+    });
   }
 
   endGame() {
     this.socket.on('endGame', function() {
+      game.gameWorld.stopTimers();
       console.log("%cGAME OVER", "color: red; font-size: 32px;");
       sceneController.setScreen("GameOver");
-      game.gameWorld.stopTimers();
     });
   }
 

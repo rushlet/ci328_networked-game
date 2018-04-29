@@ -1,13 +1,31 @@
 class GameWorld {
   constructor() {
-    this.map = game.add.tilemap('map1');
-    this.layer = this.map.createLayer('map');
-    this.map.addTilesetImage('maze-template');
-    this.layer.resizeWorld();
     game.cursors = game.input.keyboard.createCursorKeys();
     game.physics.startSystem(Phaser.Physics.ARCADE);
     this.gameTimer = game.time.create(true);
     game.input.onDown.add(this.getTileProperties, this); //enable tile debugging
+  }
+
+  addTileMap(id) {
+    console.log('add tile map called');
+    var tilemap;
+    var image;
+    switch (id) {
+      case 0:
+        tilemap = 'map1';
+        image = 'maze-template';
+        break;
+      case 1:
+        tilemap = 'map2';
+        image = 'tileset';
+        break;
+      default:
+        break;
+    }
+    this.map = game.add.tilemap(tilemap);
+    this.layer = this.map.createLayer(`map${id+1}`);
+    this.map.addTilesetImage(image);
+    this.layer.resizeWorld();
   }
 
   getTileProperties() {

@@ -2,7 +2,7 @@ var tilemapper = require('./utils/tilemap-array-generator.js');
 module.exports = class GameWorld {
 
   constructor() {
-    this.tilemap = tilemapper.create2dArrayFromTilemap(0);
+    this.chooseTileMap();
     this.gameOverTimer;
     this.entities = {
       players: {},
@@ -12,9 +12,33 @@ module.exports = class GameWorld {
     this.powerups = ['Double Speed', 'Double Points', 'Half Speed', 'Half Points'];
   }
 
+  chooseTileMap() {
+    this.tileMapSelection = this.randomInt(1, 1);
+    this.tilemap = tilemapper.create2dArrayFromTilemap(this.tileMapSelection)
+    this.walkableTile = this.setWalkableTile(this.tileMapSelection);
+    console.log(this.tileMapSelection, this.tilemap, this.walkableTile);
+  }
+
+  setWalkableTile(mapNumber, io) {
+    var walkableTile;
+    switch (mapNumber) {
+      case 0:
+        walkableTile = 10;
+        break;
+      case 1:
+        walkableTile = 1;
+        break;
+      default:
+        break;
+    }
+    return walkableTile;
+  }
+
   gamePrep(io, client, lobby) {
     var gameWorld = this;
     this.chooseHero();
+    io.emit('tilemapChosen', gameWorld.tileMapSelection);
+    client.emit('allplayers', gameWorld.getArrayOfEntityType('players'));
     this.generateEntity('dots', 5);
     this.generateEntity('powerups', 1);
     io.emit('drawDots', this.getArrayOfEntityType('dots'));
@@ -41,31 +65,40 @@ module.exports = class GameWorld {
     var player = this.entities.players[id];
     var currentX = player.x / 32;
     var currentY = player.y / 32;
+    console.log('walkable', this.walkableTile);
     if (player.x === player.expectedPosition.x && player.y === player.expectedPosition.y) {
       player.direction = direction;
       switch (direction) {
         case "left":
-          if (this.tilemap[currentY][currentX - 1] === 10) {
+          if (this.tilemap[currentY][currentX - 1] === this.walkableTile) {
             player.expectedPosition.x -= 32;
             io.emit('move', player);
+          } else {
+            console.log('nope, that\'s a ', this.tilemap[currentY][currentX - 1]);
           }
           break;
         case "right":
-          if (this.tilemap[currentY][currentX + 1] === 10) {
+          if (this.tilemap[currentY][currentX + 1] === this.walkableTile) {
             player.expectedPosition.x += 32;
             io.emit('move', player);
+          } else {
+            console.log('nope, that\'s a ', this.tilemap[currentY][currentX + 1]);
           }
           break;
         case "up":
-          if (this.tilemap[currentY - 1][currentX] === 10) {
+          if (this.tilemap[currentY - 1][currentX] === this.walkableTile) {
             player.expectedPosition.y -= 32;
             io.emit('move', player);
+          } else {
+            console.log('nope, that\'s a ', this.tilemap[currentY - 1][currentX]);
           }
           break;
         case "down":
-          if (this.tilemap[currentY + 1][currentX] === 10) {
+          if (this.tilemap[currentY + 1][currentX] === this.walkableTile) {
             player.expectedPosition.y += 32;
             io.emit('move', player);
+          } else {
+            console.log('nope, that\'s a ', this.tilemap[currentY + 1][currentX]);
           }
           break;
         default:
@@ -205,8 +238,8 @@ module.exports = class GameWorld {
     var entities = this.entities;
     var y = this.randomInt(3, 18);
     var x = this.randomInt(1, 38);
-    var randomTile = tilemap[y][x];
-    if (randomTile != 10) {
+    var randomTile = this.tilemap[y][x];
+    if (randomTile != this.walkableTile) {
       return this.initialEntityPosition(tilemap);
     } else {
       Object.keys(entities).forEach(function(entityType) {

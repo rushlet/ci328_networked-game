@@ -18,7 +18,10 @@ function preload() {
   game.load.spritesheet('coin', 'assets/img/spritesheets/coin.png', 30, 30, 6);
   game.load.image('powerup', 'assets/img/star.png');
   game.load.tilemap('map1', 'assets/maps/tilemap.json', null, Phaser.Tilemap.TILED_JSON);
+  game.load.tilemap('map2', 'assets/maps/tilemap1.json', null, Phaser.Tilemap.TILED_JSON);
   game.load.image('maze-template', 'assets/maps/maze-template.png');
+  game.load.image('tileset', 'assets/maps/base_landscape.png');
+
 }
 
 function create() {
@@ -63,22 +66,14 @@ function updateDots(id, x, y) {
 }
 
 function updateSprites(id, hero) {
-  if (hero) {
-    game.playerMap[id].loadTexture('frog');
-  } else {
-    game.playerMap[id].loadTexture(`ghost${id}`);
-  }
+  (hero) ? game.playerMap[id].loadTexture('frog') : game.playerMap[id].loadTexture(`ghost${id}`);
   game.playerMap[id].animations.add('right', [0,1,2], true);
   game.playerMap[id].animations.add('left', [3,4,5], true);
 }
 
 function movePlayer(id, targetX, targetY, direction) {
   var player = game.playerMap[id];
-  if (direction == "left") {
-    game.playerMap[id].animations.play('left', 3);
-  } else {
-    game.playerMap[id].animations.play('right', 3);
-  }
+  (direction == "left") ? game.playerMap[id].animations.play('left', 3) : game.playerMap[id].animations.play('right', 3);
   var tween = game.add.tween(player);
   var duration = 320 / player.speedMultiplier;
   tween.to({
@@ -103,7 +98,6 @@ function handleCursorInput() {
   directions.forEach((direction) => {
     if (game.cursors[direction].isDown && client.direction != direction) {
       client.direction = direction;
-      //flip sprite
     }
   });
 }

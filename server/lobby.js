@@ -1,12 +1,11 @@
 var User = require('./user.js');
 module.exports = class Lobby {
-  constructor(gameWorld) {
+  constructor(gameWorld, io) {
     this.users = [];
     this.connectedPlayers = 0;
     this.minimumPlayers = 1;
     this.maximumPlayers = 4;
     this.gameReady = false;
-
     for (var i = 0; i < this.maximumPlayers; i++) {
       var user = new User(this.users.length + 1, gameWorld);
       this.users.push(user);
