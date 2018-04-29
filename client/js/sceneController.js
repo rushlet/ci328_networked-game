@@ -3,7 +3,6 @@ class SceneController {
     console.log("Constructing UI Elements")
     this.elements = [];
     this.screen = "";
-
     // Main Menu UI
     this.createText("SplashText", "MainMenu", game.width / 2, game.height / 2, "This is the Main Menu", 20);
     this.createText("SplashJoinLobbyText", "MainMenu", game.width / 2, game.height / 2 + 30, "Join Lobby", 20);
@@ -16,14 +15,12 @@ class SceneController {
     this.createText("LobbyReadyText", "Lobby", game.width / 2, game.height / 2 + 30, "Ready?", 20);
     this.addEvent("LobbyReadyText", function() {
       client.playerReady();
-      // set player ready sprite
     }, null);
     // In Game UI
-    // this.createText("ScoreText", "InGame", game.width / 4, 25, "Score: 0", 20);
-    this.createText("GameTimer", "InGame", game.width/2 - 30, 25, "", 20);
+    this.createText("GameTimer", "InGame", game.width / 2 - 30, 25, "", 20);
     this.createScoreText();
     // Game Over UI
-
+    this.createText("GameOver", "GameOver", game.width / 2 - 30, 25, "GAME OVER", 60, '#c30712');
   }
 
   setScreen(screen) {
@@ -43,17 +40,17 @@ class SceneController {
         client.addClientToServer();
         break;
       case "GameOver":
-        this.showUI("InGame");
+        this.showUI("GameOver");
         break;
       default:
         console.log(screen + " not found");
     }
   }
 
-  createText(name, ui, x, y, string, size) {
+  createText(name, ui, x, y, string, size, colour = '#fff') {
     var textObject = game.add.text(x, y, string, {
       font: size + 'px Arial',
-      fill: '#fff'
+      fill: colour
     });
     this.elements.push({
       name: name,
@@ -121,21 +118,31 @@ class SceneController {
   }
 
   checkObjectExists(name) {
-    let exists = false
+    var exists;
     this.elements.forEach((element) => {
-      if (element.name == name) {
-        exists = true;
-      }
+      exists = (element.name == name) ? true : false;
     });
     return exists;
   }
 
   createScoreText() {
     for (var i = 1; i <= 4; i++) {
-      var space = (i % 2 === 0)? 150 : 0;
-      var width = (i <= 2 )? 0.15 : 0.65;
-      this.createSprite(`player${i}_sprite`, "InGame", game.width * width + space + 30, 10, 32, 32, `ghost${i}`);
+      var space = (i % 2 === 0) ? 150 : 0;
+      var width = (i <= 2) ? 0.15 : 0.65;
+      this.createSprite(`player${i}_score_sprite`, "InGame", game.width * width + space + 30, 10, 32, 32, `ghost${i}`);
       this.createText(`player${i}_score`, "InGame", game.width * width + space, 45, `Player${i} score: 0`, 12);
+    }
+  }
+
+  createPlayersInLobby() {
+    for (var i = 1; i <= 4; i++) {
+      var x = (i % 2 !== 0) ? game.width * 0.65 : game.width * 0.75;
+      var y = (i <= 2) ? game.height * 0.4 : game.height * 0.6;
+      this.createSprite(`player${i}_lobby`, "Lobby", x, y, 32, 32, `ghost${i}`);
+      this.createText(`player${i}_name`, "Lobby", x, y + 35, `Player${i}`, 12);
+      if (client.getID() == i) {
+        this.createText('playerAssigned', "Lobby", game.width * 0.15, game.height / 2 + 35, `You are Player${i}`, 18);
+      }
     }
   }
 }

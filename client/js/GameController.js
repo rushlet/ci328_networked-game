@@ -1,11 +1,7 @@
 ﻿
 function main() {
-  console.log("main()");
-
   const GAMEWIDTH = 1280;
   const GAMEHEIGHT = 800;
-
-  // Initialize the phaser game window, give it a width of GAMEWIDTH and a height of GAMEHEIGHT, set the rendering context to auto and attach the window to a div with the ID "GameWindow"
   game = new Phaser.Game(GAMEWIDTH, GAMEHEIGHT, Phaser.AUTO, 'gameWindow', {
     preload: preload,
     create: create,
@@ -14,13 +10,11 @@ function main() {
 }
 
 function preload() {
-  // game.load.image('dot', 'assets/img/dot.png');
   game.load.spritesheet('frog', 'assets/img/spritesheets/frog.png', 32, 32, 6);
   game.load.spritesheet('ghost1', 'assets/img/spritesheets/ghost.png', 32, 32, 6);
   game.load.spritesheet('ghost2', 'assets/img/spritesheets/ghost2.png', 32, 32, 6);
   game.load.spritesheet('ghost3', 'assets/img/spritesheets/ghost3.png', 32, 32, 6);
   game.load.spritesheet('ghost4', 'assets/img/spritesheets/ghost4.png', 32, 32, 6);
-  // game.load.spritesheet('powerup2', 'assets/img/spritesheets/bat-thing2.png', 24, 24, 3);
   game.load.spritesheet('coin', 'assets/img/spritesheets/coin.png', 30, 30, 6);
   game.load.image('powerup', 'assets/img/star.png');
   game.load.tilemap('map1', 'assets/maps/tilemap.json', null, Phaser.Tilemap.TILED_JSON);
@@ -53,13 +47,11 @@ function getCoordinates(pointer) {
 }
 
 function addNewPlayer(id, x, y) {
-  console.log('id', id);
   game.playerMap[id] = game.add.sprite(x, y, `ghost${id}`);
   game.playerMap[id].speedMultiplier = 1;
 }
 
 function addNewDot(id, x, y) {
-  console.log('add new dot', id, x, y);
   game.dotMap[id] = game.add.sprite(x, y, 'coin');
   game.dotMap[id].animations.add('spin');
   game.dotMap[id].animations.play('spin', 6, true);
@@ -82,7 +74,6 @@ function updateSprites(id, hero) {
 
 function movePlayer(id, targetX, targetY, direction) {
   var player = game.playerMap[id];
-  console.log(direction);
   if (direction == "left") {
     game.playerMap[id].animations.play('left', 3);
   } else {

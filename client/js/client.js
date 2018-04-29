@@ -83,6 +83,7 @@ class Client {
   setID() {
     this.socket.on('setID', function(id) {
       client.ID = id;
+      sceneController.createPlayersInLobby();
     });
   }
 
@@ -105,6 +106,7 @@ class Client {
   endGame() {
     this.socket.on('endGame', function() {
       console.log("%cGAME OVER", "color: red; font-size: 32px;");
+      sceneController.setScreen("GameOver");
       game.gameWorld.stopTimers();
     });
   }
@@ -143,6 +145,11 @@ class Client {
 
   gameLoaded() {
     this.socket.emit('gameLoaded');
+  }
+
+  // other
+  getID() {
+    return client.ID;
   }
 
 }
