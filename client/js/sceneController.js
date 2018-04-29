@@ -24,7 +24,7 @@ class SceneController {
     }, null);
 
     // In Game UI
-    this.createText("GameTimer", "InGame", game.width / 2 - 30, 25, "", 20);
+    this.createText("GameTimer", "InGame", game.width / 2 - 30, 35, "", 24);
     this.createScoreText();
     // Game Over UI
     this.createText("GameOver", "GameOver", game.width / 2 - 30, 25, "GAME OVER", 60, '#c30712');
@@ -139,8 +139,8 @@ class SceneController {
     for (var i = 1; i <= 4; i++) {
       var space = (i % 2 === 0) ? 150 : 0;
       var width = (i <= 2) ? 0.15 : 0.65;
-      this.createSprite(`player${i}_score_sprite`, "InGame", game.width * width + space + 30, 10, 32, 32, `ghost${i}`);
-      this.createText(`player${i}_score`, "InGame", game.width * width + space, 45, `Player${i} score: 0`, 12);
+      this.createSprite(`player${i}_score_sprite`, "InGame", game.width * width + space + 30, 20, 32, 32, `ghost${i}`);
+      this.createText(`player${i}_score`, "InGame", game.width * width + space, 55, `Player${i} score: 0`, 12);
     }
   }
 
