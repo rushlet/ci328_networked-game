@@ -36,8 +36,8 @@ module.exports = class GameWorld {
 
   gamePrep(io, client, lobby) {
     this.chooseHero();
-    io.emit('tilemapChosen', gameWorld.tileMapSelection);
-    client.emit('allplayers', gameWorld.getArrayOfEntityType('players'));
+    io.emit('tilemapChosen', this.tileMapSelection);
+    client.emit('allplayers', this.getArrayOfEntityType('players'));
     this.generateEntity('dots', 5);
     this.generateEntity('powerups', 1);
     this.callGamePrepEmits(io);
