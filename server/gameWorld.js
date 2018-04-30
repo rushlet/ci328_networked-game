@@ -23,7 +23,6 @@ module.exports = class GameWorld {
   }
 
   gamePrep(io, client, lobby) {
-    this.chooseHero();
     this.generateEntity('dots', 5);
     this.generateEntity('powerups', 1);
     this.callGamePrepEmits(io);
@@ -105,6 +104,7 @@ module.exports = class GameWorld {
     var hero = this.randomInt(1, 4);
     console.log('hero is ', hero);
     this.entities.players[hero].hero = true;
+    return this.entities.players[hero];
   }
 
   generateEntity(type, quantity) {

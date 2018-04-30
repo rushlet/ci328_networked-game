@@ -91,6 +91,11 @@ class Client {
   }
 
   startGame() {
+
+    this.socket.on('heroChosen', function(){
+      //TO DO
+    });
+
     this.socket.on('startGame', function() {
       game.gameReady = true;
       sceneController.createText("GameTimer", "InGame", game.width / 2 - 30, 35, "", 24);
