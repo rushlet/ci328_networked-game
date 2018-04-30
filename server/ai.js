@@ -74,7 +74,9 @@ module.exports = class Ai {
           if (entity.hero) {
             action.score++;
             var target = ai.getClosestEntity(entity, ai.gameWorld.entities, "ghosts")
-            action.score = ai.incrementScoreByDistance(target.distance, action.score);
+            if(target.distance < 3){
+              action.score += 100;
+            }
           }
           break;
         default:
@@ -112,7 +114,7 @@ module.exports = class Ai {
     var bestDirection = [];
 
     adjacent.forEach(function(tile) {
-      if (tile.direction != directions[0] || tile.direction != directions[1]) {
+      if (tile.direction != directions[0]) {
         bestDirection.push(tile.direction);
       }
     });
@@ -153,7 +155,7 @@ module.exports = class Ai {
         Object.keys(entities[type]).forEach(function(id) {
           var targetXIndex = entities[type][id].x / 32;
           var targetYIndex = entities[type][id].y / 32;
-          var targetDistance = ai.calculateDistance(entity.x / 32, entity.y / 32, targetXIndex, targetYIndex);
+          var targetDistance = ai.calculateDistance(entity, targetXIndex, targetYIndex);
           if (target.distance > targetDistance) {
             target.x = targetXIndex;
             target.y = targetYIndex;
@@ -165,7 +167,7 @@ module.exports = class Ai {
           if (ai.gameWorld.entities.players[id].hero) {
             target.x = ai.gameWorld.entities.players[id].x / 32;
             target.y = ai.gameWorld.entities.players[id].y / 32;
-            target.distance = ai.calculateDistance(entity.x / 32, entity.y / 32, ai.gameWorld.entities.players[id].x / 32, ai.gameWorld.entities.players[id].y / 32);
+            target.distance = ai.calculateDistance(entity, ai.gameWorld.entities.players[id].x / 32, ai.gameWorld.entities.players[id].y / 32);
           }
         });
       } else if (targetType === "ghosts") {
@@ -173,7 +175,7 @@ module.exports = class Ai {
           if (!ai.gameWorld.entities.players[id].hero) {
             var targetXIndex = entities.players[id].x / 32;
             var targetYIndex = entities.players[id].y / 32;
-            var targetDistance = ai.calculateDistance(entity.x / 32, entity.y / 32, targetXIndex, targetYIndex);
+            var targetDistance = ai.calculateDistance(entity, targetXIndex, targetYIndex);
             if (target.distance > targetDistance) {
               target.x = targetXIndex;
               target.y = targetYIndex;
@@ -198,7 +200,7 @@ module.exports = class Ai {
       y: entity.y / 32,
       f: 0, // overall Score g + h
       g: 0, // distance from starting tile
-      h: ai.calculateDistance(entity.x / 32, entity.y / 32, target.x, target.y), // distance to target
+      h: ai.calculateHScore(entity.x / 32, entity.y / 32, target.x, target.y), // distance to target
       direction: "",
       parent: {}
     };
@@ -248,9 +250,9 @@ module.exports = class Ai {
           open.push({
             x: tile.x,
             y: tile.y,
-            f: (currentTile.g + 1) + ai.calculateDistance(tile.x, tile.y, target.x, target.y), // overall Score g + h
+            f: (currentTile.g + 1) + ai.calculateHScore(tile.x, tile.y, target.x, target.y), // overall Score g + h
             g: currentTile.g + 1, // distance from starting tile
-            h: ai.calculateDistance(tile.x, tile.y, target), // distance to target
+            h: ai.calculateHScore(tile.x, tile.y, target.x, target.y), // distance to target
             direction: tile.direction,
             parent: currentTile
           })
@@ -259,7 +261,7 @@ module.exports = class Ai {
           // test if using the current G score make the aSquare F score lower, if yes update the parent because it means its a better path
           open.forEach(function(openTile) {
             if (openTile.x == tile.x && openTile.y == tile.y) {
-              if (openTile.f > ((currentTile.g + 1) + ai.calculateDistance(tile.x, tile.y, target.x, target.y))) {
+              if (openTile.f > ((currentTile.g + 1) + ai.calculateHScore(tile.x, tile.y, target.x, target.y))) {
                 openTile.parent = currentTile;
               }
             }
@@ -281,7 +283,7 @@ module.exports = class Ai {
     var parent = child.parent;
     directions.push(child.direction);
 
-    while (gScore != 0) {
+    while (gScore != 0 && child != null) {
       child = parent;
       parent = child.parent;
       if (child.direction != "") {
@@ -292,14 +294,16 @@ module.exports = class Ai {
     return directions.reverse();
   }
 
-  printParents(tile) {
-    if (tile.parent != null) {
-      console.log(tile.parent);
-      this.printParents(tile.parent);
+  calculateDistance(entity, targetX, targetY) {
+    var target = {
+      x: targetX,
+      y: targetY
     }
+    var path = this.calculatePath(target, entity);
+    return path.length;
   }
 
-  calculateDistance(tileX, tileY, targetX, targetY) {
+  calculateHScore(tileX, tileY, targetX, targetY){
     var xDistance = tileX - targetX;
     var yDistance = tileY - targetY;
 
