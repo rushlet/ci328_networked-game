@@ -5,23 +5,21 @@ class SceneController {
     // Main Menu UI
     this.createSprite("splash", "MainMenu", 0, 0, 1280, 800, "splash");
     this.createSprite("button-menu", "MainMenu", game.width / 2 - 120, game.height * 0.75, 246, 46, "button-menu");
-    this.addCursorOnHover("button-menu");
     this.addEvent("button-menu", function() {
       client.joinLobby();
     }, null);
     // Lobby UI
     this.createSprite("bg", "Lobby", 0, 0, 1280, 800, "lobby");
     this.createSprite("button-ready", "Lobby", game.width / 2 - 120, game.height * 0.75, 246, 46, "button-ready");
-    this.addCursorOnHover("button-ready");
     this.addEvent("button-ready", function() {
       client.playerReady();
     }, null);
 
     //LobbyFull UI
-    this.createText("LobbyFullText", "LobbyFull", game.width/2, game.height / 2, "The lobby is full!", 20);
-    this.createText("LobbyFullGoBackText", "LobbyFull", game.width / 2, game.height / 2 + 30, "click here to go back", 20);
-    this.addCursorOnHover("LobbyFullGoBackText");
-    this.addEvent("LobbyFullGoBackText", function() {
+    this.createSprite("splash-lobby", "LobbyFull", 0, 0, 1280, 800, "splash");
+    this.createText("LobbyFullText", "LobbyFull", game.width / 2 - 125, game.height * 0.65, "The lobby is full!", 36);
+    this.createSprite("button-back", "LobbyFull", game.width / 2 - 120, game.height * 0.75, 246, 46, "button-back");
+    this.addEvent("button-back", function() {
       sceneController.setScreen("MainMenu");
     }, null);
 
@@ -59,15 +57,6 @@ class SceneController {
     this.elements.forEach((element) => {
       if (element.name == name) {
         element.object.text = string;
-      }
-    });
-  }
-
-  addCursorOnHover(name) {
-    this.elements.forEach((element) => {
-      if (element.name == name) {
-        element.object.inputEnabled = true;
-        element.object.useHandCursor = true;
       }
     });
   }
@@ -194,7 +183,6 @@ class SceneController {
     this.setScreen("GameOver");
     this.createSprite("GameOverBg", "GameOver", 0, 0, 1280, 800, "temp-game-over");
     this.createSprite("button-again", "MainMenu", game.width / 2 - 120, game.height * 0.53, 246, 46, "button-again");
-    this.addCursorOnHover("button-again");
     this.addEvent("button-again", function() {
       sceneController.setScreen("Lobby");
       cleanUp();

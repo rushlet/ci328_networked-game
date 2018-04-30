@@ -34,6 +34,7 @@ function preload() {
   game.load.image('button-menu', 'assets/img/buttons/button-menu.png');
   game.load.image('button-ready', 'assets/img/buttons/button-ready.png');
   game.load.image('button-again', 'assets/img/buttons/button-again.png');
+  game.load.image('button-back', 'assets/img/buttons/button-lobby-full.png');
 }
 
 function create() {
