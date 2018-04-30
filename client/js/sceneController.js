@@ -4,22 +4,23 @@ class SceneController {
     this.screen = "";
     // Main Menu UI
     this.createSprite("splash", "MainMenu", 0, 0, 1280, 800, "splash");
-    this.createSprite("button-bg", "MainMenu", game.width / 2 - 120, game.height * 0.75, 246, 46, "button");
-    this.createText("SplashJoinLobbyText", "MainMenu", game.width / 2 - 50, game.height * 0.75 + 6.5, "Join Lobby", 24);
-    this.addEvent("SplashJoinLobbyText", function() {
+    this.createSprite("button-menu", "MainMenu", game.width / 2 - 120, game.height * 0.75, 246, 46, "button-menu");
+    this.addCursorOnHover("button-menu");
+    this.addEvent("button-menu", function() {
       client.joinLobby();
     }, null);
     // Lobby UI
     this.createSprite("bg", "Lobby", 0, 0, 1280, 800, "lobby");
-    this.createSprite("button-bg", "Lobby", game.width / 2 - 75, game.height * 0.75, 150, 46, "button");
-    this.createText("LobbyReadyText", "Lobby", game.width / 2 - 35, game.height * 0.75 + 6.5, "Ready", 24);
-    this.addEvent("LobbyReadyText", function() {
+    this.createSprite("button-ready", "Lobby", game.width / 2 - 120, game.height * 0.75, 246, 46, "button-ready");
+    this.addCursorOnHover("button-ready");
+    this.addEvent("button-ready", function() {
       client.playerReady();
     }, null);
 
     //LobbyFull UI
     this.createText("LobbyFullText", "LobbyFull", game.width/2, game.height / 2, "The lobby is full!", 20);
     this.createText("LobbyFullGoBackText", "LobbyFull", game.width / 2, game.height / 2 + 30, "click here to go back", 20);
+    this.addCursorOnHover("LobbyFullGoBackText");
     this.addEvent("LobbyFullGoBackText", function() {
       sceneController.setScreen("MainMenu");
     }, null);
@@ -58,6 +59,15 @@ class SceneController {
     this.elements.forEach((element) => {
       if (element.name == name) {
         element.object.text = string;
+      }
+    });
+  }
+
+  addCursorOnHover(name) {
+    this.elements.forEach((element) => {
+      if (element.name == name) {
+        element.object.inputEnabled = true;
+        element.object.useHandCursor = true;
       }
     });
   }
@@ -157,13 +167,43 @@ class SceneController {
     this.updateSprite(`player${hero.id}_lobby`, `frog${hero.id}`);
     this.setObjectVisibility(`button-bg`, false);
     this.setObjectVisibility(`LobbyReadyText`, false);
-    this.createSprite('TimerBackground', "Lobby", game.width / 2 - 128, 35, 256, 128, 'lobby-countdown-bg');
-    this.createText('GameStarting', "Lobby", game.width / 2 - 50, 60, 'Game Starts in', 16);
-    this.createText('GameStartingTimer', "Lobby", game.width / 2 - 15, 90, '5', 42);
+    this.addLobbyCountdown();
     var count = 5;
     this.lobbyTimer = setInterval(() => {
       count--;
-      this.setText('GameStartingTimer', count)
-      ;}, 1000);
+      this.setText('GameStartingTimer', count);
+      if (count == 0) {
+        clearInterval(this.lobbyTimer);
+      }
+    }, 1000);
+  }
+
+  addLobbyCountdown() {
+    if (this.checkObjectExists('GameStartingTimer')) {
+      this.setObjectVisibility('TimerBackground', true);
+      this.setObjectVisibility('GameStarting', true);
+      this.setObjectVisibility('GameStartingTimer', true);
+    } else {
+      this.createSprite('TimerBackground', "Lobby", game.width / 2 - 128, 35, 256, 128, 'lobby-countdown-bg');
+      this.createText('GameStarting', "Lobby", game.width / 2 - 50, 60, 'Game Starts in', 16);
+      this.createText('GameStartingTimer', "Lobby", game.width / 2 - 15, 90, '5', 42);
+    }
+  }
+
+  gameOverScreen() {
+    this.setScreen("GameOver");
+    this.createSprite("GameOverBg", "GameOver", 0, 0, 1280, 800, "temp-game-over");
+    this.createSprite("button-again", "MainMenu", game.width / 2 - 120, game.height * 0.53, 246, 46, "button-again");
+    this.addCursorOnHover("button-again");
+    this.addEvent("button-again", function() {
+      sceneController.setScreen("Lobby");
+      cleanUp();
+    }, null);
+  }
+
+  cleanUpLobby() {
+      this.setObjectVisibility('TimerBackground', false);
+      this.setObjectVisibility('GameStarting', false);
+      this.setObjectVisibility('GameStartingTimer', false);
   }
 }

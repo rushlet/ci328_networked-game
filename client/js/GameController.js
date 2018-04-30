@@ -29,8 +29,11 @@ function preload() {
   game.load.image('splash', 'assets/img/splash.png');
   game.load.image('lobby', 'assets/img/lobby1.png');
   game.load.image('temp-game-over', 'assets/img/temp-game-over.png');
-  game.load.image('button', 'assets/img/button1.png');
   game.load.image('lobby-countdown-bg', 'assets/img/timer-bg.png');
+  // buttons
+  game.load.image('button-menu', 'assets/img/buttons/button-menu.png');
+  game.load.image('button-ready', 'assets/img/buttons/button-ready.png');
+  game.load.image('button-again', 'assets/img/buttons/button-again.png');
 }
 
 function create() {
@@ -62,6 +65,7 @@ function cleanUp(){
   Object.keys(game.dotMap).forEach(function(id) {
     game.dotMap[id].destroy();
   });
+  sceneController.cleanUpLobby();
 }
 
 function getCoordinates(pointer) {

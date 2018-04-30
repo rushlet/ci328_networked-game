@@ -123,13 +123,7 @@ class Client {
       game.gameReady = false;
       game.gameWorld.stopTimers();
       console.log("%cGAME OVER", "color: red; font-size: 32px;");
-      sceneController.setScreen("GameOver");
-      sceneController.createSprite("GameOverBg", "GameOver", 0, 0, 1280, 800, "temp-game-over");
-      sceneController.createText("GameOverGoBack", "GameOver", game.width / 2, game.height / 2 + 30, "click here to go back", 20);
-      sceneController.addEvent("GameOverGoBack", function() {
-        sceneController.setScreen("Lobby");
-        cleanUp();
-      }, null);
+      sceneController.gameOverScreen();
     });
   }
 
