@@ -124,7 +124,9 @@ class SceneController {
       var space = (i % 2 === 0) ? 150 : 0;
       var width = (i <= 2) ? 0.15 : 0.65;
       this.createSprite(`player${i}_score_sprite`, "InGame", game.width * width + space + 30, 20, 32, 32, `ghost${i}`);
-      this.createText(`player${i}_score`, "InGame", game.width * width + space, 55, `Player${i} score: 0`, 12);
+      this.createText(`player${i}_score`, "InGame", game.width * width + space, 55, `Player${i}: 0`, 16);
+      this.createSprite(`player${i}_sprite_gameOver`, "GameOver", game.width * width + space + 30, 20, 32, 32, `ghost${i}`);
+      this.createText(`player${i}_score_gameOver`, "GameOver", game.width * width + space, 55, `Player${i}: 0`, 16);
     }
   }
 

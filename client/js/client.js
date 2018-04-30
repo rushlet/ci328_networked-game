@@ -41,7 +41,8 @@ class Client {
 
     this.socket.on('updateScores', function(players) {
       for (var i = 0; i < players.length; i++) {
-        sceneController.setText(`player${players[i].id}_score`, `Player${players[i].id} score: ${players[i].score}`);
+        sceneController.setText(`player${players[i].id}_score`, `Player${players[i].id}: ${players[i].score}`);
+        sceneController.setText(`player${players[i].id}_score_gameOver`, `Player${players[i].id}: ${players[i].score}`);
       }
     });
   }

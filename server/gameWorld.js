@@ -13,7 +13,7 @@ module.exports = class GameWorld {
   }
 
   chooseTileMap() {
-    this.tileMapSelection = Math.floor(Math.random() * 3);
+    this.tileMapSelection = this.randomInt(1, 5) - 1;
     this.tilemap = tilemapper.create2dArrayFromTilemap(this.tileMapSelection)
     this.walkableTile = this.setWalkableTile(this.tileMapSelection);
   }
