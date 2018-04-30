@@ -253,12 +253,12 @@ module.exports = class GameWorld {
     io.emit('startGameTimer', duration);
     this.gameOverTimer = setTimeout(() => {
       io.emit('endGame', duration);
-      this.stopTimers(lobby);
       this.resetGame(lobby, io);
     }, duration);
   }
 
   resetGame(lobby) {
+    this.stopTimers(lobby);
     lobby.gameActive = false;
     lobby.gameReady = false;
     var gameWorld = this;
