@@ -10,7 +10,10 @@ function main() {
 }
 
 function preload() {
-  game.load.spritesheet('frog', 'assets/img/spritesheets/frog.png', 32, 32, 6);
+  game.load.spritesheet('frog1', 'assets/img/spritesheets/frog1.png', 32, 32, 6);
+  game.load.spritesheet('frog2', 'assets/img/spritesheets/frog2.png', 32, 32, 6);
+  game.load.spritesheet('frog3', 'assets/img/spritesheets/frog3.png', 32, 32, 6);
+  game.load.spritesheet('frog4', 'assets/img/spritesheets/frog4.png', 32, 32, 6);
   game.load.spritesheet('ghost1', 'assets/img/spritesheets/ghost.png', 32, 32, 6);
   game.load.spritesheet('ghost2', 'assets/img/spritesheets/ghost2.png', 32, 32, 6);
   game.load.spritesheet('ghost3', 'assets/img/spritesheets/ghost3.png', 32, 32, 6);
@@ -71,7 +74,7 @@ function updateDots(id, x, y) {
 }
 
 function updateSprites(id, hero) {
-  (hero) ? game.playerMap[id].loadTexture('frog') : game.playerMap[id].loadTexture(`ghost${id}`);
+  (hero) ? game.playerMap[id].loadTexture(`frog${id}`) : game.playerMap[id].loadTexture(`ghost${id}`);
   game.playerMap[id].animations.add('right', [0,1,2], true);
   game.playerMap[id].animations.add('left', [3,4,5], true);
 }
