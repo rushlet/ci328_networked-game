@@ -161,8 +161,8 @@ class Client {
     this.socket.emit('movement', direction);
   }
 
-  targetReached() {
-    this.socket.emit('targetReached');
+  targetReached(id, targetX, targetY) {
+    this.socket.emit('targetReached', id, targetX, targetY);
   }
 
   joinLobby() {
