@@ -34,8 +34,14 @@ function main() {
       client.user.isReady = true;
       console.log(lobby);
       if (lobby.checkAllReady() === true) {
-        io.emit('loadGame');
+        var hero = gameWorld.chooseHero();
+        io.emit('heroChosen', hero );
+        this.loadGameTimer = setTimeout(() => {
+          io.emit('loadGame');
+          clearTimeout(this.loadGameTimer);
+        }, 5000);
       }
+
     });
 
     client.on('gameLoaded', function() {
