@@ -53,6 +53,16 @@ function update() {
   }
 }
 
+function cleanUp(){
+  game.gameWorld.cleanUp();
+  Object.keys(game.playerMap).forEach(function(id) {
+    game.playerMap[id].destroy();
+  });
+  Object.keys(game.dotMap).forEach(function(id) {
+    game.dotMap[id].destroy();
+  });
+}
+
 function getCoordinates(pointer) {
   client.sendClick(pointer.worldX, pointer.worldY);
 }

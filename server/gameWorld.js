@@ -1,8 +1,8 @@
 var tilemapper = require('./utils/tilemap-array-generator.js');
+var Lobby = require('./lobby.js');
 module.exports = class GameWorld {
 
   constructor() {
-    this.chooseTileMap();
     this.gameOverTimer;
     this.entities = {
       players: {},
@@ -23,6 +23,8 @@ module.exports = class GameWorld {
   }
 
   gamePrep(io, client, lobby) {
+    this.chooseTileMap();
+    this.setPlayerStartingPositions();
     this.generateEntity('dots', 5);
     this.generateEntity('powerups', 1);
     this.callGamePrepEmits(io);
@@ -261,7 +263,28 @@ module.exports = class GameWorld {
     this.gameOverTimer = setTimeout(() => {
       io.emit('endGame', duration);
       this.stopTimers(lobby);
+      this.resetGame(lobby, io);
     }, duration);
+  }
+
+  resetGame(lobby) {
+    lobby.gameActive = false;
+    lobby.gameReady = false;
+    var gameWorld = this;
+    this.entities = {
+      players: {},
+      dots: {},
+      powerups: {}
+    };
+    lobby.users.forEach(function(user) {
+      if (user.connected === true) {
+        user.gameLoaded = false;
+        user.isReady = false;
+        user.AI.active = false;
+      }
+      gameWorld.createEntity("players", user.id, 0, 0);
+    });
+
   }
 
   addPowerups(io) {

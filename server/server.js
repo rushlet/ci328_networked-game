@@ -35,13 +35,12 @@ function main() {
       console.log(lobby);
       if (lobby.checkAllReady() === true) {
         var hero = gameWorld.chooseHero();
-        io.emit('heroChosen', hero );
+        io.emit('heroChosen', hero);
         this.loadGameTimer = setTimeout(() => {
           io.emit('loadGame');
           clearTimeout(this.loadGameTimer);
         }, 5000);
       }
-
     });
 
     client.on('gameLoaded', function() {
@@ -50,7 +49,7 @@ function main() {
         gameWorld.gamePrep(io, client, lobby);
         lobby.startAIUpdateTimer(io, gameWorld);
         lobby.gameActive = true;
-      }else if( lobby.gameActive){
+      } else if (lobby.gameActive) {
         gameWorld.callGamePrepEmits(io, client);
         gameWorld.addPowerups(io);
       }

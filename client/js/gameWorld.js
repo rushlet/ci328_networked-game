@@ -6,6 +6,11 @@ class GameWorld {
     game.input.onDown.add(this.getTileProperties, this); //enable tile debugging
   }
 
+  cleanUp(){
+    this.map.visible = false;
+    this.layer.visible = false;
+  }
+
   addTileMap(id) {
     var image = (id == 0) ? 'maze-template' : 'tileset';
     this.map = game.add.tilemap(`map${id+1}`);

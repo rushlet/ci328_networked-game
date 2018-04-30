@@ -13,7 +13,6 @@ module.exports = class Lobby {
       this.users.push(user);
       gameWorld.createEntity("players", user.id, 0, 0);
     }
-    gameWorld.setPlayerStartingPositions();
   }
 
   addPlayer(client) {
