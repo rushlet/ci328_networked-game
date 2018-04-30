@@ -15,11 +15,7 @@ module.exports = class GameWorld {
   chooseTileMap() {
     this.tileMapSelection = this.randomInt(1, 5) - 1;
     this.tilemap = tilemapper.create2dArrayFromTilemap(this.tileMapSelection)
-    this.walkableTile = this.setWalkableTile(this.tileMapSelection);
-  }
-
-  setWalkableTile(mapNumber, io) {
-    return (mapNumber == 0) ? 10 : 1;
+    this.walkableTile = 1;
   }
 
   gamePrep(io, client, lobby) {

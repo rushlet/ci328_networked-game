@@ -21,8 +21,8 @@ function preload() {
   game.load.spritesheet('coin', 'assets/img/spritesheets/coin.png', 30, 30, 6);
   game.load.spritesheet('powerup', 'assets/img/spritesheets/gem.png', 32, 32, 8);
   game.load.tilemap('map1', 'assets/maps/tilemap.json', null, Phaser.Tilemap.TILED_JSON);
-  game.load.tilemap('map2', 'assets/maps/tilemap2.json', null, Phaser.Tilemap.TILED_JSON);
-  game.load.tilemap('map3', 'assets/maps/tilemap4.json', null, Phaser.Tilemap.TILED_JSON);
+  game.load.tilemap('map2', 'assets/maps/tilemap_another.json', null, Phaser.Tilemap.TILED_JSON);
+  game.load.tilemap('map3', 'assets/maps/tilemap_croaked.json', null, Phaser.Tilemap.TILED_JSON);
   game.load.tilemap('map4', 'assets/maps/tilemap5.json', null, Phaser.Tilemap.TILED_JSON);
   game.load.image('maze-template', 'assets/maps/maze-template.png');
   game.load.image('tileset', 'assets/maps/base_landscape.png');
