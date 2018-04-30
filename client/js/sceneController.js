@@ -1,19 +1,16 @@
 class SceneController {
   constructor() {
-    console.log("Constructing UI Elements")
     this.elements = [];
     this.screen = "";
     // Main Menu UI
     this.createSprite("splash", "MainMenu", 0, 0, 1280, 800, "splash");
     this.createSprite("button-bg", "MainMenu", game.width / 2 - 120, game.height * 0.75, 246, 46, "button");
-    // this.createText("SplashText", "MainMenu", game.width / 2, game.height / 2, "This is the Main Menu", 20);
     this.createText("SplashJoinLobbyText", "MainMenu", game.width / 2 - 50, game.height * 0.75 + 6.5, "Join Lobby", 24);
     this.addEvent("SplashJoinLobbyText", function() {
       client.joinLobby();
     }, null);
     // Lobby UI
     this.createSprite("bg", "Lobby", 0, 0, 1280, 800, "lobby");
-    // this.createText("SplashText", "Lobby", game.width / 2, game.height / 2, "This is the Lobby", 20);
     this.createSprite("button-bg", "Lobby", game.width / 2 - 75, game.height * 0.75, 150, 46, "button");
     this.createText("LobbyReadyText", "Lobby", game.width / 2 - 35, game.height * 0.75 + 6.5, "Ready", 24);
     this.addEvent("LobbyReadyText", function() {
@@ -34,29 +31,12 @@ class SceneController {
   }
 
   setScreen(screen) {
-    console.log("Changing Screen to: " + screen);
     this.hideAll();
     this.screen = screen;
-    switch (screen) {
-      case "MainMenu":
-        this.showUI("MainMenu");
-        break;
-      case "Lobby":
-        this.showUI("Lobby");
-        break;
-      case "LobbyFull":
-        this.showUI("LobbyFull");
-        break;
-      case "InGame":
-        this.showUI("InGame");
-        game.gameWorld = new GameWorld();
-        client.addClientToServer();
-        break;
-      case "GameOver":
-        this.showUI("GameOver");
-        break;
-      default:
-        console.log(screen + " not found");
+    this.showUI(screen);
+    if (screen == "InGame") {
+      game.gameWorld = new GameWorld();
+      client.addClientToServer();
     }
   }
 
@@ -155,7 +135,7 @@ class SceneController {
       this.createSprite(`player${i}_lobby`, "Lobby", x, y, 48, 48, `ghost${i}`);
       this.createText(`player${i}_name`, "Lobby", x - 18, y + 85, `Player${i}`, 20);
       if (client.getID() == i) {
-        this.createText('you_are', "Lobby", game.width * 0.19, game.height * 0.42, 'You Are', 16);
+        this.createText('youAre', "Lobby", game.width * 0.19, game.height * 0.42, 'You Are', 16);
         this.createText('playerAssigned', "Lobby", game.width * 0.185, game.height * 0.475, `Player${i}`, 24);
       }
     }
