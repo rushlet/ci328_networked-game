@@ -165,7 +165,14 @@ class SceneController {
   }
 
   updateLobby(hero) {
-    this.updateSprite(`player${hero.id}_lobby`, `frog${hero.id}`);
+    for (var i = 0; i < 4; i++) {
+      if(i === hero.id){
+          this.updateSprite(`player${hero.id}_lobby`, `frog${hero.id}`);
+      }
+      else{
+          this.updateSprite(`player${i}_lobby`, `ghost${i}`);
+      }
+    }
     this.setObjectVisibility(`button-bg`, false);
     this.setObjectVisibility(`LobbyReadyText`, false);
     this.addLobbyCountdown();
@@ -196,8 +203,9 @@ class SceneController {
     this.createSprite("GameOverBg", "GameOver", 0, 0, 1280, 800, "temp-game-over");
     this.createSprite("button-again", "MainMenu", game.width / 2 - 120, game.height * 0.53, 246, 46, "button-again");
     this.addEvent("button-again", function() {
-      sceneController.setScreen("Lobby");
       cleanUp();
+      sceneController.setScreen("Lobby");
+      sceneController.cleanUpLobby();
     }, null);
   }
 

@@ -66,7 +66,6 @@ function cleanUp(){
   Object.keys(game.dotMap).forEach(function(id) {
     game.dotMap[id].destroy();
   });
-  sceneController.cleanUpLobby();
 }
 
 function getCoordinates(pointer) {

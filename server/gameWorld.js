@@ -4,6 +4,8 @@ module.exports = class GameWorld {
 
   constructor() {
     this.gameOverTimer;
+    this.gameStarted = false;
+    this.countdown = 10;
     this.entities = {
       players: {},
       dots: {},
@@ -249,16 +251,24 @@ module.exports = class GameWorld {
   }
 
   startGameTimer(io, lobby) {
-    let duration = 150000;
-    io.emit('startGameTimer', duration);
-    this.gameOverTimer = setTimeout(() => {
-      io.emit('endGame', duration);
-      this.resetGame(lobby, io);
-    }, duration);
+    if (!this.gameStarted) {
+      this.gameStarted = true;
+      let duration = 1000;
+      this.gameOverTimer = setInterval(() => {
+        this.countdown--;
+        io.emit('setGameTimer', this.countdown);
+        if (this.countdown === 0) {
+          this.stopTimers(lobby);
+          this.resetGame(lobby, io);
+          io.emit('endGame');
+        }
+      }, duration);
+    }
   }
 
   resetGame(lobby) {
-    this.stopTimers(lobby);
+    this.countdown = 10;
+    this.gameStarted = false;
     lobby.gameActive = false;
     lobby.gameReady = false;
     var gameWorld = this;
@@ -282,13 +292,15 @@ module.exports = class GameWorld {
     let duration = this.randomInt(5000, 15000);
     io.emit('addPowerup', this.entities.powerups[0].x, this.entities.powerups[0].y);
     this.powerupTimer = setInterval(() => {
-      this.updateEntityPosition("powerups", 0);
-      if (this.entities.powerups[0].visible) {
-        this.entities.powerups[0].visible = false;
-      } else {
-        this.entities.powerups[0].visible = true;
+      if (this.entities.powerups[0] != null) {
+        this.updateEntityPosition("powerups", 0);
+        if (this.entities.powerups[0].visible) {
+          this.entities.powerups[0].visible = false;
+        } else {
+          this.entities.powerups[0].visible = true;
+        }
+          io.emit('updatePowerup', this.entities.powerups[0].visible, this.entities.powerups[0].x, this.entities.powerups[0].y);
       }
-      io.emit('updatePowerup', this.entities.powerups[0].visible, this.entities.powerups[0].x, this.entities.powerups[0].y);
     }, duration);
   }
 
@@ -303,7 +315,7 @@ module.exports = class GameWorld {
   }
 
   stopTimers(lobby) {
-    clearTimeout(this.gameOverTimer);
+    clearInterval(this.gameOverTimer);
     clearInterval(this.powerupTimer);
     clearInterval(lobby.AIUpdateTimer);
   }

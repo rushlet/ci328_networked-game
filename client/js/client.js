@@ -137,9 +137,9 @@ class Client {
       }
     });
 
-    this.socket.on('startGameTimer', function(countdown) {
+    this.socket.on('setGameTimer', function(countdown) {
       if (client.ID != null) {
-        game.gameWorld.setGameTimer(countdown);
+        sceneController.setText("GameTimer", game.gameWorld.secondsToMinutes(countdown));
       }
     });
 
@@ -163,7 +163,6 @@ class Client {
     this.socket.on('endGame', function() {
       if (client.ID != null) {
         game.gameReady = false;
-        game.gameWorld.stopTimers();
         console.log("%cGAME OVER", "color: red; font-size: 32px;");
         sceneController.gameOverScreen();
       }
