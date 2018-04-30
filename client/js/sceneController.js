@@ -62,6 +62,14 @@ class SceneController {
     });
   }
 
+  updateSprite(name, newSprite) {
+    this.elements.forEach((element) => {
+      if (element.name == name) {
+        element.object.loadTexture(newSprite);
+      }
+    });
+  }
+
   setObjectVisibility(name, visible) {
     this.elements.forEach((element) => {
       if (element.name == name) {
@@ -137,9 +145,25 @@ class SceneController {
       this.createSprite(`player${i}_lobby`, "Lobby", x, y, 48, 48, `ghost${i}`);
       this.createText(`player${i}_name`, "Lobby", x - 18, y + 85, `Player${i}`, 20);
       if (client.getID() == i) {
-        this.createText('youAre', "Lobby", game.width * 0.19, game.height * 0.42, 'You Are', 16);
-        this.createText('playerAssigned', "Lobby", game.width * 0.185, game.height * 0.475, `Player${i}`, 24);
+        this.createText('youAre', "Lobby", game.width * 0.18, game.height * 0.34, 'You Are', 16);
+        this.createText('playerAssigned', "Lobby", game.width * 0.16, 420, `Player${i}`, 30);
+        this.createSprite(`player${i}_assignedGhost`, "Lobby", 200, 355, 48, 48, `ghost${i}`);
+        this.createSprite(`player${i}_assignedFrog`, "Lobby", 260, 350, 48, 48, `frog${i}`);
       }
     }
+  }
+
+  updateLobby(hero) {
+    this.updateSprite(`player${hero.id}_lobby`, `frog${hero.id}`);
+    this.setObjectVisibility(`button-bg`, false);
+    this.setObjectVisibility(`LobbyReadyText`, false);
+    this.createSprite('TimerBackground', "Lobby", game.width / 2 - 128, 35, 256, 128, 'lobby-countdown-bg');
+    this.createText('GameStarting', "Lobby", game.width / 2 - 50, 60, 'Game Starts in', 16);
+    this.createText('GameStartingTimer', "Lobby", game.width / 2 - 15, 90, '5', 42);
+    var count = 5;
+    this.lobbyTimer = setInterval(() => {
+      count--;
+      this.setText('GameStartingTimer', count)
+      ;}, 1000);
   }
 }

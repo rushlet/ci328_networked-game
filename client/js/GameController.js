@@ -27,9 +27,10 @@ function preload() {
   game.load.image('maze-template', 'assets/maps/maze-template.png');
   game.load.image('tileset', 'assets/maps/base_landscape.png');
   game.load.image('splash', 'assets/img/splash.png');
-  game.load.image('lobby', 'assets/img/lobby.png');
+  game.load.image('lobby', 'assets/img/lobby1.png');
   game.load.image('temp-game-over', 'assets/img/temp-game-over.png');
   game.load.image('button', 'assets/img/button1.png');
+  game.load.image('lobby-countdown-bg', 'assets/img/timer-bg.png');
 }
 
 function create() {
