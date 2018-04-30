@@ -2,6 +2,7 @@ class SceneController {
   constructor() {
     this.elements = [];
     this.screen = "";
+    var sceneController = this;
     // Main Menu UI
     this.createSprite("splash", "MainMenu", 0, 0, 1280, 800, "splash");
     this.createSprite("button-menu", "MainMenu", game.width / 2 - 120, game.height * 0.75, 246, 46, "button-menu");
@@ -13,6 +14,8 @@ class SceneController {
     this.createSprite("button-ready", "Lobby", game.width / 2 - 120, game.height * 0.75, 246, 46, "button-ready");
     this.addEvent("button-ready", function() {
       client.playerReady();
+      sceneController.setObjectVisibility("button-ready", false);
+      sceneController.updateEntityPosition("button-ready", 0, 0);
     }, null);
 
     //LobbyFull UI
@@ -65,6 +68,15 @@ class SceneController {
     this.elements.forEach((element) => {
       if (element.name == name) {
         element.object.loadTexture(newSprite);
+      }
+    });
+  }
+
+  updateEntityPosition(name, x, y) {
+    this.elements.forEach((element) => {
+      if (element.name == name) {
+        element.object.x = x;
+        element.object.y = y;
       }
     });
   }
@@ -193,5 +205,6 @@ class SceneController {
       this.setObjectVisibility('TimerBackground', false);
       this.setObjectVisibility('GameStarting', false);
       this.setObjectVisibility('GameStartingTimer', false);
+      this.updateEntityPosition("button-ready", game.width / 2 - 120, game.height * 0.75);
   }
 }
