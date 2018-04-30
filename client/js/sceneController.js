@@ -28,8 +28,7 @@ class SceneController {
     }, null);
 
     // In Game UI
-    this.createText("GameTimer", "InGame", game.width / 2 - 30, 35, "", 24);
-    this.createScoreText();
+
     // Game Over UI
     this.createText("GameOver", "GameOver", game.width / 2 - 30, 25, "GAME OVER", 60, '#c30712');
   }

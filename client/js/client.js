@@ -92,6 +92,8 @@ class Client {
   startGame() {
     this.socket.on('startGame', function() {
       game.gameReady = true;
+      sceneController.createText("GameTimer", "InGame", game.width / 2 - 30, 35, "", 24);
+      sceneController.createScoreText();
     });
 
     this.socket.on('startGameTimer', function(countdown) {
@@ -115,6 +117,7 @@ class Client {
       game.gameWorld.stopTimers();
       console.log("%cGAME OVER", "color: red; font-size: 32px;");
       sceneController.setScreen("GameOver");
+      sceneController.createSprite("GameOverBg", "GameOver", 0, 0, 1280, 800, "temp-game-over");
     });
   }
 

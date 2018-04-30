@@ -18,13 +18,14 @@ function preload() {
   game.load.spritesheet('coin', 'assets/img/spritesheets/coin.png', 30, 30, 6);
   game.load.image('powerup', 'assets/img/star.png');
   game.load.tilemap('map1', 'assets/maps/tilemap.json', null, Phaser.Tilemap.TILED_JSON);
-  game.load.tilemap('map2', 'assets/maps/tilemap1.json', null, Phaser.Tilemap.TILED_JSON);
-  game.load.tilemap('map3', 'assets/maps/tilemap2.json', null, Phaser.Tilemap.TILED_JSON);
-  game.load.tilemap('map4', 'assets/maps/tilemap3.json', null, Phaser.Tilemap.TILED_JSON);
+  game.load.tilemap('map2', 'assets/maps/tilemap2.json', null, Phaser.Tilemap.TILED_JSON);
+  game.load.tilemap('map3', 'assets/maps/tilemap4.json', null, Phaser.Tilemap.TILED_JSON);
+  game.load.tilemap('map4', 'assets/maps/tilemap5.json', null, Phaser.Tilemap.TILED_JSON);
   game.load.image('maze-template', 'assets/maps/maze-template.png');
   game.load.image('tileset', 'assets/maps/base_landscape.png');
   game.load.image('splash', 'assets/img/splash.png');
   game.load.image('lobby', 'assets/img/lobby.png');
+  game.load.image('temp-game-over', 'assets/img/temp-game-over.png');
   game.load.image('button', 'assets/img/button1.png');
 }
 
