@@ -61,10 +61,13 @@ function main() {
         gameWorld.movePlayer(direction, client.user.id, io, client);
       });
 
-      client.on('targetReached', function() {
-        var player = gameWorld.entities.players[client.user.id];
-        player.x = player.expectedPosition.x;
-        player.y = player.expectedPosition.y;
+      client.on('targetReached', function(id, targetX, targetY) {
+        console.log(id, " Reached Target");
+        var player = gameWorld.entities.players[id];
+        if(player.expectedPosition.x == targetX && player.expectedPosition.y == targetY){
+          player.x = player.expectedPosition.x;
+          player.y = player.expectedPosition.y;
+        }
       });
     });
   });

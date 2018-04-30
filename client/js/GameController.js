@@ -106,9 +106,7 @@ function movePlayer(id, targetX, targetY, direction) {
   }, duration);
   tween.start();
   tween.onComplete.add(() => {
-    if (id === client.ID) {
-      client.targetReached();
-    }
+      client.targetReached(id, targetX, targetY);
   });
 }
 

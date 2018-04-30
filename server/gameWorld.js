@@ -25,7 +25,7 @@ module.exports = class GameWorld {
   gamePrep(io, client, lobby) {
     this.chooseTileMap();
     this.setPlayerStartingPositions();
-    this.generateEntity('dots', 5);
+    this.generateEntity('dots', 20);
     this.generateEntity('powerups', 1);
     this.callGamePrepEmits(io);
     this.startGameTimer(io, lobby);
@@ -93,12 +93,7 @@ module.exports = class GameWorld {
         default:
           break;
       }
-      if (client == null) {
-        player.x = player.expectedPosition.x;
-        player.y = player.expectedPosition.y;
-      }
       this.checkCollisions(player, io, client);
-
     }
   };
 
