@@ -19,6 +19,16 @@ function main() {
           user.AI.active = true;
         }
       });
+      var stillPlaying = false;
+      lobby.users.forEach(function(user) {
+        if (user.connected === true) {
+          stillPlaying = true;
+        }
+      });
+      if(!stillPlaying){
+        gameWorld.stopTimers(lobby);
+        gameWorld.resetGame(lobby);
+      }
     });
 
     client.on('test', function() {
