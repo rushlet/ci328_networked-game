@@ -44,6 +44,8 @@ class GameWorld {
   addPowerupToGame(x, y) {
     game.gameWorld.powerup = game.add.sprite(x, y, 'powerup');
     game.gameWorld.powerup.visible = false;
+    game.gameWorld.powerup.animations.add('spin');
+    game.gameWorld.powerup.animations.play('spin', 8, true);
   }
 
   updatePowerup(visibility, x, y) {

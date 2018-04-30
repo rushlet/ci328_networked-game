@@ -16,7 +16,7 @@ function preload() {
   game.load.spritesheet('ghost3', 'assets/img/spritesheets/ghost3.png', 32, 32, 6);
   game.load.spritesheet('ghost4', 'assets/img/spritesheets/ghost4.png', 32, 32, 6);
   game.load.spritesheet('coin', 'assets/img/spritesheets/coin.png', 30, 30, 6);
-  game.load.image('powerup', 'assets/img/star.png');
+  game.load.spritesheet('powerup', 'assets/img/spritesheets/gem.png', 32, 32, 8);
   game.load.tilemap('map1', 'assets/maps/tilemap.json', null, Phaser.Tilemap.TILED_JSON);
   game.load.tilemap('map2', 'assets/maps/tilemap2.json', null, Phaser.Tilemap.TILED_JSON);
   game.load.tilemap('map3', 'assets/maps/tilemap4.json', null, Phaser.Tilemap.TILED_JSON);
