@@ -12,10 +12,8 @@ class GameWorld {
   }
 
   addTileMap(id) {
-    // var image = (id == 0) ? 'maze-template' : 'tileset';
     this.map = game.add.tilemap(`map${id+1}`);
     this.layer = this.map.createLayer(`map${id+1}`);
-    // this.map.addTilesetImage('maze-template');
     this.map.addTilesetImage('tileset');
     this.layer.resizeWorld();
   }
