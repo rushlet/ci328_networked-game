@@ -92,8 +92,8 @@ class Client {
 
   startGame() {
 
-    this.socket.on('heroChosen', function(){
-      //TO DO
+    this.socket.on('heroChosen', function(player){
+      sceneController.updateLobby(player);
     });
 
     this.socket.on('startGame', function() {
