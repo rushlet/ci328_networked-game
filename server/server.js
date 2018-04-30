@@ -51,7 +51,6 @@ function main() {
     });
 
     client.on('newplayer', function() {
-      client.emit('allplayers', gameWorld.getArrayOfEntityType('players'));
 
       client.on('movement', function(direction) {
         gameWorld.movePlayer(direction, client.user.id, io, client);

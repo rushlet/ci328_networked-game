@@ -192,7 +192,7 @@ module.exports = class Ai {
     var open = [];
     var closed = [];
     var tilemap = this.gameWorld.tilemap;
-    var walkable = 10;
+    var walkable = this.gameWorld.walkableTile;
     var currentTile = {
       x: entity.x / 32,
       y: entity.y / 32,
@@ -328,7 +328,7 @@ module.exports = class Ai {
 
   getAdjacentTiles(currentTile) {
     var tiles = [];
-    if (this.gameWorld.tilemap[currentTile.y][currentTile.x - 1] === 10) {
+    if (this.gameWorld.tilemap[currentTile.y][currentTile.x - 1] === this.gameWorld.walkableTile) {
       tiles.push({
         x: currentTile.x - 1,
         y: currentTile.y,
@@ -336,7 +336,7 @@ module.exports = class Ai {
       })
     }
 
-    if (this.gameWorld.tilemap[currentTile.y][currentTile.x + 1] === 10) {
+    if (this.gameWorld.tilemap[currentTile.y][currentTile.x + 1] === this.gameWorld.walkableTile) {
       tiles.push({
         x: currentTile.x + 1,
         y: currentTile.y,
@@ -344,7 +344,7 @@ module.exports = class Ai {
       })
     }
 
-    if (this.gameWorld.tilemap[currentTile.y - 1][currentTile.x] === 10) {
+    if (this.gameWorld.tilemap[currentTile.y - 1][currentTile.x] === this.gameWorld.walkableTile) {
       tiles.push({
         x: currentTile.x,
         y: currentTile.y - 1,
@@ -352,7 +352,7 @@ module.exports = class Ai {
       })
     }
 
-    if (this.gameWorld.tilemap[currentTile.y + 1][currentTile.x] === 10) {
+    if (this.gameWorld.tilemap[currentTile.y + 1][currentTile.x] === this.gameWorld.walkableTile) {
       tiles.push({
         x: currentTile.x,
         y: currentTile.y + 1,

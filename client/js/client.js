@@ -41,7 +41,8 @@ class Client {
 
     this.socket.on('updateScores', function(players) {
       for (var i = 0; i < players.length; i++) {
-        sceneController.setText(`player${players[i].id}_score`, `Player${players[i].id} score: ${players[i].score}`);
+        sceneController.setText(`player${players[i].id}_score`, `Player${players[i].id}: ${players[i].score}`);
+        sceneController.setText(`player${players[i].id}_score_gameOver`, `Player${players[i].id}: ${players[i].score}`);
       }
     });
   }
@@ -85,12 +86,15 @@ class Client {
   setID() {
     this.socket.on('setID', function(id) {
       client.ID = id;
+      sceneController.createPlayersInLobby();
     });
   }
 
   startGame() {
     this.socket.on('startGame', function() {
       game.gameReady = true;
+      sceneController.createText("GameTimer", "InGame", game.width / 2 - 30, 35, "", 24);
+      sceneController.createScoreText();
     });
 
     this.socket.on('startGameTimer', function(countdown) {
@@ -102,12 +106,19 @@ class Client {
         addNewDot(data[i].id, data[i].x, data[i].y);
       }
     });
+
+    this.socket.on('tilemapChosen', function(id) {
+      console.log('calling tile map', id);
+      game.gameWorld.addTileMap(id);
+    });
   }
 
   endGame() {
     this.socket.on('endGame', function() {
-      console.log("%cGAME OVER", "color: red; font-size: 32px;");
       game.gameWorld.stopTimers();
+      console.log("%cGAME OVER", "color: red; font-size: 32px;");
+      sceneController.setScreen("GameOver");
+      sceneController.createSprite("GameOverBg", "GameOver", 0, 0, 1280, 800, "temp-game-over");
     });
   }
 
@@ -159,6 +170,11 @@ class Client {
 
   gameLoaded() {
     this.socket.emit('gameLoaded');
+  }
+
+  // other
+  getID() {
+    return client.ID;
   }
 
 }
