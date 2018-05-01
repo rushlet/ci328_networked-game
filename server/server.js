@@ -36,7 +36,7 @@ function main() {
     });
 
     client.on('joinLobby', function() {
-      lobby.addPlayer(client, gameWorld);
+      lobby.addPlayer(client, io);
     });
 
     client.on('playerReady', function() {

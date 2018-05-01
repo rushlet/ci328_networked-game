@@ -15,7 +15,7 @@ module.exports = class Lobby {
     }
   }
 
-  addPlayer(client) {
+  addPlayer(client, io) {
     console.log("adding player to Lobby");
     var lobby = this;
     if (this.checkSlotAvailable() === true) {
@@ -28,7 +28,7 @@ module.exports = class Lobby {
           client.user = user;
           lobby.connectedPlayers++;
           client.emit('setID', client.user.id);
-          client.emit('setLobbyScreen');
+          io.emit('setLobbyScreen', lobby.users);
         }
       });
     } else {

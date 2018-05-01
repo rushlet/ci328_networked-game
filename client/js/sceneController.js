@@ -164,7 +164,7 @@ class SceneController {
       var x = (i % 2 !== 0) ? game.width * 0.7 : game.width * 0.85;
       var y = (i <= 2) ? game.height * 0.31 : game.height * 0.55;
       this.createSprite(`player${i}_lobby`, "Lobby", x, y, 48, 48, `ghost${i}`);
-      this.createText(`player${i}_name`, "Lobby", x - 18, y + 85, `Player${i}`, 20);
+      this.createText(`player${i}_name`, "Lobby", x - 18, y + 85, `Player${i} (ai)`, 20);
       this.createSprite(`player${i}_ready`, "Lobby", x - 10, y - 10, 16, 21, "tick");
       if (client.getID() == i) {
         this.createText('youAre', "Lobby", game.width * 0.18, game.height * 0.34, 'You Are', 16);
@@ -216,6 +216,15 @@ class SceneController {
       sceneController.setScreen("Lobby");
       cleanUp();
     }, null);
+  }
+
+  updateLobbyPlayers(users) {
+    for (var i = 0; i < users.length; i++) {
+      console.log(users[i].connected);
+      if (users[i].connected) {
+        this.setText(`player${users[i].id}_name`, `Player${users[i].id}`);
+      }
+    }
   }
 
   cleanUpLobby() {
