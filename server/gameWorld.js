@@ -190,12 +190,6 @@ module.exports = class GameWorld {
       io.emit('move', this.entities.players[id]);
       io.emit('updateHero', this.getArrayOfEntityType('players'));
       io.emit('playSoundEffect', 'players');
-    } else if (!this.entities.players[id].hero && player.hero) {
-      this.entities.players[id].hero = true;
-      this.entities.players[id].score += 4 * player.powerups.pointMultiplier;
-      this.entities.players[player.id].hero = false;
-      io.emit('updateHero', this.getArrayOfEntityType('players'));
-      io.emit('playSoundEffect', 'players');
     }
   }
 

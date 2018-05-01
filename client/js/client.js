@@ -177,21 +177,25 @@ class Client {
     })
   }
 
-  gameActive(){
-    this.socket.on('gameActive', function(){
+  gameActive() {
+    this.socket.on('gameActive', function() {
       sceneController.setScreen("GameActive");
     })
   }
 
-  setLobbyScreen(){
-      this.socket.on('setLobbyScreen', function(users){
+  setLobbyScreen() {
+    this.socket.on('setLobbyScreen', function(users) {
+      if (client.ID != null) {
         sceneController.setScreen("Lobby");
         sceneController.updateLobbyPlayers(users);
-      })
+      }
+    });
 
-      this.socket.on('playerReady', function(id){
+    this.socket.on('playerReady', function(id) {
+      if (client != null) {
         sceneController.lobbyPlayerReady(id);
-      })
+      }
+    });
   }
 
   // Client Emit Functions
