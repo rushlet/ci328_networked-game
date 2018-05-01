@@ -45,6 +45,10 @@ class Client {
         sceneController.setText(`player${players[i].id}_score_gameOver`, `Player${players[i].id}: ${players[i].score}`);
       }
     });
+
+    this.socket.on('playSoundEffect', function(type) {
+      game.gameWorld.playSoundEffect(type);
+    });
   }
 
   powerups() {

@@ -32,6 +32,7 @@ class GameWorld {
       sceneController.setText("GameTimer", this.millisecondsToMinutes(countdown));
     }, this);
     game.gameWorld.gameTimer.start();
+    this.playSoundEffect('background');
   }
 
   stopTimers() {
@@ -67,5 +68,10 @@ class GameWorld {
     setTimeout(() => {
       sceneController.setObjectVisibility("PowerupText", false);
     }, 2000);
+  }
+
+  playSoundEffect(type) {
+    game.music[type].play();
+    console.log('play ', type);
   }
 }

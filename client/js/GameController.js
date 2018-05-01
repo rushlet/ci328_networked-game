@@ -35,6 +35,11 @@ function preload() {
   game.load.image('button-ready', 'assets/img/buttons/button-ready.png');
   game.load.image('button-again', 'assets/img/buttons/button-again.png');
   game.load.image('button-back', 'assets/img/buttons/button-lobby-full.png');
+  //sounds
+  game.load.audio('audio_background', 'assets/audio/venga.mp3');
+  game.load.audio('audio_powerups', 'assets/audio/powerup.mp3');
+  game.load.audio('audio_dots', 'assets/audio/coin_collection.wav');
+  game.load.audio('audio_players', 'assets/audio/collision.wav');
 }
 
 function create() {
@@ -42,6 +47,13 @@ function create() {
   game.playerMap = {};
   game.dotMap = {};
   game.gameReady = false;
+  game.music = {};
+  game.music.powerups = game.add.audio('audio_powerups');
+  game.music.dots = game.add.audio('audio_dots');
+  game.music.players = game.add.audio('audio_players');
+  game.music.background = game.add.audio('audio_background');
+  game.music.background.volume = 0.4;
+  game.music.background.dots += 0.3;
 
   client = new Client();
   client.sendTest();
