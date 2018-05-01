@@ -16,24 +16,29 @@ module.exports = class Lobby {
   }
 
   addPlayer(client) {
-    console.log("adding player to Lobby");
-    var lobby = this;
-    if (this.checkSlotAvailable() === true) {
-      this.users.forEach(function(user) {
-        if (user.connected === false && client.user == null) {
-          user.connected = true;
-          user.gameLoaded = false;
-          user.isReady = false;
-          user.AI.active = false;
-          client.user = user;
-          lobby.connectedPlayers++;
-          client.emit('setID', client.user.id);
-          client.emit('setLobbyScreen');
-        }
-      });
+    if (!this.gameActive) {
+      console.log("adding player to Lobby");
+      var lobby = this;
+      if (this.checkSlotAvailable() === true) {
+        this.users.forEach(function(user) {
+          if (user.connected === false && client.user == null) {
+            user.connected = true;
+            user.gameLoaded = false;
+            user.isReady = false;
+            user.AI.active = false;
+            client.user = user;
+            lobby.connectedPlayers++;
+            client.emit('setID', client.user.id);
+            client.emit('setLobbyScreen');
+          }
+        });
+      } else {
+        console.log("All slots full");
+        client.emit('lobbyFull');
+      }
     } else {
-      console.log("All slots full");
-      client.emit('lobbyFull');
+      console.log("sorry game is already active, you'll have to wait");
+      client.emit('gameActive');
     }
   }
 

@@ -11,6 +11,7 @@ class Client {
     this.endGame();
     this.powerups();
     this.lobbyFull();
+    this.gameActive();
     this.setLobbyScreen();
   }
 
@@ -173,6 +174,12 @@ class Client {
   lobbyFull() {
     this.socket.on('lobbyFull', function() {
       sceneController.setScreen("LobbyFull");
+    })
+  }
+
+  gameActive(){
+    this.socket.on('gameActive', function(){
+      sceneController.setScreen("GameActive");
     })
   }
 

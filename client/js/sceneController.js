@@ -27,6 +27,14 @@ class SceneController {
     }, null);
 
     // In Game UI
+
+    // Game Active UI
+    this.createSprite("splash-gameActive", "GameActive", 0, 0, 1280, 800, "splash");
+    this.createText("gameActiveText", "GameActive", game.width / 2 - 265, game.height * 0.65, "The game is running, please wait", 36);
+    this.createSprite("gameActive-button-back", "GameActive", game.width / 2 - 120, game.height * 0.75, 246, 46, "button-back");
+    this.addEvent("gameActive-button-back", function() {
+      sceneController.setScreen("MainMenu");
+    }, null);
   }
 
   setScreen(screen) {
