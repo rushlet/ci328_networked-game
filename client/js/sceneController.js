@@ -34,6 +34,7 @@ class SceneController {
     this.screen = screen;
     this.showUI(screen);
     if (screen == "InGame") {
+      game.gameWorld = new GameWorld();
       client.addClientToServer();
     }
     if (screen == "Lobby") {
@@ -152,9 +153,8 @@ class SceneController {
   }
 
   addSoundIcon() {
-    this.createSprite("sound_on", "InGame", 1200, 25, 16, 16, "sound_on");
+    this.createSprite("sound_on", "InGame", 1230, 40, 16, 16, "sound_on");
     this.addEvent("sound_on", function() {
-      console.log(game.gameWorld);
       game.gameWorld.switchSound();
     }, null);
   }
@@ -176,13 +176,6 @@ class SceneController {
   }
 
   updateLobby(hero) {
-    for (var i = 0; i < 4; i++) {
-      if (i === hero.id) {
-        this.updateSprite(`player${hero.id}_lobby`, `frog${hero.id}`);
-      } else {
-        this.updateSprite(`player${i}_lobby`, `ghost${i}`);
-      }
-    }
     this.updateSprite(`player${hero.id}_lobby`, `frog${hero.id}`);
     this.setObjectVisibility(`button-bg`, false);
     this.setObjectVisibility(`LobbyReadyText`, false);
@@ -214,6 +207,8 @@ class SceneController {
   }
 
   gameOverScreen() {
+    // stop music
+    game.music.background.stop();
     this.setScreen("GameOver");
     this.createSprite("GameOverBg", "GameOver", 0, 0, 1280, 800, "temp-game-over");
     this.createSprite("button-again", "MainMenu", game.width / 2 - 120, game.height * 0.53, 246, 46, "button-again");
@@ -224,9 +219,9 @@ class SceneController {
   }
 
   cleanUpLobby() {
-    this.setObjectVisibility('TimerBackground', false);
-    this.setObjectVisibility('GameStarting', false);
-    this.setObjectVisibility('GameStartingTimer', false);
-    this.updateEntityPosition("button-ready", game.width / 2 - 120, game.height * 0.75);
+      this.setObjectVisibility('TimerBackground', false);
+      this.setObjectVisibility('GameStarting', false);
+      this.setObjectVisibility('GameStartingTimer', false);
+      this.updateEntityPosition("button-ready", game.width / 2 - 120, game.height * 0.75);
   }
 }

@@ -336,19 +336,6 @@ module.exports = class GameWorld {
     }
   }
 
-  switchSound() {
-      if (game.music.on) {
-        game.sound.mute = true;
-        game.music.on = false;
-        sceneController.updateSprite("sound_on", "sound_off");
-      } else {
-        game.sound.mute = false;
-        game.music.on = true;
-        sceneController.updateSprite("sound_off", "sound_on");
-      }
-    });
-  }
-
   stopTimers(lobby) {
     clearInterval(this.gameOverTimer);
     clearInterval(this.powerupTimer);
