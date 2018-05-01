@@ -3,12 +3,12 @@ class GameWorld {
     game.cursors = game.input.keyboard.createCursorKeys();
     game.physics.startSystem(Phaser.Physics.ARCADE);
     this.gameTimer = game.time.create(true);
-    game.input.onDown.add(this.getTileProperties, this); //enable tile debugging
   }
 
   cleanUp(){
     this.map.visible = false;
     this.layer.visible = false;
+    this.powerup.destroy();
   }
 
   addTileMap(id) {
@@ -18,29 +18,9 @@ class GameWorld {
     this.layer.resizeWorld();
   }
 
-  getTileProperties() {
-    var x = game.gameWorld.layer.getTileX(game.input.activePointer.worldX);
-    var y = game.gameWorld.layer.getTileY(game.input.activePointer.worldY);
-    console.log(game.gameWorld.map.getTile(x, y, game.gameWorld.layer));
-  }
-
-  setGameTimer(duration) {
-    let countdown = duration
-    sceneController.setText("GameTimer", this.millisecondsToMinutes(countdown));
-    game.gameWorld.gameTimer.loop(1000, () => {
-      countdown -= 1000;
-      sceneController.setText("GameTimer", this.millisecondsToMinutes(countdown));
-    }, this);
-    game.gameWorld.gameTimer.start();
-  }
-
-  stopTimers() {
-    game.gameWorld.gameTimer.destroy();
-  }
-
-  millisecondsToMinutes(ms) {
-    var seconds = ms / 1000;
-    var minutes = ('0' + (parseInt(seconds / 60))).slice(-2);
+  secondsToMinutes(time) {
+    var minutes = Math.floor(time / 60);
+    var seconds = time - minutes * 60;
     seconds = ('0' + (seconds % 60)).slice(-2);
     return `${minutes}:${seconds}`;
   }
@@ -53,9 +33,11 @@ class GameWorld {
   }
 
   updatePowerup(visibility, x, y) {
+    if(game.gameWorld.powerup != null){
     game.gameWorld.powerup.visible = visibility;
     game.gameWorld.powerup.x = x;
     game.gameWorld.powerup.y = y;
+  }
   }
 
   powerupText(powerup) {

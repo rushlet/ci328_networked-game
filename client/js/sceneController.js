@@ -37,7 +37,6 @@ class SceneController {
     this.screen = screen;
     this.showUI(screen);
     if (screen == "InGame") {
-      game.gameWorld = new GameWorld();
       client.addClientToServer();
     }
   }
@@ -165,6 +164,13 @@ class SceneController {
   }
 
   updateLobby(hero) {
+    for (var i = 0; i < 4; i++) {
+      if (i === hero.id) {
+        this.updateSprite(`player${hero.id}_lobby`, `frog${hero.id}`);
+      } else {
+        this.updateSprite(`player${i}_lobby`, `ghost${i}`);
+      }
+    }
     this.updateSprite(`player${hero.id}_lobby`, `frog${hero.id}`);
     this.setObjectVisibility(`button-bg`, false);
     this.setObjectVisibility(`LobbyReadyText`, false);
@@ -202,9 +208,9 @@ class SceneController {
   }
 
   cleanUpLobby() {
-      this.setObjectVisibility('TimerBackground', false);
-      this.setObjectVisibility('GameStarting', false);
-      this.setObjectVisibility('GameStartingTimer', false);
-      this.updateEntityPosition("button-ready", game.width / 2 - 120, game.height * 0.75);
+    this.setObjectVisibility('TimerBackground', false);
+    this.setObjectVisibility('GameStarting', false);
+    this.setObjectVisibility('GameStartingTimer', false);
+    this.updateEntityPosition("button-ready", game.width / 2 - 120, game.height * 0.75);
   }
 }

@@ -25,7 +25,7 @@ function main() {
           stillPlaying = true;
         }
       });
-      if(!stillPlaying){
+      if (!stillPlaying) {
         gameWorld.stopTimers(lobby);
         gameWorld.resetGame(lobby);
       }
@@ -40,45 +40,52 @@ function main() {
     });
 
     client.on('playerReady', function() {
-      console.log("Client " + client.user.id + " is ready");
-      client.user.isReady = true;
-      console.log(lobby);
-      if (lobby.checkAllReady() === true) {
-        var hero = gameWorld.chooseHero();
-        io.emit('heroChosen', hero);
-        this.loadGameTimer = setTimeout(() => {
-          io.emit('loadGame');
-          clearTimeout(this.loadGameTimer);
-        }, 5000);
+      if (client.user != null) {
+        console.log("Client " + client.user.id + " is ready");
+        client.user.isReady = true;
+        console.log(lobby);
+        if (lobby.checkAllReady() === true) {
+          if (!lobby.gameActive) {
+             var hero = gameWorld.chooseHero();
+           }
+          io.emit('heroChosen', gameWorld.getHero());
+          this.loadGameTimer = setTimeout(() => {
+            io.emit('loadGame');
+            clearTimeout(this.loadGameTimer);
+          }, 5000);
+        }
       }
     });
 
     client.on('gameLoaded', function() {
-      client.user.gameLoaded = true;
-      if (lobby.checkGameReady() && !lobby.gameActive) {
-        gameWorld.gamePrep(io, client, lobby);
-        lobby.startAIUpdateTimer(io, gameWorld);
-        lobby.gameActive = true;
-      } else if (lobby.gameActive) {
-        gameWorld.callGamePrepEmits(io, client);
-        gameWorld.addPowerups(io);
+      if (client.user != null) {
+        client.user.gameLoaded = true;
+        if (lobby.checkGameReady() && !lobby.gameActive) {
+          gameWorld.gamePrep(io, client, lobby);
+          lobby.startAIUpdateTimer(io, gameWorld);
+          lobby.gameActive = true;
+        } else if (lobby.gameActive) {
+          gameWorld.callGamePrepEmits(io, client);
+          gameWorld.addPowerups(io);
+        }
       }
     });
 
     client.on('newplayer', function() {
+      if (client.user != null) {
+        client.on('movement', function(direction) {
+          gameWorld.movePlayer(direction, client.user.id, io, client);
+        });
 
-      client.on('movement', function(direction) {
-        gameWorld.movePlayer(direction, client.user.id, io, client);
-      });
-
-      client.on('targetReached', function(id, targetX, targetY) {
-        console.log(id, " Reached Target");
-        var player = gameWorld.entities.players[id];
-        if(player.expectedPosition.x == targetX && player.expectedPosition.y == targetY){
-          player.x = player.expectedPosition.x;
-          player.y = player.expectedPosition.y;
-        }
-      });
+        client.on('targetReached', function(id, targetX, targetY) {
+          console.log(id, " Reached Target");
+          var player = gameWorld.entities.players[id];
+          if (player.expectedPosition.x == targetX && player.expectedPosition.y == targetY) {
+            player.x = player.expectedPosition.x;
+            player.y = player.expectedPosition.y;
+          }
+        });
+      }
     });
   });
 

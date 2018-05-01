@@ -45,7 +45,7 @@ function create() {
 
   client = new Client();
   client.sendTest();
-
+  game.gameWorld = new GameWorld();
   sceneController = new SceneController();
   sceneController.setScreen("MainMenu");
 }
@@ -58,7 +58,7 @@ function update() {
   }
 }
 
-function cleanUp(){
+function cleanUp() {
   game.gameWorld.cleanUp();
   Object.keys(game.playerMap).forEach(function(id) {
     game.playerMap[id].destroy();
@@ -85,19 +85,23 @@ function addNewDot(id, x, y) {
 }
 
 function updateDots(id, x, y) {
-  game.dotMap[id].x = x;
-  game.dotMap[id].y = y;
+  if (game.dotMap[id] != null) {
+    game.dotMap[id].x = x;
+    game.dotMap[id].y = y;
+  }
 }
 
 function updateSprites(id, hero) {
-  (hero) ? game.playerMap[id].loadTexture(`frog${id}`) : game.playerMap[id].loadTexture(`ghost${id}`);
-  game.playerMap[id].animations.add('right', [0,1,2], true);
-  game.playerMap[id].animations.add('left', [3,4,5], true);
+  if (game.playerMap[id] != null) {
+    (hero) ? game.playerMap[id].loadTexture(`frog${id}`): game.playerMap[id].loadTexture(`ghost${id}`);
+    game.playerMap[id].animations.add('right', [0, 1, 2], true);
+    game.playerMap[id].animations.add('left', [3, 4, 5], true);
+  }
 }
 
 function movePlayer(id, targetX, targetY, direction) {
   var player = game.playerMap[id];
-  (direction == "left") ? game.playerMap[id].animations.play('left', 3) : game.playerMap[id].animations.play('right', 3);
+  (direction == "left") ? game.playerMap[id].animations.play('left', 3): game.playerMap[id].animations.play('right', 3);
   var tween = game.add.tween(player);
   var duration = 320 / player.speedMultiplier;
   tween.to({
@@ -106,7 +110,7 @@ function movePlayer(id, targetX, targetY, direction) {
   }, duration);
   tween.start();
   tween.onComplete.add(() => {
-      client.targetReached(id, targetX, targetY);
+    client.targetReached(id, targetX, targetY);
   });
 }
 
