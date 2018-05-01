@@ -165,6 +165,7 @@ class Client {
       if (client.ID != null) {
         sceneController.setScreen("InGame");
         client.gameLoaded();
+        game.gameWorld.playSoundEffect('background');
       }
     });
   }
