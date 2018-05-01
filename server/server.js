@@ -14,9 +14,11 @@ function main() {
       lobby.users.forEach(function(user) {
         if (user === client.user) {
           lobby.connectedPlayers--;
-          console.log("disconnecting player" + client.user.id)
           user.connected = false;
+          user.gameLoaded = true;
+          user.isReady = true;
           user.AI.active = true;
+          io.emit('setLobbyScreen', lobby.users);
         }
       });
       var stillPlaying = false;
@@ -41,10 +43,8 @@ function main() {
 
     client.on('playerReady', function() {
       if (client.user != null) {
-        console.log("Client " + client.user.id + " is ready");
         client.user.isReady = true;
         io.emit('playerReady', client.user.id);
-        console.log(lobby);
         if (lobby.checkAllReady() === true) {
           if (!lobby.gameActive) {
              var hero = gameWorld.chooseHero();
@@ -79,7 +79,6 @@ function main() {
         });
 
         client.on('targetReached', function(id, targetX, targetY) {
-          console.log(id, " Reached Target");
           var player = gameWorld.entities.players[id];
           if (player.expectedPosition.x == targetX && player.expectedPosition.y == targetY) {
             player.x = player.expectedPosition.x;

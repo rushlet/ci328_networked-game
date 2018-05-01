@@ -271,8 +271,6 @@ module.exports = class Ai {
     } while (open.length > 0); // Continue until there is no more available tiles in the open list (which means there is no path)
     if (path != null) {
       return this.processPath(path);
-    } else {
-      console.log("Path Not Found");
     }
   }
 

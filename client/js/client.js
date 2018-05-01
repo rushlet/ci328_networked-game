@@ -145,7 +145,6 @@ class Client {
 
     this.socket.on('tilemapChosen', function(id) {
       if (client.ID != null) {
-        console.log('calling tile map', id);
         game.gameWorld.addTileMap(id);
       }
     });
@@ -155,7 +154,6 @@ class Client {
     this.socket.on('endGame', function() {
       if (client.ID != null) {
         game.gameReady = false;
-        console.log("%cGAME OVER", "color: red; font-size: 32px;");
         sceneController.gameOverScreen();
       }
     });

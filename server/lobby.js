@@ -17,7 +17,6 @@ module.exports = class Lobby {
 
   addPlayer(client, io) {
     if (!this.gameActive) {
-      console.log("adding player to Lobby");
       var lobby = this;
       if (this.checkSlotAvailable() === true) {
         this.users.forEach(function(user) {
@@ -33,11 +32,9 @@ module.exports = class Lobby {
           }
         });
       } else {
-        console.log("All slots full");
         client.emit('lobbyFull');
       }
     } else {
-      console.log("sorry game is already active, you'll have to wait");
       client.emit('gameActive');
     }
   }
@@ -54,8 +51,6 @@ module.exports = class Lobby {
     } else {
       ready = false;
     }
-
-    console.log("Checking Ready : " + ready);
     return ready;
   }
 

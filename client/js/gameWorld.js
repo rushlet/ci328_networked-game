@@ -53,7 +53,6 @@ class GameWorld {
 
   playSoundEffect(type) {
     game.music[type].play();
-    console.log('play ', type);
   }
 
   switchSound() {

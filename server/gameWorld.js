@@ -99,7 +99,6 @@ module.exports = class GameWorld {
 
   chooseHero() {
     var hero = this.randomInt(1, 4);
-    console.log('hero is ', hero);
     this.entities.players[hero].hero = true;
     return this.entities.players[hero];
   }
@@ -123,7 +122,6 @@ module.exports = class GameWorld {
   }
 
   createEntity(type, id, x, y) {
-    console.log("Creating Entity: " + type + " ID: " + id);
     this.entities[type][id] = {
       id: id,
       x: x,
