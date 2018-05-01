@@ -18,7 +18,6 @@ function main() {
           user.gameLoaded = true;
           user.isReady = true;
           user.AI.active = true;
-          io.emit('setLobbyScreen', lobby.users);
         }
       });
       var stillPlaying = false;
@@ -30,6 +29,8 @@ function main() {
       if (!stillPlaying) {
         gameWorld.stopTimers(lobby);
         gameWorld.resetGame(lobby);
+      } else {
+        io.emit('setLobbyScreen', lobby.users);
       }
     });
 
@@ -47,8 +48,8 @@ function main() {
         io.emit('playerReady', client.user.id);
         if (lobby.checkAllReady() === true) {
           if (!lobby.gameActive) {
-             var hero = gameWorld.chooseHero();
-           }
+            var hero = gameWorld.chooseHero();
+          }
           io.emit('heroChosen', gameWorld.getHero());
           this.loadGameTimer = setTimeout(() => {
             io.emit('loadGame');
