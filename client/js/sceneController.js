@@ -27,9 +27,6 @@ class SceneController {
     }, null);
 
     // In Game UI
-
-    // Game Over UI
-    this.createText("GameOver", "GameOver", game.width / 2 - 30, 25, "GAME OVER", 60, '#c30712');
   }
 
   setScreen(screen) {
@@ -94,11 +91,10 @@ class SceneController {
     });
   }
 
-  createSprite(name, ui, x, y, width, height, image, visibility = true) {
+  createSprite(name, ui, x, y, width, height, image) {
     var sprite = game.add.sprite(x, y, image);
     sprite.width = width;
     sprite.height = height;
-    sprite.visible = visibility;
     this.elements.push({
       name: name,
       ui: ui,
@@ -153,6 +149,15 @@ class SceneController {
       this.createSprite(`player${i}_sprite_gameOver`, "GameOver", game.width * width + space + 30, 20, 32, 32, `ghost${i}`);
       this.createText(`player${i}_score_gameOver`, "GameOver", game.width * width + space, 55, `Player${i}: 0`, 16);
     }
+    this.addSoundIcon();
+  }
+
+  addSoundIcon() {
+    this.createSprite("sound_on", "InGame", 1200, 25, 16, 16, "sound_on");
+    this.addEvent("sound_on", function() {
+      console.log(game.gameWorld);
+      game.gameWorld.switchSound();
+    }, null);
   }
 
   createPlayersInLobby() {

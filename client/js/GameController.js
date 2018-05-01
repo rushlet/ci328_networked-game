@@ -31,6 +31,8 @@ function preload() {
   game.load.image('temp-game-over', 'assets/img/temp-game-over.png');
   game.load.image('lobby-countdown-bg', 'assets/img/timer-bg.png');
   game.load.image('tick', 'assets/img/tick.png');
+  game.load.image('sound_on', 'assets/img/sound_on.png');
+  game.load.image('sound_off', 'assets/img/sound_off.png');
   // buttons
   game.load.image('button-menu', 'assets/img/buttons/button-menu.png');
   game.load.image('button-ready', 'assets/img/buttons/button-ready.png');
@@ -48,13 +50,7 @@ function create() {
   game.playerMap = {};
   game.dotMap = {};
   game.gameReady = false;
-  game.music = {};
-  game.music.powerups = game.add.audio('audio_powerups');
-  game.music.dots = game.add.audio('audio_dots');
-  game.music.players = game.add.audio('audio_players');
-  game.music.background = game.add.audio('audio_background');
-  game.music.background.volume = 0.4;
-  game.music.background.dots += 0.3;
+  addMusic();
 
   client = new Client();
   client.sendTest();
@@ -69,6 +65,18 @@ function update() {
     handleCursorInput();
     client.updatePlayerInput(client.direction);
   }
+}
+
+function addMusic() {
+  var music = {};
+  music.on = true;
+  music.powerups = game.add.audio('audio_powerups');
+  music.dots = game.add.audio('audio_dots');
+  music.players = game.add.audio('audio_players');
+  music.background = game.add.audio('audio_background');
+  music.background.volume = 0.4;
+  music.background.dots += 0.3;
+  game.music = music;
 }
 
 function cleanUp(){

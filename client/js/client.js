@@ -154,8 +154,6 @@ class Client {
       })
   }
 
-
-
   // Client Emit Functions
   sendTest() {
     this.socket.emit('test');
