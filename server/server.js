@@ -43,6 +43,7 @@ function main() {
       if (client.user != null) {
         console.log("Client " + client.user.id + " is ready");
         client.user.isReady = true;
+        io.emit('playerReady', client.user.id);
         console.log(lobby);
         if (lobby.checkAllReady() === true) {
           if (!lobby.gameActive) {
