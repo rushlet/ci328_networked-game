@@ -44,10 +44,10 @@ function main() {
         console.log("Client " + client.user.id + " is ready");
         client.user.isReady = true;
         if (lobby.checkAllReady() === true) {
-          if(!lobby.gameActive){
-          var hero = gameWorld.chooseHero();
-        }
-          io.emit('heroChosen', hero);
+          if (!lobby.gameActive) {
+            var hero = gameWorld.chooseHero();
+          }
+          io.emit('heroChosen', gameWorld.getHero());
           this.loadGameTimer = setTimeout(() => {
             io.emit('loadGame');
             clearTimeout(this.loadGameTimer);

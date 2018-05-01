@@ -99,7 +99,7 @@ class Client {
     });
 
     this.socket.on('powerupExpire', function(id) {
-      if (client.ID != null) {
+      if (client.ID != null && game.playerMap[id] != null) {
         game.playerMap[id].speedMultiplier = 1;
       }
     });
@@ -132,13 +132,11 @@ class Client {
     this.socket.on('startGame', function() {
       if (client.ID != null) {
         game.gameReady = true;
-        sceneController.createText("GameTimer", "InGame", game.width / 2 - 30, 35, "", 24);
-        sceneController.createScoreText();
       }
     });
 
     this.socket.on('setGameTimer', function(countdown) {
-      if (client.ID != null) {
+      if (client.ID != null && game.gameReady) {
         sceneController.setText("GameTimer", game.gameWorld.secondsToMinutes(countdown));
       }
     });
@@ -162,9 +160,9 @@ class Client {
   endGame() {
     this.socket.on('endGame', function() {
       if (client.ID != null) {
-        game.gameReady = false;
+        cleanUp();
         console.log("%cGAME OVER", "color: red; font-size: 32px;");
-        sceneController.gameOverScreen();
+        sceneController.setScreen("GameOver");
       }
     });
   }

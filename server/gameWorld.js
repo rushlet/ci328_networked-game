@@ -5,7 +5,8 @@ module.exports = class GameWorld {
   constructor() {
     this.gameOverTimer;
     this.gameStarted = false;
-    this.countdown = 10;
+    this.gameLength = 10;
+    this.countdown = this.gameLength;
     this.entities = {
       players: {},
       dots: {},
@@ -100,6 +101,17 @@ module.exports = class GameWorld {
     console.log('hero is ', hero);
     this.entities.players[hero].hero = true;
     return this.entities.players[hero];
+  }
+
+  getHero(){
+    var hero;
+    var gameWorld = this;
+    Object.keys(this.entities.players).forEach(function(id) {
+      if(gameWorld.entities.players[id].hero){
+        hero = gameWorld.entities.players[id];
+      }
+    });
+    return hero;
   }
 
   generateEntity(type, quantity) {
@@ -267,7 +279,7 @@ module.exports = class GameWorld {
   }
 
   resetGame(lobby) {
-    this.countdown = 10;
+    this.countdown = this.gameLength;
     this.gameStarted = false;
     lobby.gameActive = false;
     lobby.gameReady = false;

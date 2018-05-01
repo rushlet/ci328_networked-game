@@ -3,14 +3,19 @@ class SceneController {
     this.elements = [];
     this.screen = "";
     var sceneController = this;
+
     // Main Menu UI
     this.createSprite("splash", "MainMenu", 0, 0, 1280, 800, "splash");
     this.createSprite("button-menu", "MainMenu", game.width / 2 - 120, game.height * 0.75, 246, 46, "button-menu");
     this.addEvent("button-menu", function() {
       client.joinLobby();
     }, null);
+
     // Lobby UI
     this.createSprite("bg", "Lobby", 0, 0, 1280, 800, "lobby");
+    this.createSprite('TimerBackground', "Lobby", game.width / 2 - 128, 35, 256, 128, 'lobby-countdown-bg');
+    this.createText('GameStarting', "Lobby", game.width / 2 - 50, 60, 'Game Starts in', 16);
+    this.createText('GameStartingTimer', "Lobby", game.width / 2 - 15, 90, '5', 42);
     this.createSprite("button-ready", "Lobby", game.width / 2 - 120, game.height * 0.75, 246, 46, "button-ready");
     this.addEvent("button-ready", function() {
       client.playerReady();
@@ -27,9 +32,29 @@ class SceneController {
     }, null);
 
     // In Game UI
+    this.createText("GameTimer", "InGame", game.width / 2 - 30, 35, "", 24);
+    for (var i = 1; i <= 4; i++) {
+      var space = (i % 2 === 0) ? 150 : 0;
+      var width = (i <= 2) ? 0.15 : 0.65;
+      this.createSprite(`player${i}_score_sprite`, "InGame", game.width * width + space + 30, 20, 32, 32, `ghost${i}`);
+      this.createText(`player${i}_score`, "InGame", game.width * width + space, 55, `Player${i}: 0`, 16);
+    }
 
     // Game Over UI
-    this.createText("GameOver", "GameOver", game.width / 2 - 30, 25, "GAME OVER", 60, '#c30712');
+    this.createSprite("GameOverBg", "GameOver", 0, 0, 1280, 800, "temp-game-over");
+    this.createSprite("button-again", "GameOver", game.width / 2 - 120, game.height * 0.53, 246, 46, "button-again");
+    this.addEvent("button-again", function() {
+      sceneController.setScreen("Lobby");
+      sceneController.cleanUpLobby();
+    }, null);
+
+    for (var i = 1; i <= 4; i++) {
+      var space = (i % 2 === 0) ? 150 : 0;
+      var width = (i <= 2) ? 0.15 : 0.65;
+      this.createSprite(`player${i}_sprite_gameOver`, "GameOver", game.width * width + space + 30, 20, 32, 32, `ghost${i}`);
+      this.createText(`player${i}_score_gameOver`, "GameOver", game.width * width + space, 55, `Player${i}: 0`, 16);
+    }
+
   }
 
   setScreen(screen) {
@@ -39,6 +64,11 @@ class SceneController {
     if (screen == "InGame") {
       game.gameWorld = new GameWorld();
       client.addClientToServer();
+    }
+    if(screen == "Lobby"){
+      this.setObjectVisibility("TimerBackground", false);
+      this.setObjectVisibility("GameStarting", false);
+      this.setObjectVisibility("GameStartingTimer", false);
     }
   }
 
@@ -138,17 +168,6 @@ class SceneController {
     return exists;
   }
 
-  createScoreText() {
-    for (var i = 1; i <= 4; i++) {
-      var space = (i % 2 === 0) ? 150 : 0;
-      var width = (i <= 2) ? 0.15 : 0.65;
-      this.createSprite(`player${i}_score_sprite`, "InGame", game.width * width + space + 30, 20, 32, 32, `ghost${i}`);
-      this.createText(`player${i}_score`, "InGame", game.width * width + space, 55, `Player${i}: 0`, 16);
-      this.createSprite(`player${i}_sprite_gameOver`, "GameOver", game.width * width + space + 30, 20, 32, 32, `ghost${i}`);
-      this.createText(`player${i}_score_gameOver`, "GameOver", game.width * width + space, 55, `Player${i}: 0`, 16);
-    }
-  }
-
   createPlayersInLobby() {
     for (var i = 1; i <= 4; i++) {
       var x = (i % 2 !== 0) ? game.width * 0.7 : game.width * 0.85;
@@ -166,15 +185,16 @@ class SceneController {
 
   updateLobby(hero) {
     for (var i = 0; i < 4; i++) {
-      if(i === hero.id){
-          this.updateSprite(`player${hero.id}_lobby`, `frog${hero.id}`);
-      }
-      else{
-          this.updateSprite(`player${i}_lobby`, `ghost${i}`);
+      if (i === hero.id) {
+        this.updateSprite(`player${hero.id}_lobby`, `frog${hero.id}`);
+      } else {
+        this.updateSprite(`player${i}_lobby`, `ghost${i}`);
       }
     }
     this.setObjectVisibility(`button-bg`, false);
-    this.setObjectVisibility(`LobbyReadyText`, false);
+    this.setObjectVisibility("TimerBackground", true);
+    this.setObjectVisibility("GameStarting", true);
+    this.setObjectVisibility("GameStartingTimer", true);
     this.addLobbyCountdown();
     var count = 5;
     this.lobbyTimer = setInterval(() => {
@@ -191,28 +211,13 @@ class SceneController {
       this.setObjectVisibility('TimerBackground', true);
       this.setObjectVisibility('GameStarting', true);
       this.setObjectVisibility('GameStartingTimer', true);
-    } else {
-      this.createSprite('TimerBackground', "Lobby", game.width / 2 - 128, 35, 256, 128, 'lobby-countdown-bg');
-      this.createText('GameStarting', "Lobby", game.width / 2 - 50, 60, 'Game Starts in', 16);
-      this.createText('GameStartingTimer', "Lobby", game.width / 2 - 15, 90, '5', 42);
     }
   }
 
-  gameOverScreen() {
-    this.setScreen("GameOver");
-    this.createSprite("GameOverBg", "GameOver", 0, 0, 1280, 800, "temp-game-over");
-    this.createSprite("button-again", "MainMenu", game.width / 2 - 120, game.height * 0.53, 246, 46, "button-again");
-    this.addEvent("button-again", function() {
-      cleanUp();
-      sceneController.setScreen("Lobby");
-      sceneController.cleanUpLobby();
-    }, null);
-  }
-
   cleanUpLobby() {
-      this.setObjectVisibility('TimerBackground', false);
-      this.setObjectVisibility('GameStarting', false);
-      this.setObjectVisibility('GameStartingTimer', false);
-      this.updateEntityPosition("button-ready", game.width / 2 - 120, game.height * 0.75);
+    this.setObjectVisibility('TimerBackground', false);
+    this.setObjectVisibility('GameStarting', false);
+    this.setObjectVisibility('GameStartingTimer', false);
+    this.updateEntityPosition("button-ready", game.width / 2 - 120, game.height * 0.75);
   }
 }

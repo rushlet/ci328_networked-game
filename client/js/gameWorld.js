@@ -2,12 +2,11 @@ class GameWorld {
   constructor() {
     game.cursors = game.input.keyboard.createCursorKeys();
     game.physics.startSystem(Phaser.Physics.ARCADE);
-    game.input.onDown.add(this.getTileProperties, this); //enable tile debugging
   }
 
   cleanUp(){
-    this.map.visible = false;
-    this.layer.visible = false;
+    this.map.destroy();
+    this.layer.destroy();
     this.powerup.destroy();
   }
 
@@ -16,12 +15,6 @@ class GameWorld {
     this.layer = this.map.createLayer(`map${id+1}`);
     this.map.addTilesetImage('tileset');
     this.layer.resizeWorld();
-  }
-
-  getTileProperties() {
-    var x = game.gameWorld.layer.getTileX(game.input.activePointer.worldX);
-    var y = game.gameWorld.layer.getTileY(game.input.activePointer.worldY);
-    console.log(game.gameWorld.map.getTile(x, y, game.gameWorld.layer));
   }
 
   secondsToMinutes(time) {
