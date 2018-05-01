@@ -18,31 +18,39 @@ class Client {
   allPlayers() {
     let client = this;
     this.socket.on('allplayers', function(data) {
-      for (var i = 0; i < data.length; i++) {
-        addNewPlayer(data[i].id, data[i].x, data[i].y);
+      if (client.ID != null) {
+        for (var i = 0; i < data.length; i++) {
+          addNewPlayer(data[i].id, data[i].x, data[i].y);
+        }
+        client.move();
+        client.remove();
       }
-      client.move();
-      client.remove();
     });
   }
 
   updateGame() {
     this.socket.on('updateHero', function(players) {
-      for (var i = 0; i < players.length; i++) {
-        updateSprites(players[i].id, players[i].hero);
+      if (client.ID != null) {
+        for (var i = 0; i < players.length; i++) {
+          updateSprites(players[i].id, players[i].hero);
+        }
       }
     });
 
     this.socket.on('updateDots', function(data) {
-      for (var i = 0; i < data.length; i++) {
-        updateDots(data[i].id, data[i].x, data[i].y);
+      if (client.ID != null) {
+        for (var i = 0; i < data.length; i++) {
+          updateDots(data[i].id, data[i].x, data[i].y);
+        }
       }
     });
 
     this.socket.on('updateScores', function(players) {
-      for (var i = 0; i < players.length; i++) {
-        sceneController.setText(`player${players[i].id}_score`, `Player${players[i].id}: ${players[i].score}`);
-        sceneController.setText(`player${players[i].id}_score_gameOver`, `Player${players[i].id}: ${players[i].score}`);
+      if (client.ID != null) {
+        for (var i = 0; i < players.length; i++) {
+          sceneController.setText(`player${players[i].id}_score`, `Player${players[i].id}: ${players[i].score}`);
+          sceneController.setText(`player${players[i].id}_score_gameOver`, `Player${players[i].id}: ${players[i].score}`);
+        }
       }
     });
 
@@ -53,31 +61,41 @@ class Client {
 
   powerups() {
     this.socket.on('addPowerup', function(x, y) {
-      game.gameWorld.addPowerupToGame(x, y);
+      if (client.ID != null) {
+        game.gameWorld.addPowerupToGame(x, y);
+      }
     });
 
     this.socket.on('updatePowerup', function(visibility, x, y) {
-      game.gameWorld.updatePowerup(visibility, x, y);
+      if (client.ID != null) {
+        game.gameWorld.updatePowerup(visibility, x, y);
+      }
     });
 
     this.socket.on('powerupCaught', function(powerup, player) {
-      game.gameWorld.updatePowerup(false, 0, 0);
-      if (powerup == 'Double Speed' || powerup == 'Half Speed') {
-        game.playerMap[player.id].speedMultiplier = player.powerups.speedMultiplier;
-      }
-      if (client.ID == player.id) {
-        game.gameWorld.powerupText(powerup);
+      if (client.ID != null) {
+        game.gameWorld.updatePowerup(false, 0, 0);
+        if (powerup == 'Double Speed' || powerup == 'Half Speed') {
+          game.playerMap[player.id].speedMultiplier = player.powerups.speedMultiplier;
+        }
+        if (client.ID == player.id) {
+          game.gameWorld.powerupText(powerup);
+        }
       }
     });
 
     this.socket.on('powerupExpire', function(id) {
-      game.playerMap[id].speedMultiplier = 1;
+      if (client.ID != null) {
+        game.playerMap[id].speedMultiplier = 1;
+      }
     });
   }
 
   move() {
     this.socket.on('move', function(data) {
-      movePlayer(data.id, data.expectedPosition.x, data.expectedPosition.y, data.direction);
+      if (client.ID != null) {
+        movePlayer(data.id, data.expectedPosition.x, data.expectedPosition.y, data.direction);
+      }
     });
   }
 
@@ -96,52 +114,65 @@ class Client {
 
   startGame() {
 
-    this.socket.on('heroChosen', function(player){
-      sceneController.updateLobby(player);
+    this.socket.on('heroChosen', function(player) {
+      if (client.ID != null) {
+        sceneController.updateLobby(player);
+      }
     });
 
     this.socket.on('startGame', function() {
-      game.gameReady = true;
-      sceneController.createText("GameTimer", "InGame", game.width / 2 - 30, 35, "", 24);
-      sceneController.createScoreText();
+      if (client.ID != null) {
+        game.gameReady = true;
+        sceneController.createText("GameTimer", "InGame", game.width / 2 - 30, 35, "", 24);
+        sceneController.createScoreText();
+      }
     });
 
-    this.socket.on('startGameTimer', function(countdown) {
-      game.gameWorld.setGameTimer(countdown);
+    this.socket.on('setGameTimer', function(countdown) {
+      if (client.ID != null) {
+        sceneController.setText("GameTimer", game.gameWorld.secondsToMinutes(countdown));
+      }
     });
 
     this.socket.on('drawDots', function(data) {
-      for (var i = 0; i < data.length; i++) {
-        addNewDot(data[i].id, data[i].x, data[i].y);
+      if (client.ID != null) {
+        for (var i = 0; i < data.length; i++) {
+          addNewDot(data[i].id, data[i].x, data[i].y);
+        }
       }
     });
 
     this.socket.on('tilemapChosen', function(id) {
-      console.log('calling tile map', id);
-      game.gameWorld.addTileMap(id);
+      if (client.ID != null) {
+        console.log('calling tile map', id);
+        game.gameWorld.addTileMap(id);
+      }
     });
   }
 
   endGame() {
     this.socket.on('endGame', function() {
-      game.gameReady = false;
-      game.gameWorld.stopTimers();
-      console.log("%cGAME OVER", "color: red; font-size: 32px;");
-      sceneController.gameOverScreen();
+      if (client.ID != null) {
+        game.gameReady = false;
+        console.log("%cGAME OVER", "color: red; font-size: 32px;");
+        sceneController.gameOverScreen();
+      }
     });
   }
 
   loadGame() {
     this.socket.on('loadGame', function() {
-      sceneController.setScreen("InGame");
-      client.gameLoaded();
+      if (client.ID != null) {
+        sceneController.setScreen("InGame");
+        client.gameLoaded();
+      }
     });
   }
 
-  lobbyFull(){
-      this.socket.on('lobbyFull', function(){
-        sceneController.setScreen("LobbyFull");
-      })
+  lobbyFull() {
+    this.socket.on('lobbyFull', function() {
+      sceneController.setScreen("LobbyFull");
+    })
   }
 
   setLobbyScreen(){

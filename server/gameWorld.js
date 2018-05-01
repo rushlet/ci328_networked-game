@@ -3,7 +3,11 @@ var Lobby = require('./lobby.js');
 module.exports = class GameWorld {
 
   constructor() {
+    this.gameStarted = false;
+    this.gameLength = 10;
+    this.countdown = this.gameLength;
     this.gameOverTimer;
+    this.powerupAdded = false;
     this.entities = {
       players: {},
       dots: {},
@@ -98,6 +102,17 @@ module.exports = class GameWorld {
     console.log('hero is ', hero);
     this.entities.players[hero].hero = true;
     return this.entities.players[hero];
+  }
+
+  getHero() {
+    var hero;
+    var gameWorld = this;
+    Object.keys(this.entities.players).forEach(function(id) {
+      if (gameWorld.entities.players[id].hero) {
+        hero = gameWorld.entities.players[id];
+      }
+    });
+    return hero;
   }
 
   generateEntity(type, quantity) {
@@ -253,16 +268,25 @@ module.exports = class GameWorld {
   }
 
   startGameTimer(io, lobby) {
-    let duration = 150000;
-    io.emit('startGameTimer', duration);
-    this.gameOverTimer = setTimeout(() => {
-      io.emit('endGame', duration);
-      this.stopTimers(lobby);
-      this.resetGame(lobby, io);
-    }, duration);
+    if (!this.gameStarted) {
+      this.gameStarted = true;
+      let duration = 1000;
+      this.gameOverTimer = setInterval(() => {
+        this.countdown--;
+        io.emit('setGameTimer', this.countdown);
+        if (this.countdown === 0) {
+          this.stopTimers(lobby);
+          this.resetGame(lobby, io);
+          io.emit('endGame');
+        }
+      }, duration);
+    }
   }
 
   resetGame(lobby) {
+    this.countdown = this.gameLength;
+    this.gameStarted = false;
+    this.powerupAdded = false;
     lobby.gameActive = false;
     lobby.gameReady = false;
     var gameWorld = this;
@@ -283,26 +307,32 @@ module.exports = class GameWorld {
   }
 
   addPowerups(io) {
-    let duration = this.randomInt(5000, 15000);
-    io.emit('addPowerup', this.entities.powerups[0].x, this.entities.powerups[0].y);
-    this.powerupTimer = setInterval(() => {
-      this.updateEntityPosition("powerups", 0);
-      if (this.entities.powerups[0].visible) {
-        this.entities.powerups[0].visible = false;
-      } else {
-        this.entities.powerups[0].visible = true;
-      }
-      io.emit('updatePowerup', this.entities.powerups[0].visible, this.entities.powerups[0].x, this.entities.powerups[0].y);
-    }, duration);
+    if(!this.powerupAdded){
+      this.powerupAdded = true;
+    if (this.entities.powerups[0] != null) {
+      let duration = this.randomInt(5000, 15000);
+      io.emit('addPowerup', this.entities.powerups[0].x, this.entities.powerups[0].y);
+      this.powerupTimer = setInterval(() => {
+        this.updateEntityPosition("powerups", 0);
+        if (this.entities.powerups[0].visible) {
+          this.entities.powerups[0].visible = false;
+        } else {
+          this.entities.powerups[0].visible = true;
+        }
+        io.emit('updatePowerup', this.entities.powerups[0].visible, this.entities.powerups[0].x, this.entities.powerups[0].y);
+      }, duration);
+    }}
   }
 
   updateEntityPosition(entityType, id) {
-    let location = this.initialEntityPosition(this.tilemap)
-    this.entities[entityType][id].x = location.worldX;
-    this.entities[entityType][id].y = location.worldY;
-    if (entityType === "players") {
-      this.entities.players[id].expectedPosition.x = location.worldX;
-      this.entities.players[id].expectedPosition.y = location.worldY;
+    if (this.entities[entityType][id] != null) {
+      let location = this.initialEntityPosition(this.tilemap)
+      this.entities[entityType][id].x = location.worldX;
+      this.entities[entityType][id].y = location.worldY;
+      if (entityType === "players") {
+        this.entities.players[id].expectedPosition.x = location.worldX;
+        this.entities.players[id].expectedPosition.y = location.worldY;
+      }
     }
   }
 
@@ -320,7 +350,7 @@ module.exports = class GameWorld {
   }
 
   stopTimers(lobby) {
-    clearTimeout(this.gameOverTimer);
+    clearInterval(this.gameOverTimer);
     clearInterval(this.powerupTimer);
     clearInterval(lobby.AIUpdateTimer);
   }
