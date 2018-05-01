@@ -40,6 +40,11 @@ class SceneController {
       game.gameWorld = new GameWorld();
       client.addClientToServer();
     }
+    if (screen == "Lobby") {
+      for (var i = 1; i <= 4; i++) {
+        this.setObjectVisibility(`player${i}_ready`, false);
+      }
+    }
   }
 
   createText(name, ui, x, y, string, size, colour = '#fff') {
@@ -89,10 +94,11 @@ class SceneController {
     });
   }
 
-  createSprite(name, ui, x, y, width, height, image) {
+  createSprite(name, ui, x, y, width, height, image, visibility = true) {
     var sprite = game.add.sprite(x, y, image);
     sprite.width = width;
     sprite.height = height;
+    sprite.visible = visibility;
     this.elements.push({
       name: name,
       ui: ui,
@@ -155,6 +161,7 @@ class SceneController {
       var y = (i <= 2) ? game.height * 0.31 : game.height * 0.55;
       this.createSprite(`player${i}_lobby`, "Lobby", x, y, 48, 48, `ghost${i}`);
       this.createText(`player${i}_name`, "Lobby", x - 18, y + 85, `Player${i}`, 20);
+      this.createSprite(`player${i}_ready`, "Lobby", x - 10, y - 10, 16, 21, "tick");
       if (client.getID() == i) {
         this.createText('youAre', "Lobby", game.width * 0.18, game.height * 0.34, 'You Are', 16);
         this.createText('playerAssigned', "Lobby", game.width * 0.16, 420, `Player${i}`, 30);
@@ -177,6 +184,10 @@ class SceneController {
         clearInterval(this.lobbyTimer);
       }
     }, 1000);
+  }
+
+  lobbyPlayerReady(id) {
+    this.setObjectVisibility(`player${id}_ready`, true);
   }
 
   addLobbyCountdown() {

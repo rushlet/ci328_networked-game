@@ -30,6 +30,7 @@ function preload() {
   game.load.image('lobby', 'assets/img/lobby1.png');
   game.load.image('temp-game-over', 'assets/img/temp-game-over.png');
   game.load.image('lobby-countdown-bg', 'assets/img/timer-bg.png');
+  game.load.image('tick', 'assets/img/tick.png');
   // buttons
   game.load.image('button-menu', 'assets/img/buttons/button-menu.png');
   game.load.image('button-ready', 'assets/img/buttons/button-ready.png');

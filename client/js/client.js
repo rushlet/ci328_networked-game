@@ -148,6 +148,10 @@ class Client {
       this.socket.on('setLobbyScreen', function(){
         sceneController.setScreen("Lobby");
       })
+
+      this.socket.on('playerReady', function(id){
+        sceneController.lobbyPlayerReady(id);
+      })
   }
 
 

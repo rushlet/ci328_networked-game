@@ -42,7 +42,7 @@ function main() {
     client.on('playerReady', function() {
       console.log("Client " + client.user.id + " is ready");
       client.user.isReady = true;
-      console.log(lobby);
+      io.emit('playerReady', client.user.id);
       if (lobby.checkAllReady() === true) {
         var hero = gameWorld.chooseHero();
         io.emit('heroChosen', hero);
