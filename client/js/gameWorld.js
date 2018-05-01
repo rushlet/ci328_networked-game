@@ -50,4 +50,9 @@ class GameWorld {
       sceneController.setObjectVisibility("PowerupText", false);
     }, 2000);
   }
+
+  playSoundEffect(type) {
+    game.music[type].play();
+    console.log('play ', type);
+  }
 }

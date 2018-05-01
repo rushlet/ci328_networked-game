@@ -177,6 +177,7 @@ module.exports = class GameWorld {
     var location = this.initialEntityPosition(tilemap);
     this.updateEntityPosition("dots", id);
     io.emit('updateDots', this.getArrayOfEntityType('dots'));
+    io.emit('playSoundEffect', 'dots');
     this.entities.players[player.id].score += 2 * player.powerups.pointMultiplier;
   }
 
@@ -188,11 +189,13 @@ module.exports = class GameWorld {
       this.updateEntityPosition("players", id)
       io.emit('move', this.entities.players[id]);
       io.emit('updateHero', this.getArrayOfEntityType('players'));
+      io.emit('playSoundEffect', 'players');
     } else if (!this.entities.players[id].hero && player.hero) {
       this.entities.players[id].hero = true;
       this.entities.players[id].score += 4 * player.powerups.pointMultiplier;
       this.entities.players[player.id].hero = false;
       io.emit('updateHero', this.getArrayOfEntityType('players'));
+      io.emit('playSoundEffect', 'players');
     }
   }
 
@@ -202,6 +205,7 @@ module.exports = class GameWorld {
     let selectedPowerup = this.powerups[this.randomInt(0, this.powerups.length)];
     this.applyPowerup(selectedPowerup, player);
     io.emit('powerupCaught', selectedPowerup, player);
+    io.emit('playSoundEffect', 'powerups');
     let powerupExpire = setTimeout(() => {
       player.powerups.speedMultiplier = 1;
       player.powerups.pointMultiplier = 1;

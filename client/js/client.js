@@ -53,6 +53,10 @@ class Client {
         }
       }
     });
+
+    this.socket.on('playSoundEffect', function(type) {
+      game.gameWorld.playSoundEffect(type);
+    });
   }
 
   powerups() {
@@ -171,10 +175,14 @@ class Client {
     })
   }
 
-  setLobbyScreen() {
-    this.socket.on('setLobbyScreen', function() {
-      sceneController.setScreen("Lobby");
-    })
+  setLobbyScreen(){
+      this.socket.on('setLobbyScreen', function(){
+        sceneController.setScreen("Lobby");
+      })
+
+      this.socket.on('playerReady', function(id){
+        sceneController.lobbyPlayerReady(id);
+      })
   }
 
   // Client Emit Functions
