@@ -4,7 +4,7 @@ module.exports = class GameWorld {
 
   constructor() {
     this.gameStarted = false;
-    this.gameLength = 10;
+    this.gameLength = 150;
     this.countdown = this.gameLength;
     this.gameOverTimer;
     this.powerupAdded = false;
