@@ -29,7 +29,7 @@ function main() {
       if (!stillPlaying) {
         gameWorld.stopTimers(lobby);
         gameWorld.resetGame(lobby);
-      } else {
+      } else if(!lobby.gameActive) {
         io.emit('setLobbyScreen', lobby.users);
       }
     });
