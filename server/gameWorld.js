@@ -152,8 +152,7 @@ module.exports = class GameWorld {
     var gameWorld = this;
     var entities = this.entities;
     var tilemap = this.tilemap;
-    let collision = "false";
-    Object.keys(entities).forEach(function(type) {
+     Object.keys(entities).forEach(function(type) {
       Object.keys(entities[type]).forEach(function(id) {
         if (player != entities[type][id]) {
           if (player.x === entities[type][id].x && player.y === entities[type][id].y) {
@@ -193,7 +192,6 @@ module.exports = class GameWorld {
 
   powerupCollision(id, io, player) {
     this.entities.powerups[0].visible = false;
-    var random = this.randomInt(0, this.powerups.length - 1);
     let selectedPowerup = this.powerups[this.randomInt(0, this.powerups.length)];
     this.applyPowerup(selectedPowerup, player);
     io.emit('powerupCaught', selectedPowerup, player);

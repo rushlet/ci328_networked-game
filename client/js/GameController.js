@@ -90,10 +90,6 @@ function cleanUp(){
   sceneController.cleanUpLobby();
 }
 
-function getCoordinates(pointer) {
-  client.sendClick(pointer.worldX, pointer.worldY);
-}
-
 function addNewPlayer(id, x, y) {
   game.playerMap[id] = game.add.sprite(x, y, `ghost${id}`);
   game.playerMap[id].speedMultiplier = 1;

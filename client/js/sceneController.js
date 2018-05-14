@@ -17,7 +17,6 @@ class SceneController {
       sceneController.setObjectVisibility("button-ready", false);
       sceneController.updateEntityPosition("button-ready", 0, 0);
     }, null);
-
     //LobbyFull UI
     this.createSprite("splash-lobby", "LobbyFull", 0, 0, 1280, 800, "splash");
     this.createText("LobbyFullText", "LobbyFull", game.width / 2 - 125, game.height * 0.65, "The lobby is full!", 36);
@@ -25,9 +24,6 @@ class SceneController {
     this.addEvent("button-back", function() {
       sceneController.setScreen("MainMenu");
     }, null);
-
-    // In Game UI
-
     // Game Active UI
     this.createSprite("splash-gameActive", "GameActive", 0, 0, 1280, 800, "splash");
     this.createText("gameActiveText", "GameActive", game.width / 2 - 265, game.height * 0.65, "The game is running, please wait", 36);

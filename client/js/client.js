@@ -24,7 +24,6 @@ class Client {
           addNewPlayer(data[i].id, data[i].x, data[i].y);
         }
         client.move();
-        client.remove();
       }
     });
   }
@@ -97,12 +96,6 @@ class Client {
       if (client.ID != null) {
         movePlayer(data.id, data.expectedPosition.x, data.expectedPosition.y, data.direction);
       }
-    });
-  }
-
-  remove() {
-    this.socket.on('remove', function(id) {
-      removePlayer(id);
     });
   }
 
