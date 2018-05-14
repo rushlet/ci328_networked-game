@@ -1,7 +1,22 @@
 .container {
-  margin-top: 24px;
+  margin: 24px auto;
+  font-family: sans-serif;
 }
 .container canvas {
   margin: auto;
   display: block;
+}
+
+.instructions {
+  max-width: 700px;
+  display: block;
+  margin: auto;
+}
+
+p {
+  line-height: 1.5;
+}
+
+h1 {
+  text-align: center;
 }
