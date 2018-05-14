@@ -124,7 +124,7 @@ function movePlayer(id, targetX, targetY, direction) {
   var player = game.playerMap[id];
   (direction == "left") ? game.playerMap[id].animations.play('left', 3): game.playerMap[id].animations.play('right', 3);
   var tween = game.add.tween(player);
-  var duration = 320 / player.speedMultiplier;
+  var duration = 280 / player.speedMultiplier;
   tween.to({
     x: targetX,
     y: targetY
