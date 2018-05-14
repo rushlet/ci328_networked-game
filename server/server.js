@@ -47,6 +47,7 @@ function main() {
         client.user.isReady = true;
         io.emit('playerReady', client.user.id);
         if (lobby.checkAllReady() === true) {
+          gameWorld.resetGame(lobby);
           if (!lobby.gameActive) {
             var hero = gameWorld.chooseHero();
           }
