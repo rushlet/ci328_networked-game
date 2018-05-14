@@ -184,7 +184,13 @@ class SceneController {
   }
 
   updateLobby(hero) {
-    this.updateSprite(`player${hero.id}_lobby`, `frog${hero.id}`);
+    for (var i = 0; i < 4; i++) {
+      if (i === hero.id) {
+        this.updateSprite(`player${hero.id}_lobby`, `frog${hero.id}`);
+      } else {
+        this.updateSprite(`player${i}_lobby`, `ghost${i}`);
+      }
+    }
     this.setObjectVisibility(`button-bg`, false);
     this.setObjectVisibility(`LobbyReadyText`, false);
     this.addLobbyCountdown();
